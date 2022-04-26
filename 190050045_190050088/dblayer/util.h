@@ -6,4 +6,4 @@ char *trim(char *str);
 
 int split(char *buf, char *delim, char **tokens);
 
-Schema *parseSchema(char *buf);
+Schema_ *parseSchema(char *buf);

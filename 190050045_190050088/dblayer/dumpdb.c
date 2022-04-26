@@ -12,7 +12,7 @@
 
 void
 printRow(void *callbackObj, RecId rid, byte *row, int len) {
-    Schema *schema = (Schema *) callbackObj;
+    Schema_ *schema = (Schema_ *) callbackObj;
     // +2 because the first 2 bytes store the length of the record
     byte *cursor = row+2;
     // UNIMPLEMENTED;
@@ -58,7 +58,7 @@ printRow(void *callbackObj, RecId rid, byte *row, int len) {
 #define INDEX_NAME "data.db.0"
 	 
 void
-index_scan(Table *tbl, Schema *schema, int indexFD, int op, int value) {
+index_scan(Table_ *tbl, Schema_ *schema, int indexFD, int op, int value) {
     // UNIMPLEMENTED;
     /*
     Open index ...
@@ -85,8 +85,8 @@ index_scan(Table *tbl, Schema *schema, int indexFD, int op, int value) {
 int
 main(int argc, char **argv) {
     char *schemaTxt = "Country:varchar,Capital:varchar,Population:int";
-    Schema *schema = parseSchema(schemaTxt);
-    Table *tbl;
+    Schema_ *schema = parseSchema(schemaTxt);
+    Table_ *tbl;
 
     // UNIMPLEMENTED;
     Table_Open(DB_NAME, schema, false, &tbl);

@@ -18,61 +18,7 @@
 #define INDEX_NAME "data.db.0"
 #define CSV_NAME "data.csv"
 
-
-/*
-Takes a schema, and an array of strings (fields), and uses the functionality
-in codec.c to convert strings into compact binary representations
- */
-int
-encode(Schema *sch, char **fields, byte *record, int spaceLeft) {
-    // for each field
-    //    switch corresponding schema type is
-    //        VARCHAR : EncodeCString
-    //        INT : EncodeInt
-    //        LONG: EncodeLong
-    // return the total number of bytes encoded into record
-    int bytes_encoded = 0;
-    for ( int i = 0; i < sch->numColumns; ++i )
-    {
-        switch ( sch->columns[i]->type )
-        {
-            case VARCHAR:
-            {
-                int len = EncodeCString(fields[i], record, spaceLeft);
-                spaceLeft -= len;
-                record += len;
-                bytes_encoded += len;
-                break;
-            }
-            case INT:
-            {
-                assert(spaceLeft >= 4);
-                EncodeInt(atoi(fields[i]), record);
-                spaceLeft -= 4;
-                record += 4;
-                bytes_encoded += 4;
-                break;
-            }
-            case LONG:
-            {
-                assert(spaceLeft >= 8);
-                EncodeLong(atol(fields[i]), record);
-                spaceLeft -= 8;
-                record += 8;
-                bytes_encoded += 8;
-                break;
-            }
-            default:
-            {
-                printf("Unknown type %d\n", sch->columns[i]->type);
-                exit(1);
-            }
-        }
-    }
-    return bytes_encoded;
-}
-
-Schema *
+Schema_ *
 loadCSV() {
     // Open csv file, parse schema
     FILE *fp = fopen(CSV_NAME, "r");
@@ -89,8 +35,8 @@ loadCSV() {
     }
 
     // Open main db file
-    Schema *sch = parseSchema(line);
-    Table *tbl;
+    Schema_ *sch = parseSchema(line);
+    Table_ *tbl;
     checkerr(Table_Open(DB_NAME, sch, true, &tbl), "Loadcsv : table open");
     AM_DestroyIndex(DB_NAME, 0);
     assert(AM_CreateIndex(DB_NAME, 0, 'i', 4) == AME_OK);

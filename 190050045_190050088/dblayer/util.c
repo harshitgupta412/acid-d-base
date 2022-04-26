@@ -43,12 +43,12 @@ split(char *buf, char *delim, char **tokens) {
     return n;
 }
 
-Schema *
+Schema_ *
 parseSchema(char *buf) {
     buf = strdup(buf);
     char *tokens[MAX_TOKENS];
     int n = split(buf, ",", tokens);
-    Schema *sch = malloc(sizeof(Schema));
+    Schema_ *sch = malloc(sizeof(Schema_));
     sch->columns = malloc(n * sizeof(ColumnDesc *));
     // strtok is terrible; it depends on global state.
     // Do one split based on ',".
