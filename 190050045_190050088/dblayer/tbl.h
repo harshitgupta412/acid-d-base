@@ -1,7 +1,7 @@
 #ifndef _TBL_H_
 #define _TBL_H_
 #include <stdbool.h>
-#include <codec.h>
+#include "codec.h"
 #define VARCHAR 1
 #define INT     2
 #define LONG    3
@@ -15,7 +15,7 @@ typedef struct {
 
 typedef struct {
     int numColumns;
-    ColumnDesc **columns; // array of column descriptors
+    ColumnDesc *columns; // array of column descriptors
 } Schema_;
 
 typedef struct {
@@ -65,7 +65,7 @@ encode(Schema_ *sch, char **fields, byte *record, int spaceLeft) {
     int bytes_encoded = 0;
     for ( int i = 0; i < sch->numColumns; ++i )
     {
-        switch ( sch->columns[i]->type )
+        switch ( sch->columns[i].type )
         {
             case VARCHAR:
             {
@@ -77,7 +77,7 @@ encode(Schema_ *sch, char **fields, byte *record, int spaceLeft) {
             }
             case INT:
             {
-                assert(spaceLeft >= 4);
+                // assert(spaceLeft >= 4);
                 EncodeInt(atoi(fields[i]), record);
                 spaceLeft -= 4;
                 record += 4;
@@ -86,7 +86,7 @@ encode(Schema_ *sch, char **fields, byte *record, int spaceLeft) {
             }
             case LONG:
             {
-                assert(spaceLeft >= 8);
+                // assert(spaceLeft >= 8);
                 EncodeLong(atol(fields[i]), record);
                 spaceLeft -= 8;
                 record += 8;
@@ -95,7 +95,7 @@ encode(Schema_ *sch, char **fields, byte *record, int spaceLeft) {
             }
             default:
             {
-                printf("Unknown type %d\n", sch->columns[i]->type);
+                printf("Unknown type %d\n", sch->columns[i].type);
                 exit(1);
             }
         }
@@ -116,12 +116,12 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
 
     for ( int i = 0; i < sch->numColumns; ++i )
     {
-        switch ( sch->columns[i]->type )
+        switch ( sch->columns[i].type )
         {
             case VARCHAR:
             {
                 short string_len = DecodeShort(cursor);
-                char x[len];
+                char* x = (char*)malloc(len + 1);
                 int strlen = DecodeCString(cursor, x, len)+2;
                 cursor += strlen;
                 bytes_decoded += strlen;
@@ -134,7 +134,7 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
             case INT:
             {
                 fields[i] = (char*)malloc(sizeof(int));
-                fields[i] = DecodeInt(cursor);
+                memcpy(fields[i],cursor, 4);
                 cursor += 4;
                 bytes_decoded += 4;
                 len -= 4;
@@ -143,7 +143,7 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
             case LONG:
             {
                 fields[i] = (char*)malloc(sizeof(long));
-                fields[i] = DecodeLong(cursor);
+                memcpy(fields[i],cursor, 8);
                 cursor += 8;
                 bytes_decoded += 8;
                 len -= 8;
@@ -151,7 +151,7 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
             }
             default:
             {
-                printf("Unknown type %d\n", sch->columns[i]->type);
+                printf("Unknown type %d\n", sch->columns[i].type);
                 exit(1);
             }
         }

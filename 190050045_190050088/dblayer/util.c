@@ -73,7 +73,7 @@ parseSchema(char *buf) {
 	    exit(EXIT_FAILURE);
 	}
 	cd->type = itype;
-	sch->columns[i] = cd;
+	sch->columns[i] = *cd;
     }
     free(buf);
     return sch;

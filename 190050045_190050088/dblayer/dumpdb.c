@@ -18,7 +18,7 @@ printRow(void *callbackObj, RecId rid, byte *row, int len) {
     // UNIMPLEMENTED;
     // len is the record length, we decrement it to keep a track of remaining space 
     for(int i = 0; i < schema -> numColumns; i++){
-        if((schema -> columns[i]) -> type == INT){
+        if((schema -> columns[i]) .type == INT){
             if(i != schema -> numColumns-1){
                 printf("%d,", DecodeInt(cursor));
             }
@@ -28,7 +28,7 @@ printRow(void *callbackObj, RecId rid, byte *row, int len) {
             cursor += 4;
             len -= 4;
         }
-        else if((schema -> columns[i]) -> type == VARCHAR){
+        else if((schema -> columns[i]).type == VARCHAR){
             short string_len = DecodeShort(cursor);
             char x[len];
             int str_len = DecodeCString(cursor, x, len)+2;
