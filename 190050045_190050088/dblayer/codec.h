@@ -21,3 +21,11 @@ EncodeCString(char *str, byte *bytes, int max_len);
 
 int
 DecodeCString(byte *bytes, char *str, int max_len);
+
+int
+DecodeCString2(byte *bytes, char *str, int max_len);
+
+int
+EncodeFloat(float i, byte *bytes);
+float
+DecodeFloat(byte *bytes);

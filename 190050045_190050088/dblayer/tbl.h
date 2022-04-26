@@ -5,7 +5,7 @@
 #define VARCHAR 1
 #define INT     2
 #define LONG    3
-
+#define FLOAT   4
 typedef char byte;
 
 typedef struct {
@@ -93,6 +93,15 @@ encode(Schema_ *sch, char **fields, byte *record, int spaceLeft) {
                 bytes_encoded += 8;
                 break;
             }
+            case FLOAT:
+            {
+                // assert(spaceLeft >= 4);
+                EncodeFloat(atof(fields[i]), record);
+                spaceLeft -= 4;
+                record += 4;
+                bytes_encoded += 4;
+                break;
+            }
             default:
             {
                 printf("Unknown type %d\n", sch->columns[i].type);
@@ -149,6 +158,15 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
                 len -= 8;
                 break;
             }
+            case FLOAT:
+            {
+                fields[i] = (char*)malloc(sizeof(float));
+                memcpy(fields[i],cursor, 4);
+                cursor += 4;
+                bytes_decoded += 4;
+                len -= 4;
+                break;
+            }
             default:
             {
                 printf("Unknown type %d\n", sch->columns[i].type);
@@ -157,5 +175,43 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
         }
     }
     return bytes_decoded;
+}
+
+char* getNthfield(char* record, int n, Schema_* sch)
+{
+    char* cursor = record + 2;
+    for (int i = 0; i < n; ++i)
+    {
+        switch (sch->columns[i].type)
+        {
+            case VARCHAR:
+            {
+                short string_len = DecodeShort(cursor);
+                cursor += string_len + 2;
+                break;
+            }
+            case INT:
+            {
+                cursor += 4;
+                break;
+            }
+            case LONG:
+            {
+                cursor += 8;
+                break;
+            }
+            case FLOAT:
+            {
+                cursor += 4;
+                break;
+            }
+            default:
+            {
+                printf("Unknown type %d\n", sch->columns[i].type);
+                exit(1);
+            }
+        }
+    }
+    return cursor;
 }
 #endif

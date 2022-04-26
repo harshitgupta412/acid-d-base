@@ -103,6 +103,18 @@ DecodeCString(byte *bytes, char *str, int max_len) {
     return len;
 }
 
+int 
+DecodeCString2(byte *bytes, char *str, int max_len) {
+    int len = DecodeShort(bytes);
+    str = (char*) malloc(len*sizeof(char));
+    if (len + 1 > max_len) { // account for null terminator.
+	len = max_len - 1; 
+    }
+    memcpy(str, bytes+2, len);
+    str[len] = '\0';
+    return len;
+}
+
 
 int
 stricmp(char const *a, char const *b)
@@ -112,6 +124,26 @@ stricmp(char const *a, char const *b)
         if (d != 0 || !*a)
             return d;
     }
+}
+
+typedef union {
+    float i;
+    byte  bytes[4];
+} FloatBytes;
+
+int
+EncodeFloat(float i, byte *bytes) {
+    FloatBytes ib;
+    ib.i = i;
+    memcpy(bytes, ib.bytes, 4);
+    return 4;
+}
+
+float
+DecodeFloat(byte *bytes) {
+    IntBytes ib;
+    memcpy(ib.bytes, bytes, 4);
+    return ib.i;
 }
 
 /*

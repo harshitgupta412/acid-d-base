@@ -255,6 +255,8 @@ Table_Search(Table_ *tbl, int pk_index[], char* pk_value[], int numAttr) {
     }
     else
         checkerr(err, "Table_ scan : get first page");
+
+    return -1;
 }
 
 
