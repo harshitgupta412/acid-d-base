@@ -1,5 +1,5 @@
 
-CC=cc
+CC=gcc-11
 CFLAGS = -g
 
 OBJS=am.o amfns.o amsearch.o aminsert.o amstack.o amglobals.o amscan.o amprint.o misc.o

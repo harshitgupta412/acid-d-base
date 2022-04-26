@@ -1,7 +1,7 @@
 # Uncomment to enable 'American Fuzzy Lop' for fuzz testing
 #CC=afl-clang
 
-CC=cc
+CC=gcc-11
 CFLAGS = -g
 #PUBLICDIR= /usr0/cs564/public/project
 SRC= buf.c hash.c pf.c

@@ -1,4 +1,5 @@
 #include "tbl.h"
+typedef char byte;
 
 int
 EncodeInt(int i, byte *bytes);
