@@ -54,10 +54,13 @@ class Table {
     public:
 
     Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes): schema(*_schema) {
-        name += db_name;
+        name += db_name + ".";
         name += table_name;
         name += ".tbl";
-        Table_Open((char*)name.c_str(), &_schema->getSchema(), overwrite, &table);
+        if(Table_Open((char*)name.c_str(), &_schema->getSchema(), overwrite, &table)== -1){
+            std::cout << "Error opening table " << name << std::endl;
+            exit(1);
+        }
         std::vector<int> _pk = _schema->getpk();
         pk_index = new int[_pk.size()];
         for(int i=0; i<_pk.size(); i++) {
