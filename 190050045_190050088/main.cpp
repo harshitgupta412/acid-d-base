@@ -168,7 +168,7 @@ loadCSV() {
     cout<<"deleted"<<endl;
     tbl.print();
     
-    char name[] = "Zimbabwe";
+    char name[] = "Zimbabwase";
     char capital[] = "Harare";
     char pop[] = "16529904";
     void *data2[3] = {(void*)name, (void*)capital, (void*)pop};

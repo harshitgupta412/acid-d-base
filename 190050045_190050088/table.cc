@@ -58,7 +58,7 @@ void Table::deleteRow(int rowId){
             assert(err == AME_OK);
         }
         else {
-            indexes[i].fileDesc = PF_OpenFile((char*)(name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            indexes[i].fileDesc = PF_OpenFile((char*)(db_name + "." + name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
             assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
@@ -129,7 +129,7 @@ bool Table::addRow(void* data[], bool update) {
             assert(err == AME_OK);
         }
         else {
-            indexes[i].fileDesc = PF_OpenFile((char*)(name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            indexes[i].fileDesc = PF_OpenFile((char*)(db_name + "." + name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
             // std::cout<<(name + std::to_string(indexes[i].indexNo) + ".idx")<<std::endl;
             assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
@@ -159,7 +159,7 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
             assert(err == AME_OK);
         }
         else {
-            indexes[i].fileDesc = PF_OpenFile((char*)(name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            indexes[i].fileDesc = PF_OpenFile((char*)(db_name + "." + name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
             assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
@@ -171,7 +171,7 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
 }
 
 std::string Table::get_name(){
-    return this->name;
+    return db_name + "." + this->name;
 }
 void print_row(void* callbackObj, int rid, byte* row, int len) {
     Schema_ *schema = (Schema_ *) callbackObj;
@@ -301,9 +301,9 @@ int Table::createIndex(std::vector<int> cols) {
                 exit(1);
         }
     }
-    int err = AM_CreateIndex((char*)name.c_str(), index.indexNo, index.attrType, index.attrLen, index.numCols);
+    int err = AM_CreateIndex((char*)(db_name + "." + name).c_str(), index.indexNo, index.attrType, index.attrLen, index.numCols);
     if(err == AME_PF) {
-        int fd = PF_OpenFile((char*)(name + "." + std::to_string(index.indexNo) + ".idx").c_str());
+        int fd = PF_OpenFile((char*)(db_name + "." + name + "." + std::to_string(index.indexNo) + ".idx").c_str());
         if(fd >= 0) {
             PF_CloseFile(fd);
         }
@@ -319,7 +319,7 @@ int Table::createIndex(std::vector<int> cols) {
 bool Table::eraseIndex(int id) {
     for(int i=0; i<indexes.size(); i++) {
         if(indexes[i].indexNo == id) {
-            assert(AM_DestroyIndex((char*)name.c_str(), id) == AME_OK);
+            assert(AM_DestroyIndex((char*)(db_name + "." + name).c_str(), id) == AME_OK);
             indexes.erase(indexes.begin() + i);
             return true;
         }
