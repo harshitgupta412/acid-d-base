@@ -39,6 +39,8 @@ class Schema {
     std::vector<int> getpk();
 
     std::string encodeSchema();
+
+    void print();
 };
 
 Schema decodeSchema(char * s, int max_len, int* length = NULL);

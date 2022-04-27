@@ -7,10 +7,14 @@ using namespace std;
 int main(){
     cout<<"Start"<<endl;
     std::vector<std::pair<std::string, int> > cols; 
-    cols.push_back(make_pair("ID", 0));
-    cols.push_back(make_pair("DB", 1));
+    cols.push_back(make_pair("ID", INT));
+    cols.push_back(make_pair("DB", INT));
+    cols.push_back(make_pair("DB1", INT));
+    cols.push_back(make_pair("DB2", INT));
     vector<int> pk;
     pk.push_back(0);
+    pk.push_back(1);
+    pk.push_back(1);
     pk.push_back(1);
     cout<<"Creating table"<<endl;
     Schema s = Schema(cols, pk);
@@ -19,14 +23,6 @@ int main(){
     cout<<x.size()<<' '<<x<<endl;
     Schema d = decodeSchema((char*)x.c_str(),x.size());
     cout<<"decoded"<<endl;
-    vector<int> v = d.getpk();
-    for (int x: v){
-        cout << x << endl;
-    }
-    Schema_ s_ = d.getSchema();
-    cout<<s_.numColumns<<endl;
-    for(int i=0; i< s_.numColumns; i++) {
-        cout<<s_.columns[i].name<<' '<<s_.columns[i].type<<endl;
-    }
+    d.print();  
     return 0;
 }
