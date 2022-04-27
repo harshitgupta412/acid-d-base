@@ -263,8 +263,12 @@ Table::~Table() {
 
 std::string Table::encodeTable() {
     std::string str;
-    char* r = new char[name.size() + 2];
-    int len = EncodeCString((char*)name.c_str(), r, name.size()+2);
+    char* r = new char[db_name.size() + 2];
+    int len = EncodeCString((char*)db_name.c_str(), r, db_name.size()+2);
+    str.append(r,len);
+    free(r);
+    r = new char[name.size() + 2];
+    len = EncodeCString((char*)name.c_str(), r, name.size()+2);
     str.append(r,len);
     free(r);
     str += schema.encodeSchema();
@@ -293,12 +297,21 @@ std::string Table::encodeTable() {
 Table decodeTable(byte* s, int max_len ) {
     char* r;
     int len = DecodeCString2(s, &r, max_len);
+    std::string db_name(r,len);
+    std::cout<<len<<std::endl;
+    free(r);
+    s += len+2;
+    len = DecodeCString2(s, &r, max_len);
+    std::cout<<len<<std::endl;
     std::string name(r,len);
     free(r);
-    s += len;
+    s += len+2;
     Schema schema = decodeSchema(s, max_len, &len);
+    std::cout<<name<<' '<<db_name<<std::endl;
+    schema.print();
     s+=len;
     int num_indexes = DecodeInt(s);
+    std::cout<<num_indexes<<std::endl;
     s += sizeof(int);
     std::vector<IndexData> indexes(num_indexes);
     for(int i=0; i<num_indexes; i++) {
@@ -309,5 +322,5 @@ Table decodeTable(byte* s, int max_len ) {
         indexes[i].attrLength= DecodeInt(s);
         s += sizeof(int);
     }
-    return Table(&schema,(char*)name.substr(name.find('.'),name.size()).c_str() , (char*)name.substr(0, name.find('.')).c_str(), false, indexes);
+    return Table(&schema, (char*)name.c_str(), (char*)db_name.c_str(), false, indexes);
 }
