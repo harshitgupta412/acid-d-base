@@ -9,20 +9,11 @@ using namespace std;
 User::User(string username, string password){
     uname = username;
     user_table_name = "DB_USER_TABLE";
-    char* user_db_name = "DB_USER_DB";
     status = true;
     is_admin = false;
 
-    std::vector<std::pair<std::string, int> > cols;
-    cols.push_back({"username", VARCHAR});
-    cols.push_back({"password", LONG});
-    cols.push_back({"admin", INT});
-    vector<int> pk = {0};
-
-    schema = new Schema(cols, pk);
-    vector<IndexData> vi;
-
-    user_table = new Table(schema, (char*) user_table_name.c_str(), user_db_name, false, vi);
+    user_table = connectUserTable();
+    // user_table->print();
 
     char *user = new char[username.length()];
     strcpy(user,username.c_str());
@@ -33,42 +24,171 @@ User::User(string username, string password){
 
     if (data == NULL) {
         status = false;
+        user_table->close();
         return;
     }
-    int pass = DecodeLong((char*)data[1]);
+    long pass = DecodeLong((char*)data[1]);
     hash<string> hasher;
-
     long hashedPasswordGuess = hasher(password);
 
     if (hashedPasswordGuess != pass){
+        std::cout << "Incorrect username or password" << std::endl;
         status = false;
+        user_table->close();
         return;
     }
     is_admin = (bool) DecodeInt((char*)data[2]);
-
+    user_table->close();
 }
 
 bool User::isAdmin() {
     return is_admin;
 }
+bool User::get_status() {
+    return status;
+}
 bool User::addUser(std::string username, std::string password){
-    if (!is_admin) return false;
+    if (!is_admin || username == "SUPERUSER") return false;
 
     char user[username.length()];
     strcpy(user,username.c_str());
 
-    char pass[password.length()];
-    strcpy(pass,password.c_str());
+    hash<string> hasher;
+    std::string pass = std::to_string(hasher(password));
+    char* passCh = new char[pass.length() + 1];
+    strcpy(passCh, pass.c_str());
     
     void* data[3];
-    bool* is_admin = new bool;
-    *is_admin = false;
-    data[0] = (void*) user; data[1] = (void*) pass; data[2] = (void*) is_admin;
+    char is_admin[] = "0";
+    data[0] = (void*) user; data[1] = (void*) passCh; data[2] = (void*) is_admin;
 
-    return user_table->addRow(data, true);
-
+    user_table = connectUserTable();
+    bool ret = user_table->addRow(data, true);
+    user_table->close();
+    return ret;
 }
 
 std::string User::get_user() {
     return uname;
+}
+
+bool User::assignPerm(User& user, std::string dbName, int perm) {
+    if (!is_admin) return false;
+
+    Table* user_table = connectUserPrivDb();
+    if (perm < 0 || perm > 2) return false;
+
+    void* data[3];
+    data[0] = (void*) user.uname.c_str();
+    data[1] = (void*) dbName.c_str();
+    data[2] = (void*) std::to_string(perm).c_str();
+
+    bool ret = user_table->addRow(data,true);
+    user_table->print();
+    user_table->close();
+    return ret;
+}   
+
+bool User::assignPerm(User& user, std::string dbName, std::string tableName, int perm) {
+    if (!is_admin) return false;
+
+    Table* user_table = connectUserPrivTable();
+    if (perm < 0 || perm > 2) return false;
+
+    void* data[4];
+    data[0] = (void*) user.uname.c_str();
+    data[1] = (void*) dbName.c_str();
+    data[2] = (void*) tableName.c_str();
+    data[3] = (void*) std::to_string(perm).c_str();
+
+    bool ret = user_table->addRow(data,true);
+    user_table->print();
+    user_table->close();
+    return ret;
+}   
+
+Table* connectUserTable() {
+    // Create table of users
+    char user_table_name[] = "DB_USER_TABLE";
+    char user_db_name[] = "DB_USER_DB";
+
+    std::vector<std::pair<std::string, int> > cols;
+    cols.push_back({"username", VARCHAR});
+    cols.push_back({"password", LONG});
+    cols.push_back({"admin", INT});
+    vector<int> pk = {0};
+
+    Schema* schema = new Schema(cols, pk);
+    vector<IndexData> vi;
+    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi);
+    return user_table;
+}
+
+Table* connectUserPrivTable() {
+    // Create user privileges for table
+    char user_table_name[] = "DB_USER_PRIV_TABLE";
+    char user_db_name[] = "DB_USER_DB";
+
+    std::vector<std::pair<std::string, int> > cols;
+    cols.push_back({"username", VARCHAR});
+    cols.push_back({"DBNAME", VARCHAR});
+    cols.push_back({"TABLE", VARCHAR});
+    cols.push_back({"PRIV_LEVEL", INT});
+    // vector<int> pk = {0,1,2};
+    vector<int> pk = {0};
+
+    Schema* schema = new Schema(cols, pk);
+    vector<IndexData> vi;
+    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi);
+    return user_table;
+}
+
+Table* connectUserPrivDb() {
+    // Create user privileges for db
+    char user_table_name[] = "DB_USER_PRIV_DB";
+    char user_db_name[] = "DB_USER_DB";
+
+    std::vector<std::pair<std::string, int> > cols;
+    cols.push_back({"username", VARCHAR});
+    cols.push_back({"DBNAME", VARCHAR});
+    cols.push_back({"PRIV_LEVEL", INT});
+    // vector<int> pk = {0,1};
+    vector<int> pk = {0};
+
+    Schema* schema = new Schema(cols, pk);
+    vector<IndexData> vi;
+    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi);
+    return user_table;
+}
+
+bool createUserDb() {
+    Table* user_table = connectUserTable();
+
+    char username[] = "SUPERUSER";
+    hash<string> hasher;
+    long passLong = hasher("SUPERUSER_PASSWORD");
+    string pass = std::to_string(passLong);
+    char* password = new char[pass.length() + 1];
+    strcpy(password, pass.c_str());
+    char admin[] = "1";
+
+    void* data[3];
+    data[0] = (void*) username;
+    data[1] = (void*) password;
+    data[2] = (void*) admin;
+    bool ret =  user_table->addRow(data,true);
+    user_table->close();
+    return ret;
+}
+
+void createPrivilegeTable() {
+    // Create user privileges for a given table
+    Table* user_table = connectUserPrivTable();
+    user_table->close();
+}
+
+
+void createPrivilegeDb() {
+    Table* user_table = connectUserPrivDb();
+    user_table->close();
 }

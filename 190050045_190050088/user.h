@@ -19,14 +19,21 @@ class User {
 
     User(std::string username, std::string password);
 
+    bool get_status();
     bool isAdmin();
     bool addUser(std::string username, std::string password);
     std::string get_user();
-    // bool User::assignPerm(User& user, Database& db, int perm);
-    // bool User::assignPerm(User& user, Table& tbl, int perm);
-
+    bool assignPerm(User& user, std::string dbName, int perm);
+    bool assignPerm(User& user, std::string dbName, std::string tableName, int perm);
     
 };
 
+Table* connectUserTable();
+Table* connectUserPrivTable();
+Table* connectUserPrivDb();
+
+bool createUserDb();
+void createPrivilegeTable();
+void createPrivilegeDb();
 
 #endif

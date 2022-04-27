@@ -18,7 +18,6 @@ Schema::Schema(std::vector<std::pair<std::string, int> > cols, std::vector<int> 
         schema->columns[i].type = cols[i].second;
     }
     pk = _pk;
-    pk.insert(pk.begin(),0);
 }
 
 Schema::Schema(Schema_ *sch, std::vector<int> _pk) {
