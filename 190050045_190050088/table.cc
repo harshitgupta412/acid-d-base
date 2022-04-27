@@ -106,12 +106,29 @@ bool Table::addRow(void* data[], bool update) {
 std::string Table::get_name(){
     return this->name;
 }
+
 void print_row(void* callbackObj, int rid, byte* row, int len) {
     Schema_ *schema = (Schema_ *) callbackObj;
-    void** data = new void*[schema->numColumns];
-    decode(schema, (char**)data, row, len);
+    char* data[schema->numColumns];
+    decode(schema, (char**)data, row+2, len);
     for(int i=0; i<schema->numColumns; i++) {
-        std::cout << data[i] << " ";
+        switch(schema->columns[i].type) {
+            case INT:
+                printf("%d\t", DecodeInt(data[i]));
+                break;
+            case FLOAT:
+                printf("%f\t", DecodeFloat(data[i]));
+                break;
+            case LONG:
+                printf("%lld\t", DecodeLong(data[i]));
+                break;
+            case VARCHAR:
+                printf("%s\t", (char*)data[i]);
+                break;
+            default:
+                printf("%s\t", (char*)data[i]);
+                break;
+        }
     }
     std::cout << std::endl;
 }
@@ -126,16 +143,19 @@ bool Table::deleteRow(void** pk) {
 void** Table::getRow(void** pk) {
     int rid = Table_Search(table, pk_index, (byte**)pk, pk_size);
     if(rid == -1) return NULL;
+    // std::cout<<rid<<std::endl;
     char record[MAX_PAGE_SIZE];
     int len = Table_Get(table, rid, record, MAX_PAGE_SIZE);
+    // std::cout<<len<<std::endl;
     void** data = new void*[schema.getSchema()->numColumns];
     Schema_ sch = *schema.getSchema();
-    decode(&sch, (char**)data, record, len);
+    decode(&sch, (char**)data, record+2, len);
     return data;
 }
 
 void Table::print() {
     Schema_ sch = *schema.getSchema();   
+    schema.print();
     Table_Scan(table, &sch, print_row);
 }
 
