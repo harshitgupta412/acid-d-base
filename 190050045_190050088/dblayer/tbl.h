@@ -11,7 +11,7 @@ typedef char byte;
 
 typedef struct {
     char *name;
-    int  type;  // one of VARCHAR, INT, LONG
+    int  type;  // one of VARCHAR, INT, LONG, FLOAT
 } ColumnDesc;
 
 typedef struct {

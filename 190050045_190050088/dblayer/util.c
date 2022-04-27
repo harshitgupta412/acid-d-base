@@ -49,7 +49,7 @@ parseSchema(char *buf) {
     char *tokens[MAX_TOKENS];
     int n = split(buf, ",", tokens);
     Schema_ *sch = malloc(sizeof(Schema_));
-    sch->columns = malloc(n * sizeof(ColumnDesc *));
+    sch->columns = malloc(n * sizeof(ColumnDesc));
     // strtok is terrible; it depends on global state.
     // Do one split based on ',".
     // Could use strtok_s for this use case
@@ -69,7 +69,7 @@ parseSchema(char *buf) {
 	} else if (stricmp(type, "long") == 0) {
 	    itype = LONG;
 	} else {
-	    fprintf(stderr, "Unknown type %s \n", type);
+	    fprintf(stderr, "Unknown type! %s \n", type);
 	    exit(EXIT_FAILURE);
 	}
 	cd->type = itype;

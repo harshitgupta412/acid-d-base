@@ -15,7 +15,7 @@
 
 
 #define DB_NAME "data.db"
-#define INDEX_NAME "data.db.0.idx"
+#define INDEX_NAME "data.db.0"
 #define CSV_NAME "data.csv"
 
 
@@ -81,11 +81,27 @@ loadCSV() {
 
     // Open main db file
     Schema_ *sch = parseSchema(line);
+    for (int i = 0; i < sch -> numColumns; i++) {
+        if (sch -> columns[i].type == VARCHAR)
+            printf("varchar,");
+        else if (sch -> columns[i].type == INT)
+            printf("int,");
+        else if (sch -> columns[i].type == LONG)
+            printf("long,");
+        else if (sch -> columns[i].type == FLOAT)
+            printf("float,");
+        else
+            printf("error");
+    }
+    printf("\n");
+    
     Table_ *tbl;
     checkerr(Table_Open(DB_NAME, sch, true, &tbl), "Loadcsv : table open");
-    // AM_DestroyIndex(DB_NAME, 0);
-    // assert(AM_CreateIndex(DB_NAME, 0, 'i', 4) == AME_OK);
-    // int index_fileDesc = PF_OpenFile(INDEX_NAME);
+    AM_DestroyIndex(DB_NAME, 0);
+    char attrType[] = {'i'};
+    int attrLen[] = {4};
+    assert(AM_CreateIndex(DB_NAME, 0, attrType, attrLen, 1) == AME_OK);
+    int index_fileDesc = PF_OpenFile(INDEX_NAME);
 
     char *tokens[MAX_TOKENS];
     char record[MAX_PAGE_SIZE];
@@ -96,9 +112,9 @@ loadCSV() {
 	assert (n == sch->numColumns);
 	int len = encode(sch, tokens, record, sizeof(record));
     char* fields[MAX_TOKENS];
-	RecId rid;
+	RecId rid = 1;
 
-    // Table_Insert(tbl, record, len, &rid);
+    Table_Insert(tbl, record, len, &rid);
 	printf("Got token: %d %s\n", rid, tokens[0]);
 
     decode(sch, fields, record, len);
@@ -106,19 +122,19 @@ loadCSV() {
     for(int i=0;i < sch->numColumns; i++) 
         printf("Check: %d %s ", i, fields[i]);
 	// Indexing on the population column 
-	// int population = atoi(tokens[2]);
+	int population = atoi(tokens[2]);
 
 	// Use the population field as the field to index on
-    // byte population_bytes[4];
-    // EncodeInt(population, population_bytes);
-	// AM_InsertEntry(index_fileDesc, 'i', 4, population_bytes, rid);
+    byte population_bytes[4];
+    EncodeInt(population, population_bytes);
+	checkerr(AM_InsertEntry(index_fileDesc, attrType, attrLen, 1, population_bytes, rid), "Loadcsv : index insert");
     }
     // Table_Close(tbl);
     // Table_Open(DB_NAME, sch, false, &tbl);
-    // Table_Scan(tbl, (void *)sch, printRow);
+    Table_Scan(tbl, (void *)sch, printRow);
     fclose(fp);
     Table_Close(tbl);
-    // checkerr(PF_CloseFile(index_fileDesc), "Loadcsv : close file");
+    checkerr(PF_CloseFile(index_fileDesc), "Loadcsv : close file");
     return sch;
 }
 

@@ -34,8 +34,9 @@ xAM_CreateIndex(
 )
 {
     int errval;
-
-    if ((errval=AM_CreateIndex(fname,indexno,attrtype,attrlen))!= AME_OK) {
+    char attrType[] = {attrtype};
+    int attrLength[] = {attrlen};
+    if ((errval=AM_CreateIndex(fname,indexno,attrType,attrLength,1))!= AME_OK) {
         printf("AM_CreateIndex(%s,%d,'%c',%d) failed: %d\n",
                fname,indexno,attrtype,attrlen,errval);
         exit(1);
@@ -69,8 +70,9 @@ xAM_InsertEntry(
 )
 {
     int errval;
-
-    if ((errval=AM_InsertEntry(fd,attrtype,attrlen,val,recid))!=AME_OK) {
+    char attrType[] = {attrtype};
+    int attrLength[] = {attrlen};
+    if ((errval=AM_InsertEntry(fd,attrType,attrLength,1,val,recid))!=AME_OK) {
         printf("AM_InsertEntry(%d,'%c',%d,val,%d) failed: %d\n",
                fd,attrtype,attrlen,RecIdToInt(recid),errval);
         exit(1);
@@ -89,8 +91,9 @@ xAM_DeleteEntry(
 )
 {
     int errval;
-
-    if ((errval=AM_DeleteEntry(fd,attrtype,attrlen,val,recid))!= AME_OK) {
+    char attrType[] = {attrtype};
+    int attrLength[] = {attrlen};
+    if ((errval=AM_DeleteEntry(fd,attrType,attrLength,1,val,recid))!= AME_OK) {
         printf("AM_DeleteEntry(%d,'%c',%d,val,%d) failed: %d\n",
                fd,attrtype,attrlen,RecIdToInt(recid),errval);
         exit(1);
@@ -108,9 +111,10 @@ xAM_OpenIndexScan(
 )
 {
     int sd;
+    char attrType[] = {attrtype};
+    int attrLength[] = {attrlen};
 
-
-    if ((sd=AM_OpenIndexScan(fd,attrtype,attrlen,op,val))<0 ) {
+    if ((sd=AM_OpenIndexScan(fd,attrType,attrLength,1,op,val))<0 ) {
         printf("AM_OpenIndexScan(%d,'%c',%d,%d,rec) failed: %d\n",
                fd,attrtype,attrlen,op,sd);
         exit(1);

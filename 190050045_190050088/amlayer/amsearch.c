@@ -10,8 +10,9 @@
 int
 AM_Search(
     int fileDesc,
-    char attrType,
-    int attrLength,
+    char attrType[],
+    int attrLength[],
+    int numCols,
     char *value,
     int *pageNum, /* page number of page where key is present or can be inserted*/
     char **pageBuf, /* pointer to buffer in memory where leaf page corresponding                                                        to pageNum can be found */
@@ -19,6 +20,11 @@ AM_Search(
 			   can be inserted */
 )
 {
+
+    int totalAttrLength = 0;
+    for (int i = 0; i < numCols; i++)
+        totalAttrLength += attrLength[i];
+
     int errVal;
     int nextPage; /* next page to be followed on the path from root to leaf*/
     int retval; /* return value */
@@ -37,20 +43,20 @@ AM_Search(
         /* if root is a leaf page */
     {
         bcopy(*pageBuf,lheader,AM_sl);
-        if (lheader->attrLength != attrLength) {
+        if (lheader->attrLength != totalAttrLength) {
             return(AME_INVALIDATTRLENGTH);
         }
 
     } else { /* root is not a leaf */
         bcopy(*pageBuf,iheader,AM_sint);
-        if (iheader->attrLength != attrLength) {
+        if (iheader->attrLength != totalAttrLength) {
             return(AME_INVALIDATTRLENGTH);
         }
     }
     /* find the leaf at which key is present or can be inserted */
     while ((**pageBuf) != 'l') {
         /* find the next page to be followed */
-        nextPage = AM_BinSearch(*pageBuf,attrType,attrLength,value,
+        nextPage = AM_BinSearch(*pageBuf,attrType,attrLength, numCols, value,
                                 indexPtr,iheader);
 
         /* push onto stack for backtracking and splitting nodes if
@@ -70,19 +76,19 @@ AM_Search(
         if (**pageBuf == 'l' ) {
             /* if next page is a leaf */
             bcopy(*pageBuf,lheader,AM_sl);
-            if (lheader->attrLength != attrLength) {
+            if (lheader->attrLength != totalAttrLength) {
                 return(AME_INVALIDATTRLENGTH);
             }
         } else {
             /* if next page is an internal node */
             bcopy(*pageBuf,iheader,AM_sint);
-            if (iheader->attrLength != attrLength) {
+            if (iheader->attrLength != totalAttrLength) {
                 return(AME_INVALIDATTRLENGTH);
             }
         }
     }
     /* find whether key is in leaf or not */
-    return(AM_SearchLeaf(*pageBuf,attrType,attrLength,value,indexPtr,lheader));
+    return(AM_SearchLeaf(*pageBuf,attrType,attrLength, numCols, value,indexPtr,lheader));
 }
 
 
@@ -90,20 +96,25 @@ AM_Search(
 int
 AM_BinSearch(
     char *pageBuf, /* buffer where the page is found */
-    char attrType,
-    int attrLength,
+    char attrType[],
+    int attrLength[],
+    int numCols,
     char *value, /* attribute value for which search is called */
     int *indexPtr,
     AM_INTHEADER *header
 )
 
 {
+    int totalAttrLength = 0;
+    for (int i = 0; i < numCols; i++)
+        totalAttrLength += attrLength[i];
+
     int low,high,mid; /* for binary search */
     int compareVal; /* result of comparison of key with value */
     int recSize; /* size in bytes of a key,ptr pair */
     int pageNum; /* page number of node to be followed along the B+ tree */
 
-    recSize = AM_si  + attrLength;
+    recSize = AM_si  + totalAttrLength;
     low = 1;
     high = header->numKeys;
 
@@ -113,7 +124,7 @@ AM_BinSearch(
 
         /* compare the value with the middle key */
         compareVal = AM_Compare(pageBuf + AM_sint + AM_si +
-                                (mid - 1)*recSize,attrType,attrLength,value);
+                                (mid - 1)*recSize,attrType,attrLength, numCols, value);
 
         if (compareVal < 0) {
             high = mid - 1 ;
@@ -132,7 +143,7 @@ AM_BinSearch(
     /* check the border cases */
     if ((high - low) == 0) {
         if(AM_Compare(pageBuf+AM_sint+AM_si +(low - 1)*recSize,attrType,
-                      attrLength, value) < 0) {
+                      attrLength, numCols, value) < 0) {
             bcopy(pageBuf+AM_sint+(low-1)*recSize,(char *)&pageNum,
                   AM_si);
             *indexPtr = low -1;
@@ -147,13 +158,13 @@ AM_BinSearch(
 
     if ((high - low) == 1) {
         if(AM_Compare(pageBuf+AM_sint+AM_si +(low - 1)*recSize,attrType,
-                      attrLength, value) < 0) {
+                      attrLength, numCols, value) < 0) {
             bcopy(pageBuf+AM_sint+(low-1)*recSize,(char *)&pageNum,
                   AM_si);
             *indexPtr = low -1;
             return(pageNum);
         } else if(AM_Compare(pageBuf+AM_sint+AM_si +low*recSize,
-                             attrType,attrLength, value) < 0) {
+                             attrType,attrLength, numCols, value) < 0) {
             bcopy(pageBuf+AM_sint+low*recSize,
                   (char *)&pageNum,AM_si);
             *indexPtr = low;
@@ -176,8 +187,9 @@ AM_BinSearch(
 int
 AM_SearchLeaf(
     char *pageBuf, /* buffer where the leaf page resides */
-    char attrType,
-    int attrLength,
+    char attrType[],
+    int attrLength[],
+    int numCols,
     char *value, /* attribute value to be compared with */
     int *indexPtr,/* pointer to the index where key is found or can be inserted */
     AM_LEAFHEADER *header
@@ -185,11 +197,15 @@ AM_SearchLeaf(
 
 
 {
+    int totalAttrLength = 0;
+    for (int i = 0; i < numCols; i++)
+        totalAttrLength += attrLength[i];
+
     int low,high,mid; /* for binary search */
     int compareVal; /* result of comparison of key with value */
     int recSize; /* size in bytes of a key,ptr pair */
 
-    recSize = AM_ss + attrLength;
+    recSize = AM_ss + totalAttrLength;
     low = 1;
     high = header->numKeys;
 
@@ -205,7 +221,7 @@ AM_SearchLeaf(
 
         /* compare value with the middle key */
         compareVal = AM_Compare(pageBuf + AM_sl + (mid - 1)*recSize,
-                                attrType,attrLength,value);
+                                attrType,attrLength, numCols, value);
 
         if (compareVal < 0) {
             high = mid - 1 ;
@@ -219,7 +235,7 @@ AM_SearchLeaf(
 
     if ((high - low) == 0) {
         compareVal = AM_Compare(pageBuf+AM_sl+(low - 1)*recSize,
-                                attrType,attrLength, value);
+                                attrType,attrLength, numCols, value);
 
 
         if (compareVal < 0) {
@@ -236,7 +252,7 @@ AM_SearchLeaf(
 
     if ((high - low) == 1) {
         compareVal = AM_Compare(pageBuf+AM_sl+(low - 1)*recSize,
-                                attrType,attrLength, value);
+                                attrType,attrLength, numCols, value);
 
         if (compareVal < 0) {
             *indexPtr = low;
@@ -246,7 +262,7 @@ AM_SearchLeaf(
             return(AM_FOUND);
         } else {
             compareVal = AM_Compare(pageBuf+AM_sl+low*recSize,
-                                    attrType, attrLength, value);
+                                    attrType, attrLength, numCols, value);
 
             if (compareVal < 0) {
                 *indexPtr = low + 1;
@@ -272,41 +288,64 @@ AM_SearchLeaf(
 int
 AM_Compare(
     char *bufPtr,
-    char attrType,
-    int attrLength,
+    char attrType[],
+    int attrLength[],
+    int numCols,
     char *valPtr
 )
 
 {
     int bufint,valint;/* temporary aligned storage for comparison */
     float buffloat,valfloat;/* temporary aligned storage for comparison */
+    long buflong,vallong;/* temporary aligned storage for comparison */
 
-    switch(attrType) {
-    case 'i' : {
-        bcopy(bufPtr,(char *)&bufint,AM_si);
-        bcopy(valPtr,(char *)&valint,AM_si);
-        if (valint < bufint) {
-            return(-1);
-        } else if (valint > bufint) {
-            return(1);
-        } else {
-            return(0);
+    for (int i = 0; i < numCols; i++) {
+        switch(attrType[i]) {
+            case 'i' : {
+                bcopy(bufPtr,(char *)&bufint,AM_si);
+                bcopy(valPtr,(char *)&valint,AM_si);
+                if (valint < bufint) {
+                    return(-1);
+                } else if (valint > bufint) {
+                    return(1);
+                }
+                bufPtr += AM_si;
+                valPtr += AM_si;
+                break;
+            }
+            case 'f' : {
+                bcopy(bufPtr,(char *)&buffloat,AM_sf);
+                bcopy(valPtr,(char *)&valfloat,AM_sf);
+                if (valfloat < buffloat) {
+                    return(-1);
+                } else if (valfloat > buffloat) {
+                    return(1);
+                }
+                bufPtr += AM_sf;
+                valPtr += AM_sf;
+                break;
+            }
+            case 'l' : {
+                bcopy(bufPtr,(char *)&buflong,AM_sli);
+                bcopy(valPtr,(char *)&vallong,AM_sli);
+                if (vallong < buflong) {
+                    return(-1);
+                } else if (vallong > buflong) {
+                    return(1);
+                }
+                bufPtr += AM_sli;
+                valPtr += AM_sli;
+                break;
+            }
+            case 'c' : {
+                int res = strncmp(valPtr,bufPtr,attrLength[i]);
+                if (res != 0)
+                    return(res);
+                bufPtr += attrLength[i];
+                valPtr += attrLength[i];
+                break;
+            }
         }
-    }
-    case 'f' : {
-        bcopy(bufPtr,(char *)&buffloat,AM_sf);
-        bcopy(valPtr,(char *)&valfloat,AM_sf);
-        if (valfloat < buffloat) {
-            return(-1);
-        } else if (valfloat > buffloat) {
-            return(1);
-        } else {
-            return(0);
-        }
-    }
-    case 'c' : {
-        return(strncmp(valPtr,bufPtr,attrLength));
-    }
     }
     return 0 ; // FIX
 }

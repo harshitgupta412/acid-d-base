@@ -24,6 +24,7 @@ extern int AM_Errno; /* last error in AM layer */
 # define AM_Check if (errVal != PFE_OK) {AM_Errno = AME_PF; return(AME_PF) ;}
 # define AM_si sizeof(int)
 # define AM_ss sizeof(short)
+# define AM_sli sizeof(long)
 # define AM_sl sizeof(AM_LEAFHEADER)
 # define AM_sint sizeof(AM_INTHEADER)
 # define AM_sc sizeof(char)
@@ -67,8 +68,9 @@ int
 AM_CreateIndex(
     char *fileName,/* Name of indexed file */
     int indexNo,/*number of this index for file */
-    char attrType,/* 'c' for char ,'i' for int ,'f' for float */
-    int attrLength /* 4 for 'i' or 'f', 1-255 for 'c' */
+    char attrType[],/* 'c' for char ,'i' for int ,'f' for float */
+    int attrLength[], /* 4 for 'i' or 'f', 1-255 for 'c' */
+    int numCols
 );
 
 int
@@ -79,16 +81,18 @@ AM_DestroyIndex(
 int
 AM_DeleteEntry(
     int fileDesc, /* file Descriptor */
-    char attrType, /* 'c' , 'i' or 'f' */
-    int attrLength, /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    char attrType[], /* 'c' , 'i' or 'f' */
+    int attrLength[], /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    int numCols,
     char *value,/* Value of key whose corr recId is to be deleted */
     int recId /* id of the record to delete */
 );
 int
 AM_InsertEntry(
     int fileDesc, /* file Descriptor */
-    char attrType, /* 'i' or 'c' or 'f' */
-    int attrLength, /* 4 for 'i' or 'f', 1-255 for 'c' */
+    char attrType[], /* 'i' or 'c' or 'f' */
+    int attrLength[], /* 4 for 'i' or 'f', 1-255 for 'c' */
+    int numCols,
     char *value, /* value to be inserted */
     int recId /* recId to be inserted */
 );
@@ -99,8 +103,9 @@ AM_PrintError(char *s);
 int
 AM_OpenIndexScan(
     int fileDesc, /* file Descriptor */
-    char attrType, /* 'i' or 'c' or 'f' */
-    int attrLength, /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    char attrType[], /* 'i' or 'c' or 'f' */
+    int attrLength[], /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    int numCols,
     int op, /* operator for comparison */
     char *value /* value for comparison */
 );

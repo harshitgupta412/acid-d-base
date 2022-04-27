@@ -71,7 +71,9 @@ index_scan(Table_ *tbl, Schema_ *schema, int indexFD, int op, int value) {
     */
    byte population_bytes[4];
    EncodeInt(value, population_bytes);
-   int scanDesc = AM_OpenIndexScan(indexFD, 'i', 4, op, population_bytes);
+   char attrType[] = {'i'};
+   int attrLen[] = {4};
+   int scanDesc = AM_OpenIndexScan(indexFD, attrType, attrLen, 1, op, population_bytes);
    while(true){
        int rid = AM_FindNextEntry(scanDesc);
        if(rid == AME_EOF) break;

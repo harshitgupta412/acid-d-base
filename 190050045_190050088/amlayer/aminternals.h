@@ -3,8 +3,9 @@
 int AM_CreateIndex(
     char *fileName,/* Name of indexed file */
     int indexNo,/*number of this index for file */
-    char attrType,/* 'c' for char ,'i' for int ,'f' for float */
-    int attrLength /* 4 for 'i' or 'f', 1-255 for 'c' */
+    char attrType[],/* 'c' for char ,'i' for int ,'f' for float */
+    int attrLength[], /* 4 for 'i' or 'f', 1-255 for 'c' */
+    int numCols
 );
 
 
@@ -15,16 +16,18 @@ int AM_DestroyIndex(
 
 int AM_DeleteEntry(
     int fileDesc, /* file Descriptor */
-    char attrType, /* 'c' , 'i' or 'f' */
-    int attrLength, /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    char attrType[], /* 'c' , 'i' or 'f' */
+    int attrLength[], /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    int numCols,
     char *value,/* Value of key whose corr recId is to be deleted */
     int recId /* id of the record to delete */
 );
-
-int AM_InsertEntry(
+int
+AM_InsertEntry(
     int fileDesc, /* file Descriptor */
-    char attrType, /* 'i' or 'c' or 'f' */
-    int attrLength, /* 4 for 'i' or 'f', 1-255 for 'c' */
+    char attrType[], /* 'i' or 'c' or 'f' */
+    int attrLength[], /* 4 for 'i' or 'f', 1-255 for 'c' */
+    int numCols,
     char *value, /* value to be inserted */
     int recId /* recId to be inserted */
 );
@@ -132,8 +135,9 @@ AM_EmptyStack();
 int
 AM_Search(
     int fileDesc,
-    char attrType,
-    int attrLength,
+    char attrType[],
+    int attrLength[],
+    int numCols,
     char *value,
     int *pageNum, /* page number of page where key is present or can be inserted*/
     char **pageBuf, /* pointer to buffer in memory where leaf page corresponding                                                        to pageNum can be found */
@@ -144,8 +148,9 @@ AM_Search(
 int
 AM_BinSearch(
     char *pageBuf, /* buffer where the page is found */
-    char attrType,
-    int attrLength,
+    char attrType[],
+    int attrLength[],
+    int numCols,
     char *value, /* attribute value for which search is called */
     int *indexPtr,
     AM_INTHEADER *header
@@ -154,8 +159,9 @@ AM_BinSearch(
 int
 AM_SearchLeaf(
     char *pageBuf, /* buffer where the leaf page resides */
-    char attrType,
-    int attrLength,
+    char attrType[],
+    int attrLength[],
+    int numCols,
     char *value, /* attribute value to be compared with */
     int *indexPtr,/* pointer to the index where key is found or can be inserted */
     AM_LEAFHEADER *header
@@ -164,47 +170,8 @@ AM_SearchLeaf(
 int
 AM_Compare(
     char *bufPtr,
-    char attrType,
-    int attrLength,
+    char attrType[],
+    int attrLength[],
+    int numCols,
     char *valPtr
 );
-
-void
-AM_PrintIntNode(
-    char *pageBuf,
-    char attrType
-);
-
-void
-AM_PrintLeafNode(
-    char *pageBuf,
-    char attrType
-);
-int
-AM_DumpLeafPages(
-    int fileDesc,
-    int min,
-    int attrLength,
-    char attrType
-);
-void
-AM_PrintLeafKeys(
-    char *pageBuf,
-    char attrType
-);
-
-void
-AM_PrintAttr(
-    char *bufPtr,
-    char attrType,
-    int attrLength
-);
-
-void
-AM_PrintTree(
-    int fileDesc,
-    int pageNum,
-    char attrType
-);
-
-

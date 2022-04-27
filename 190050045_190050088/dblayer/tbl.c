@@ -357,7 +357,7 @@ encode(Schema_ *sch, char **fields, byte *record, int spaceLeft) {
             }
             default:
             {
-                printf("Unknown type %d\n", sch->columns[i].type);
+                printf("Unknown type-- %d\n", sch->columns[i].type);
                 exit(1);
             }
         }

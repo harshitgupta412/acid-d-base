@@ -10,8 +10,9 @@ int
 AM_CreateIndex(
     char *fileName,/* Name of indexed file */
     int indexNo,/*number of this index for file */
-    char attrType,/* 'c' for char ,'i' for int ,'f' for float */
-    int attrLength /* 4 for 'i' or 'f', 1-255 for 'c' */
+    char attrType[],/* 'c' for char ,'i' for int ,'f' for float */
+    int attrLength[], /* 4 for 'i' or 'f', 1-255 for 'c' */
+    int numCols
 )
 
 {
@@ -24,27 +25,41 @@ AM_CreateIndex(
     int maxKeys;/* Maximum keys that can be held on one internal page */
     AM_LEAFHEADER head,*header;
 
-    /* Check the parameters */
+/*
     if ((attrType != 'c') && (attrType != 'f') && (attrType != 'i')) {
         AM_Errno = AME_INVALIDATTRTYPE;
         return(AME_INVALIDATTRTYPE);
     }
-
-    if ((attrLength < 1) || (attrLength > 255)) {
+*/
+    int totalAttrLength = 0;
+    for (int i = 0; i < numCols; ++i)
+    {
+        if ((attrType[i] != 'c') && (attrType[i] != 'f') && (attrType[i] != 'i') && (attrType[i] != 'l')) {
+            AM_Errno = AME_INVALIDATTRTYPE;
+            return(AME_INVALIDATTRTYPE);
+        }
+        if ((attrLength[i] < 1) || (attrLength[i] > 255)) {
+            AM_Errno = AME_INVALIDATTRLENGTH;
+            return(AME_INVALIDATTRLENGTH);
+        }
+        totalAttrLength += attrLength[i];
+    }
+    if (totalAttrLength > 255) {
         AM_Errno = AME_INVALIDATTRLENGTH;
         return(AME_INVALIDATTRLENGTH);
     }
 
+/*
     if (attrLength != 4)
         if (attrType !='c') {
             AM_Errno = AME_INVALIDATTRLENGTH;
             return(AME_INVALIDATTRLENGTH);
         }
-
+*/
     header = &head;
 
     /* Get the filename with extension and create a paged file by that name*/
-    sprintf(indexfName,"%s.%d.idx",fileName,indexNo);
+    sprintf(indexfName,"%s.%d",fileName,indexNo);
     errVal = PF_CreateFile(indexfName);
     AM_Check;
 
@@ -66,10 +81,10 @@ AM_CreateIndex(
     header->keyPtr = AM_sl;
     header->freeListPtr = AM_NULL;
     header->numinfreeList = 0;
-    header->attrLength = attrLength;
+    header->attrLength = totalAttrLength;
     header->numKeys = 0;
     /* the maximum keys in an internal node- has to be even always*/
-    maxKeys = (PF_PAGE_SIZE - AM_sint - AM_si)/(AM_si + attrLength);
+    maxKeys = (PF_PAGE_SIZE - AM_sint - AM_si)/(AM_si + totalAttrLength);
     if (( maxKeys % 2) != 0) {
         header->maxKeys = maxKeys - 1;
     } else {
@@ -101,7 +116,7 @@ AM_DestroyIndex(
     char indexfName[AM_MAX_FNAME_LENGTH];
     int errVal;
 
-    sprintf(indexfName,"%s.%d.idx",fileName,indexNo);
+    sprintf(indexfName,"%s.%d",fileName,indexNo);
     errVal = PF_DestroyFile(indexfName);
     AM_Check;
     return(AME_OK);
@@ -113,8 +128,9 @@ AM_DestroyIndex(
 int
 AM_DeleteEntry(
     int fileDesc, /* file Descriptor */
-    char attrType, /* 'c' , 'i' or 'f' */
-    int attrLength, /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    char attrType[], /* 'c' , 'i' or 'f' */
+    int attrLength[], /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    int numCols,
     char *value,/* Value of key whose corr recId is to be deleted */
     int recId /* id of the record to delete */
 )
@@ -135,20 +151,22 @@ AM_DeleteEntry(
     int i; /* loop index */
 
 
-    /* check the parameters */
-    if ((attrType != 'c') && (attrType != 'f') && (attrType != 'i')) {
-        AM_Errno = AME_INVALIDATTRTYPE;
-        return(AME_INVALIDATTRTYPE);
+    int totalAttrLength = 0;
+    for (int i = 0; i < numCols; ++i)
+    {
+        if ((attrType[i] != 'c') && (attrType[i] != 'f') && (attrType[i] != 'i')  && (attrType[i] != 'l')) {
+            AM_Errno = AME_INVALIDATTRTYPE;
+            return(AME_INVALIDATTRTYPE);
+        }
+        if ((attrLength[i] < 1) || (attrLength[i] > 255)) {
+            AM_Errno = AME_INVALIDATTRLENGTH;
+            return(AME_INVALIDATTRLENGTH);
+        }
+        totalAttrLength += attrLength[i];
     }
-
-    if (value == NULL) {
-        AM_Errno = AME_INVALIDVALUE;
-        return(AME_INVALIDVALUE);
-    }
-
-    if (fileDesc < 0) {
-        AM_Errno = AME_FD;
-        return(AME_FD);
+    if (totalAttrLength > 255) {
+        AM_Errno = AME_INVALIDATTRLENGTH;
+        return(AME_INVALIDATTRLENGTH);
     }
 
     /* initialise the header */
@@ -156,7 +174,7 @@ AM_DeleteEntry(
 
     /* find the pagenumber and the index of the key to be deleted if it is
        there */
-    status = AM_Search(fileDesc,attrType,attrLength,value,&pageNum,
+    status = AM_Search(fileDesc,attrType,attrLength, numCols, value,&pageNum,
                        &pageBuf,&index);
 
     /* check if return value is an error */
@@ -172,8 +190,8 @@ AM_DeleteEntry(
     }
 
     bcopy(pageBuf,header,AM_sl);
-    recSize = attrLength + AM_ss;
-    currRecPtr = pageBuf + AM_sl + (index - 1)*recSize + attrLength;
+    recSize = totalAttrLength + AM_ss;
+    currRecPtr = pageBuf + AM_sl + (index - 1)*recSize + totalAttrLength;
     bcopy(currRecPtr,&nextRec,AM_ss);
 
     /* search the list for recId */
@@ -203,7 +221,7 @@ AM_DeleteEntry(
     }
 
     /* check if list is empty */
-    bcopy(pageBuf + AM_sl + (index - 1)*recSize + attrLength,&temp,AM_ss);
+    bcopy(pageBuf + AM_sl + (index - 1)*recSize + totalAttrLength,&temp,AM_ss);
     if (temp == 0) {
         /* list is empty , so delete key from the list */
         for(i = index; i < (header->numKeys); i++)
@@ -230,8 +248,9 @@ AM_DeleteEntry(
 int
 AM_InsertEntry(
     int fileDesc, /* file Descriptor */
-    char attrType, /* 'i' or 'c' or 'f' */
-    int attrLength, /* 4 for 'i' or 'f', 1-255 for 'c' */
+    char attrType[], /* 'i' or 'c' or 'f' */
+    int attrLength[], /* 4 for 'i' or 'f', 1-255 for 'c' */
+    int numCols,
     char *value, /* value to be inserted */
     int recId /* recId to be inserted */
 )
@@ -248,25 +267,27 @@ AM_InsertEntry(
 				   back to the parent */
 
 
-    /* check the parameters */
-    if ((attrType != 'c') && (attrType != 'f') && (attrType != 'i')) {
-        AM_Errno = AME_INVALIDATTRTYPE;
-        return(AME_INVALIDATTRTYPE);
+    int totalAttrLength = 0;
+    for (int i = 0; i < numCols; ++i)
+    {
+        if ((attrType[i] != 'c') && (attrType[i] != 'f') && (attrType[i] != 'i') && (attrType[i] != 'l')) {
+            AM_Errno = AME_INVALIDATTRTYPE;
+            return(AME_INVALIDATTRTYPE);
+        }
+        if ((attrLength[i] < 1) || (attrLength[i] > 255)) {
+            AM_Errno = AME_INVALIDATTRLENGTH;
+            return(AME_INVALIDATTRLENGTH);
+        }
+        totalAttrLength += attrLength[i];
     }
-
-    if (value == NULL) {
-        AM_Errno = AME_INVALIDVALUE;
-        return(AME_INVALIDVALUE);
-    }
-
-    if (fileDesc < 0) {
-        AM_Errno = AME_FD;
-        return(AME_FD);
+    if (totalAttrLength > 255) {
+        AM_Errno = AME_INVALIDATTRLENGTH;
+        return(AME_INVALIDATTRLENGTH);
     }
 
 
     /* Search the leaf for the key */
-    status = AM_Search(fileDesc,attrType,attrLength,value,&pageNum,
+    status = AM_Search(fileDesc,attrType,attrLength, numCols, value,&pageNum,
                        &pageBuf,&index);
 
 
@@ -279,7 +300,7 @@ AM_InsertEntry(
     }
 
     /* Insert into leaf the key,recId pair */
-    inserted = AM_InsertintoLeaf(pageBuf,attrLength,value,recId,index,
+    inserted = AM_InsertintoLeaf(pageBuf,totalAttrLength,value,recId,index,
                                  status);
 
     /* if key has been inserted then done */
@@ -301,7 +322,7 @@ AM_InsertEntry(
     if (inserted == FALSE) {
         /* Split the leaf page */
         addtoparent = AM_SplitLeaf(fileDesc,pageBuf,&pageNum,
-                                   attrLength,recId,value, status,index,key);
+                                   totalAttrLength,recId,value, status,index,key);
 
         /* check for errors */
         if (addtoparent < 0) {
@@ -314,7 +335,7 @@ AM_InsertEntry(
 
         /* if key has to be added to the parent */
         if (addtoparent == TRUE) {
-            errVal = AM_AddtoParent(fileDesc,pageNum,key,attrLength);
+            errVal = AM_AddtoParent(fileDesc,pageNum,key,totalAttrLength);
             if (errVal < 0) {
                 AM_EmptyStack();
                 AM_Errno = errVal;

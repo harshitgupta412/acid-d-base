@@ -1,5 +1,6 @@
 # include <stdio.h>
 # include <strings.h>
+# include <stdlib.h>
 # include "am.h"
 # include "aminternals.h"
 # include "pf.h"
@@ -10,7 +11,9 @@ int GetLeftPageNum(int fileDesc);
 struct {
     int fileDesc;
     int op;
-    int attrType;
+    char* attrType;
+    int* attrLength;
+    int numCols;
     int pageNum;
     short index;
     short actindex;
@@ -28,12 +31,17 @@ struct {
 int
 AM_OpenIndexScan(
     int fileDesc, /* file Descriptor */
-    char attrType, /* 'i' or 'c' or 'f' */
-    int attrLength, /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    char attrType[], /* 'i' or 'c' or 'f' */
+    int attrLength[], /* 4 for 'i' or 'f' , 1-255 for 'c' */
+    int numCols,
     int op, /* operator for comparison */
     char *value /* value for comparison */
 )
 {
+    int totalAttrLength = 0;
+    for (int i = 0; i < numCols; i++)
+        totalAttrLength += attrLength[i];
+
     int scanDesc; /* index into scan table */
     int status; /* whether value is found or not in the tree */
     int index; /* index of value in leaf */
@@ -52,9 +60,12 @@ AM_OpenIndexScan(
         return(AME_FD);
     }
 
-    if ((attrType != 'i') && (attrType != 'c') && (attrType != 'f'))  {
-        AM_Errno = AME_INVALIDATTRTYPE;
-        return(AME_INVALIDATTRTYPE);
+    for (int i = 0; i < numCols; ++i)
+    {
+        if ((attrType[i] != 'c') && (attrType[i] != 'f') && (attrType[i] != 'i')) {
+            AM_Errno = AME_INVALIDATTRTYPE;
+            return(AME_INVALIDATTRTYPE);
+        }
     }
 
     /* initialise header */
@@ -75,7 +86,13 @@ AM_OpenIndexScan(
 
     /* there is room */
     AM_scanTable[scanDesc].status = FIRST;
-    AM_scanTable[scanDesc].attrType = attrType;
+    AM_scanTable[scanDesc].attrType = malloc(numCols * sizeof(char));
+    AM_scanTable[scanDesc].attrLength = malloc(numCols * sizeof(int));
+    AM_scanTable[scanDesc].numCols = numCols;
+    for (int i = 0; i < numCols; ++i)
+        AM_scanTable[scanDesc].attrType[i] = attrType[i];
+    for (int i = 0; i < numCols; ++i)
+        AM_scanTable[scanDesc].attrLength[i] = attrLength[i];
 
     /* initialise AM_LeftPageNum */
     AM_LeftPageNum = GetLeftPageNum(fileDesc);
@@ -89,14 +106,14 @@ AM_OpenIndexScan(
         AM_scanTable[scanDesc].actindex = 1;
         errVal = PF_GetThisPage(fileDesc,AM_LeftPageNum,&pageBuf);
         AM_Check;
-        bcopy(pageBuf + AM_sl + attrLength,&AM_scanTable[scanDesc].nextRecIdPtr,AM_ss);
+        bcopy(pageBuf + AM_sl + totalAttrLength,&AM_scanTable[scanDesc].nextRecIdPtr,AM_ss);
         errVal = PF_UnfixPage(fileDesc,AM_LeftPageNum,FALSE);
         AM_Check;
         return(scanDesc);
     }
 
     /* search for the pagenumber and index of value */
-    status = AM_Search(fileDesc,attrType,attrLength,value,&pageNum,&pageBuf,&index);
+    status = AM_Search(fileDesc,attrType,attrLength, numCols, value,&pageNum,&pageBuf,&index);
     searchpageNum = pageNum;
     /* check for errors */
     if (status < 0) {
@@ -106,7 +123,7 @@ AM_OpenIndexScan(
     }
 
     bcopy(pageBuf,header,AM_sl);
-    recSize = attrLength + AM_ss;
+    recSize = totalAttrLength + AM_ss;
     AM_scanTable[scanDesc].fileDesc = fileDesc;
     AM_scanTable[scanDesc].op = op;
 
@@ -139,7 +156,7 @@ AM_OpenIndexScan(
             AM_scanTable[scanDesc].nextpageNum = pageNum;
             AM_scanTable[scanDesc].nextIndex = index;
             AM_scanTable[scanDesc].actindex = index;
-            bcopy(pageBuf + AM_sl + (index - 1)*recSize + attrLength,
+            bcopy(pageBuf + AM_sl + (index - 1)*recSize + totalAttrLength,
                   &AM_scanTable[scanDesc].nextRecIdPtr,AM_ss);
             AM_scanTable[scanDesc].lastpageNum  = pageNum;
             AM_scanTable[scanDesc].lastIndex  = index;
@@ -154,7 +171,7 @@ AM_OpenIndexScan(
             errVal = PF_GetThisPage(fileDesc,AM_LeftPageNum,&pageBuf);
             AM_Check;
         }
-        bcopy(pageBuf + AM_sl + attrLength,
+        bcopy(pageBuf + AM_sl + totalAttrLength,
               &AM_scanTable[scanDesc].nextRecIdPtr,AM_ss);
         if (searchpageNum != AM_LeftPageNum) {
             errVal = PF_UnfixPage(fileDesc,AM_LeftPageNum,FALSE);
@@ -170,7 +187,7 @@ AM_OpenIndexScan(
                 AM_scanTable[scanDesc].nextpageNum = pageNum;
                 AM_scanTable[scanDesc].nextIndex = index + 1;
                 AM_scanTable[scanDesc].actindex = index + 1;
-                bcopy(pageBuf + AM_sl + (index)*recSize + attrLength,
+                bcopy(pageBuf + AM_sl + (index)*recSize + totalAttrLength,
                       &AM_scanTable[scanDesc].nextRecIdPtr,AM_ss);
             } else {
                 /* got to start from next leaf page */
@@ -180,7 +197,7 @@ AM_OpenIndexScan(
                     AM_scanTable[scanDesc].actindex = 1;
                     errVal =PF_GetThisPage(fileDesc,header->nextLeafPage,&pageBuf);
                     AM_Check;
-                    bcopy(pageBuf + AM_sl + attrLength,
+                    bcopy(pageBuf + AM_sl + totalAttrLength,
                           &AM_scanTable[scanDesc].nextRecIdPtr,AM_ss);
                     errVal = PF_UnfixPage(fileDesc,header->nextLeafPage,FALSE);
                     AM_Check;
@@ -192,7 +209,7 @@ AM_OpenIndexScan(
             AM_scanTable[scanDesc].nextpageNum = pageNum;
             AM_scanTable[scanDesc].nextIndex = index ;
             AM_scanTable[scanDesc].actindex = index;
-            bcopy(pageBuf + AM_sl + (index - 1)*recSize + attrLength,
+            bcopy(pageBuf + AM_sl + (index - 1)*recSize + totalAttrLength,
                   &AM_scanTable[scanDesc].nextRecIdPtr,AM_ss);
         }
         break;
@@ -205,7 +222,7 @@ AM_OpenIndexScan(
             errVal = PF_GetThisPage(fileDesc,AM_LeftPageNum,&pageBuf);
             AM_Check;
         }
-        bcopy(pageBuf + AM_sl + attrLength,
+        bcopy(pageBuf + AM_sl + totalAttrLength,
               &AM_scanTable[scanDesc].nextRecIdPtr,AM_ss);
         if (searchpageNum != AM_LeftPageNum) {
             errVal = PF_UnfixPage(fileDesc,AM_LeftPageNum,FALSE);
@@ -223,7 +240,7 @@ AM_OpenIndexScan(
         AM_scanTable[scanDesc].nextpageNum = pageNum;
         AM_scanTable[scanDesc].nextIndex = index;
         AM_scanTable[scanDesc].actindex = index;
-        bcopy(pageBuf + AM_sl + (index - 1)*recSize + attrLength,
+        bcopy(pageBuf + AM_sl + (index - 1)*recSize + totalAttrLength,
               &AM_scanTable[scanDesc].nextRecIdPtr,   AM_ss);
         break;
     }
@@ -236,7 +253,7 @@ AM_OpenIndexScan(
                 errVal = PF_GetThisPage(fileDesc,AM_LeftPageNum,&pageBuf);
                 AM_Check;
             }
-            bcopy(pageBuf + AM_sl + attrLength,
+            bcopy(pageBuf + AM_sl + totalAttrLength,
                   &AM_scanTable[scanDesc].nextRecIdPtr,   AM_ss);
             if (searchpageNum != AM_LeftPageNum) {
                 errVal = PF_UnfixPage(fileDesc,AM_LeftPageNum,FALSE);
@@ -364,7 +381,8 @@ AM_FindNextEntry(int scanDesc/* index scan descriptor */)
     if (AM_scanTable[scanDesc].status != FIRST)	{
         compareVal = AM_Compare(pageBuf + (AM_scanTable[scanDesc].nextIndex - 1)
                                 *recSize + AM_sl,AM_scanTable[scanDesc].attrType,
-                                header->attrLength,AM_scanTable[scanDesc].nextvalue);
+                                AM_scanTable[scanDesc].attrLength, AM_scanTable[scanDesc].numCols
+                                ,AM_scanTable[scanDesc].nextvalue);
         if (compareVal != 0) {
             /* prev record deleted */
             AM_scanTable[scanDesc].nextIndex--;
@@ -453,6 +471,8 @@ AM_CloseIndexScan(int scanDesc /* scan Descriptor*/)
         AM_Errno = AME_INVALID_SCANDESC;
         return(AME_INVALID_SCANDESC);
     }
+    free(AM_scanTable[scanDesc].attrLength);
+    free(AM_scanTable[scanDesc].attrType);
     AM_scanTable[scanDesc].status = FREE;
     return(AME_OK);
 }

@@ -1,8 +1,8 @@
 
-CC=gcc-11
+CC=cc
 CFLAGS = -g
 
-OBJS=am.o amfns.o amsearch.o aminsert.o amstack.o amglobals.o amscan.o amprint.o misc.o
+OBJS=am.o amfns.o amsearch.o aminsert.o amstack.o amglobals.o amscan.o misc.o
 
 a.out : $(OBJS) ../pflayer/pflayer.a main.o amlayer.a
 	$(CC) $(CFLAGS) main.o amlayer.a ../pflayer/pflayer.a
@@ -30,9 +30,6 @@ amstack.o : amstack.c am.h pf.h
 
 amglobals.o : amglobals.c am.h
 	$(CC) $(CFLAGS) -c amglobals.c
-
-amprint.o : amprint.c am.h pf.h 
-	$(CC) $(CFLAGS) -c amprint.c
 
 main.o : main.c am.h pf.h 
 	$(CC) $(CFLAGS) -c main.c
