@@ -156,10 +156,10 @@ Table* Table::query(bool (*callback)(RecId, byte*, int)){
             {
                 int len = getLen(i, pageBuf);
                 if(len == -1) continue;
-                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
                 if (result){
                     void** data = new void*[sch.numColumns];
-                    decode(&    sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                    decode(&sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
                     t->addRow(data, false);
                 }
             }
@@ -273,6 +273,7 @@ Table decodeTable(byte* s, int max_len ) {
     std::string name(r,len);
     free(r);
     s += len;
+    
     Schema schema = decodeSchema(s, max_len, &len);
     s+=len;
     int num_indexes = DecodeInt(s);

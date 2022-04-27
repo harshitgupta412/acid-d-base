@@ -59,6 +59,7 @@ bool User::addUser(std::string username, std::string password){
 
     char pass[password.length()];
     strcpy(pass,password.c_str());
+    
     void* data[3];
     bool* is_admin = new bool;
     *is_admin = false;
