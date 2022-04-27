@@ -7,6 +7,7 @@ using namespace std;
 
 
 User::User(string username, string password){
+    uname = username;
     user_table_name = "DB_USER_TABLE";
     char* user_db_name = "DB_USER_DB";
     status = true;
@@ -62,4 +63,8 @@ bool User::addUser(std::string username, std::string password){
 
     return user_table->addRow(data, true);
 
+}
+
+std::string User::get_user() {
+    return uname;
 }
