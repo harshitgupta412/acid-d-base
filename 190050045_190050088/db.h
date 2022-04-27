@@ -14,11 +14,14 @@ class Database {
     int status; //commit status
     std::string current;
     int fail;
+    User* user;
 
     public:
-    Database();
-    bool connect(std::string name, User *current_user);
-    bool create(std::string name, User *current_user);
+    Database(User *current_user);
+    bool connect(std::string name);
+    bool drop();
+    bool create(std::string name);
+    Table* load(std::string db_name);
 
     bool createTable(Table* t);
     bool deleteTable(Table* t);

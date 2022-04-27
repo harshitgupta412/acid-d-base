@@ -141,5 +141,6 @@ string Schema::encodeSchema() {
 void Schema::print() {
     std::cout << "Number of Columns: " << schema->numColumns << std::endl;
     for (int i = 0; i < schema->numColumns; i++) 
-        std::cout << schema->columns[i].name << " " << schema->columns[i].type << " " << pk[i] << std::endl;
+        std::cout << schema->columns[i].name << "\t";
+    std::cout<<std::endl;
 }

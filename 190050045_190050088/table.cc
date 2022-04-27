@@ -106,12 +106,29 @@ bool Table::addRow(void* data[], bool update) {
 std::string Table::get_name(){
     return this->name;
 }
+
 void print_row(void* callbackObj, int rid, byte* row, int len) {
     Schema_ *schema = (Schema_ *) callbackObj;
-    void** data = new void*[schema->numColumns];
-    decode(schema, (char**)data, row, len);
+    char* data[schema->numColumns];
+    decode(schema, (char**)data, row+2, len);
     for(int i=0; i<schema->numColumns; i++) {
-        std::cout << data[i] << " ";
+        switch(schema->columns[i].type) {
+            case INT:
+                printf("%d\t", DecodeInt(data[i]));
+                break;
+            case FLOAT:
+                printf("%f\t", DecodeFloat(data[i]));
+                break;
+            case LONG:
+                printf("%lld\t", DecodeLong(data[i]));
+                break;
+            case VARCHAR:
+                printf("%s\t", (char*)data[i]);
+                break;
+            default:
+                printf("%s\t", (char*)data[i]);
+                break;
+        }
     }
     std::cout << std::endl;
 }
@@ -126,16 +143,19 @@ bool Table::deleteRow(void** pk) {
 void** Table::getRow(void** pk) {
     int rid = Table_Search(table, pk_index, (byte**)pk, pk_size);
     if(rid == -1) return NULL;
+    // std::cout<<rid<<std::endl;
     char record[MAX_PAGE_SIZE];
     int len = Table_Get(table, rid, record, MAX_PAGE_SIZE);
+    // std::cout<<len<<std::endl;
     void** data = new void*[schema.getSchema()->numColumns];
     Schema_ sch = *schema.getSchema();
-    decode(&sch, (char**)data, record, len);
+    decode(&sch, (char**)data, record+2, len);
     return data;
 }
 
 void Table::print() {
     Schema_ sch = *schema.getSchema();   
+    schema.print();
     Table_Scan(table, &sch, print_row);
 }
 
@@ -156,10 +176,10 @@ Table* Table::query(bool (*callback)(RecId, byte*, int)){
             {
                 int len = getLen(i, pageBuf);
                 if(len == -1) continue;
-                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
                 if (result){
                     void** data = new void*[sch.numColumns];
-                    decode(&    sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                    decode(&sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
                     t->addRow(data, false);
                 }
             }
@@ -273,6 +293,7 @@ Table decodeTable(byte* s, int max_len ) {
     std::string name(r,len);
     free(r);
     s += len;
+    
     Schema schema = decodeSchema(s, max_len, &len);
     s+=len;
     int num_indexes = DecodeInt(s);

@@ -57,7 +57,7 @@ class Table {
     
     void** getRow(void** pk);
 
-    void print(); //
+    void print();
 
     std::vector<char*> getPrimaryKey(); //
 
