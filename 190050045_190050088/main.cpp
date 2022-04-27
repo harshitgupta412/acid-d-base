@@ -149,7 +149,31 @@ loadCSV() {
     // EncodeInt(population, population_bytes);
 	// AM_InsertEntry(index_fileDesc, 'i', 4, population_bytes, rid);
     }
-
+    tbl.print();
+    cout<<"----------------------------------------------------------------"<<endl;
+    char* tokens2[1];
+    tokens2[0] = new char[100];
+    tokens2[0] = "Angola"; 
+    char** data= (char**)tbl.getRow((void**)tokens2);
+    for(int i=0; i<sch->numColumns; i++) {
+        switch(sch->columns[i].type) {
+            case INT:
+                printf("%d\t", DecodeInt(data[i]));
+                break;
+            case FLOAT:
+                printf("%f\t", DecodeFloat(data[i]));
+                break;
+            case LONG:
+                printf("%lld\t", DecodeLong(data[i]));
+                break;
+            case VARCHAR:
+                printf("%s\t", (char*)data[i]);
+                break;
+            default:
+                printf("%s\t", (char*)data[i]);
+                break;
+        }
+    }
     tbl.close();
     // fclose(fp);
     // Table_Close(tbl);
