@@ -17,4 +17,4 @@ db.o:
 	$(CC) -c -g db.cc
 
 clean:
-	rm *.o
+	rm -f *.o

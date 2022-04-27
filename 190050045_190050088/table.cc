@@ -124,6 +124,9 @@ Table decodeTable(byte* s, int max_len ) {
     return Table(&schema,(char*)name.substr(name.find('.'),name.size()).c_str() , (char*)name.substr(0, name.find('.')).c_str(), false, indexes);
 }
 
+std::string Table::get_name(){
+    return this->name;
+}
 void print_row(void* callbackObj, int rid, byte* row, int len) {
     Schema_ *schema = (Schema_ *) callbackObj;
     void** data = new void*[schema->numColumns];
@@ -141,7 +144,7 @@ bool Table::deleteRow(void** pk) {
     return true;
 }
 
-void** Table::getRow(void* pk) {
+void** Table::getRow(void** pk) {
     int rid = Table_Search(table, pk_index, (byte**)pk, pk_size);
     if(rid == -1) return NULL;
     char record[MAX_PAGE_SIZE];

@@ -30,9 +30,13 @@ Database::Database(){
 }
 
 bool Database::connect(std::string name, User *current_user) {
-    char user[name.length()];
-    strcpy(user,name.c_str());
-    void** data = db_table->getRow((void*) user);
+    char *db_n = new char[name.length()];
+    strcpy(db_n,name.c_str());
+
+    void** pk = new void*[1];
+    pk[0] = (void*) db_n;
+
+    void** data = db_table->getRow(pk);
 
     if (data != NULL){
         current = (char*) data[0];
@@ -44,22 +48,60 @@ bool Database::connect(std::string name, User *current_user) {
     }
 }
 
-// to-do
+bool Database::create(std::string name, User *current_user) {
+    char *db_n = new char[name.length()];
+    strcpy(db_n,name.c_str());
 
-// bool Database::createTable(Table *t) {
-//     char table_name[name.length()];
-//     strcpy(table_name,name.c_str());
-//     void** data = (*db_table_name).getRow((void*) table);
+    void** data = new void*[1];
+    data[0] = (void*) db_n;
 
-//     if (data != NULL){
-//         current = (char*) data[0];
-//         return true;
-//     }
-//     else {
-//         fail = true;
-//         return false;
-//     }
-// }
-// bool Database::create_table(Table* t) {
-//     string name = t->name;
-// }
+    bool status = db_table->addRow(data, true);
+
+    if (status){
+        current = name;
+    }
+
+    return status;
+}
+
+
+
+bool Database::createTable(Table *t) {
+    if (fail){
+        return false;
+    }
+    std::string name = t->get_name();
+
+    char *table_name = new char[name.length()];
+    strcpy(table_name,name.c_str());
+
+    char *db_name = new char[current.length()];
+    strcpy(db_name, current.c_str());
+
+    void** data = new void*[2];
+    data[0] = (void*) table_name;
+    data[1] = (void*) db_name;
+
+    return db_cross_table->addRow(data, true);
+    
+}
+
+bool Database::deleteTable(Table *t) {
+    if (fail){
+        return false;
+    }
+    std::string name = t->get_name();
+
+    char *table_name = new char[name.length()];
+    strcpy(table_name,name.c_str());
+
+    char *db_name = new char[current.length()];
+    strcpy(db_name, current.c_str());
+
+    void** data = new void*[2];
+    data[0] = (void*) table_name;
+    data[1] = (void*) db_name;
+
+    return db_cross_table->deleteRow(data);
+    
+}
