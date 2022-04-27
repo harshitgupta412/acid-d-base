@@ -26,21 +26,21 @@ class Schema {
     
 
     public:
-    std::map<std::vector<int>, Table*> fk;
+    std::map<std::vector<int>, std::string> fk;
     Schema(std::vector<std::pair<std::string, int> > cols, std::vector<int> _pk);
 
     Schema(Schema_ *sch, std::vector<int> _pk);
 
-    bool foreignKey(std::vector<int> ref_cols, Table* refT);
+    bool foreignKey(std::vector<int> ref_cols, char* ref_tbl);
 
     Schema_ getSchema();
     
 
     std::vector<int> getpk();
 
-    char* encodeSchema();
+    std::string encodeSchema();
 };
 
-Schema decodeSchema(char * &s, int max_len);
+Schema decodeSchema(char * s, int max_len, int* length = NULL);
 
 #endif
