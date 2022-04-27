@@ -62,4 +62,7 @@ int
 decode(Schema_ *sch, char *fields[], byte *record, int len);
 
 char* getNthfield(char* record, int n, Schema_* sch);
+
+
 #endif
+

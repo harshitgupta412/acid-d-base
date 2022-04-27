@@ -3,6 +3,33 @@
 #include <string.h>
 #include "table.h"
 
+#define SLOT_OFFSET 2
+#define HEADER_SIZE_OFFSET 2
+#define SIZE_OFFSET 2
+
+#define END_OF_PAGE PF_PAGE_SIZE
+
+// get number of slots in the page buffer
+int  getNumSlots(byte *pageBuf)
+{
+    return DecodeShort(pageBuf);
+}
+
+// get offset of the Nth slot, where N is 0 indexed
+int  getNthSlotOffset(int slot, char* pageBuf)
+{
+    assert(slot < getNumSlots(pageBuf));
+    return DecodeShort(pageBuf + HEADER_SIZE_OFFSET + slot * SLOT_OFFSET);
+}
+
+// get length of the `slot` record
+int  getLen(int slot, byte *pageBuf)
+{
+    int offset = getNthSlotOffset(slot, pageBuf);
+    if(offset == -1) return -1;
+    return DecodeShort(pageBuf + offset);
+}
+
 void Table::deleteRow(int rowId){
     Table_Delete(table, rowId);
     char record[MAX_PAGE_SIZE];
@@ -30,6 +57,7 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
     name += ".";
     name += table_name;
     name += ".tbl";
+    this->db_name = db_name;
     Schema_ sch = _schema->getSchema();
     if(Table_Open((char*)name.c_str(), &sch, overwrite, &table)== -1){
         std::cout << "Error opening table " << name << std::endl;
@@ -124,8 +152,43 @@ void** Table::getRow(void* pk) {
     return data;
 }
 void Table::print() {
-    Schema_ sch = schema.getSchema();
+    Schema_ sch = schema.getSchema();   
     Table_Scan(table, &sch, print_row);
+}
+
+Table* Table::query(bool (*callback)(RecId, byte*, int)){
+    Table *t = new Table(&schema, (char*)"result", (char*)this->db_name.c_str(), false, indexes);
+    int pageNo, err;
+    char *pageBuf;
+    Schema_ sch = schema.getSchema();
+
+    if ( (err = PF_GetFirstPage(table->fileDesc, &pageNo, &pageBuf)) == PFE_EOF)
+        return t;
+    else if ( err >= 0 || err == PFE_PAGEFIXED )
+    {
+        do
+        {
+            int nslots = getNumSlots(pageBuf);
+            for (int i = 0; i < nslots; i++)
+            {
+                int len = getLen(i, pageBuf);
+                if(len == -1) continue;
+                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                if (result){
+                    void** data = new void*[sch.numColumns];
+                    decode(&    sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                    t->addRow(data, false);
+                }
+            }
+            // if (err != PFE_PAGEFIXED) checkerr(PF_UnfixPage(table->fileDesc, pageNo, 0), "Table_ scan : unfix page");
+            err = PF_GetNextPage(table->fileDesc, &pageNo, &pageBuf);
+        } while( err >= 0 || err == PFE_PAGEFIXED );
+        assert(err == PFE_EOF);
+    }
+        // else
+        //     checkerr(err, "Table_ scan : get first page");
+
+    return t;
 }
 std::vector<char*> Table::getPrimaryKey() {
     std::vector<char*> pk;

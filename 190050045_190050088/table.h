@@ -35,6 +35,7 @@ struct IndexData {
 class Table {
     Table_ *table;
     std::string name;
+    std::string db_name;
     Schema schema;
     int* pk_index;
     int pk_size;
@@ -61,6 +62,8 @@ class Table {
     int createIndex(int col);
 
     bool eraseIndex(int id);
+
+    Table* query(bool (*callback)(RecId, byte*, int));
 
     bool close();
 
