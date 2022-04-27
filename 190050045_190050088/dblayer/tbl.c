@@ -180,6 +180,8 @@ Table_Get(Table_ *tbl, RecId rid, byte *record, int maxlen) {
     if ( (err = PF_GetThisPage(tbl->fileDesc, pageNum, &pageBuf)) == PFE_PAGEFIXED );
     else checkerr(err, "Table_ get : get page");
     int len = getLen(slot, pageBuf);
+    printf("numSlots: %d\n",getNumSlots(pageBuf));
+    fflush(stdout);
     if(len == -1) return -1;
     // the first 2 bytes in record indicate the length of the record
     if (len + 2 > maxlen) len = maxlen - 2;
@@ -204,6 +206,8 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
         do
         {
             int nslots = getNumSlots(pageBuf);
+            printf("%d\n",nslots);
+            fflush(stdout);
             for (int i = 0; i < nslots; i++)
             {
                 int len = getLen(i, pageBuf);
@@ -305,6 +309,7 @@ void Table_Delete(Table_ *tbl, RecId rid) {
     // Delete the record from the page
     // Update slot and free space index information on top of page.
     EncodeShort(-1, pageBuf + HEADER_SIZE_OFFSET + slot * SLOT_OFFSET);
+    if (err != PFE_PAGEFIXED) PF_UnfixPage(tbl->fileDesc, pageNo, 0);
 }
 
 int

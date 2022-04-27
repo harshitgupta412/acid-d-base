@@ -31,9 +31,10 @@ int  getLen(int slot, byte *pageBuf)
 }
 
 void Table::deleteRow(int rowId){
-    Table_Delete(table, rowId);
     char record[MAX_PAGE_SIZE];
     int num_bytes = Table_Get(table, rowId, record, MAX_PAGE_SIZE);
+    Table_Delete(table, rowId);
+    std::cout<<"bytes "<<num_bytes<<std::endl;
     if(num_bytes == -1) {
         return;
     }
@@ -106,18 +107,37 @@ bool Table::addRow(void* data[], bool update) {
 std::string Table::get_name(){
     return this->name;
 }
+
 void print_row(void* callbackObj, int rid, byte* row, int len) {
+    std::cout<<rid<<std::endl;
     Schema_ *schema = (Schema_ *) callbackObj;
-    void** data = new void*[schema->numColumns];
-    decode(schema, (char**)data, row, len);
+    char* data[schema->numColumns];
+    decode(schema, (char**)data, row+2, len);
     for(int i=0; i<schema->numColumns; i++) {
-        std::cout << data[i] << " ";
+        switch(schema->columns[i].type) {
+            case INT:
+                printf("%d\t", DecodeInt(data[i]));
+                break;
+            case FLOAT:
+                printf("%f\t", DecodeFloat(data[i]));
+                break;
+            case LONG:
+                printf("%lld\t", DecodeLong(data[i]));
+                break;
+            case VARCHAR:
+                printf("%s\t", (char*)data[i]);
+                break;
+            default:
+                printf("%s\t", (char*)data[i]);
+                break;
+        }
     }
     std::cout << std::endl;
 }
 
 bool Table::deleteRow(void** pk) {
     int rid = Table_Search(table, pk_index, (byte**)pk, pk_size);
+    std::cout<<rid<<std::endl;
     if(rid == -1) return true;
     deleteRow(rid);
     return true;
@@ -130,12 +150,13 @@ void** Table::getRow(void** pk) {
     int len = Table_Get(table, rid, record, MAX_PAGE_SIZE);
     void** data = new void*[schema.getSchema()->numColumns];
     Schema_ sch = *schema.getSchema();
-    decode(&sch, (char**)data, record, len);
+    decode(&sch, (char**)data, record+2, len);
     return data;
 }
 
 void Table::print() {
-    Schema_ sch = *schema.getSchema();   
+    Schema_ sch = *schema.getSchema(); 
+    schema.print();
     Table_Scan(table, &sch, print_row);
 }
 
@@ -156,10 +177,10 @@ Table* Table::query(bool (*callback)(RecId, byte*, int)){
             {
                 int len = getLen(i, pageBuf);
                 if(len == -1) continue;
-                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
                 if (result){
                     void** data = new void*[sch.numColumns];
-                    decode(&    sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                    decode(&    sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
                     t->addRow(data, false);
                 }
             }
@@ -276,20 +297,20 @@ std::string Table::encodeTable() {
     EncodeInt(indexes.size(), r);
     str.append(r,4);
     free(r);
-    for(int i=0; i<indexes.size(); i++) {
-        r = (char*) malloc(sizeof(int));
-        EncodeInt(indexes[i].indexNo, r);
-        str.append(r,4);
-        free(r);
-        r = (char*) malloc(sizeof(char));
-        EncodeInt(indexes[i].attrType, r);
-        str.append(r,4);
-        free(r);
-        r = (char*) malloc(sizeof(int));
-        EncodeInt(indexes[i].attrLength, r);
-        str.append(r,4);
-        free(r);
-    }
+    // for(int i=0; i<indexes.size(); i++) {
+    //     r = (char*) malloc(sizeof(int));
+    //     EncodeInt(indexes[i].indexNo, r);
+    //     str.append(r,4);
+    //     free(r);
+    //     r = (char*) malloc(sizeof(char));
+    //     EncodeInt(indexes[i].attrType, r);
+    //     str.append(r,4);
+    //     free(r);
+    //     r = (char*) malloc(sizeof(int));
+    //     EncodeInt(indexes[i].attrLength, r);
+    //     str.append(r,4);
+    //     free(r);
+    // }
     return str;
 }
 
@@ -314,13 +335,13 @@ Table decodeTable(byte* s, int max_len ) {
     std::cout<<num_indexes<<std::endl;
     s += sizeof(int);
     std::vector<IndexData> indexes(num_indexes);
-    for(int i=0; i<num_indexes; i++) {
-        indexes[i].indexNo = DecodeInt(s);
-        s += sizeof(int);
-        indexes[i].attrType = DecodeInt(s);
-        s += sizeof(int);
-        indexes[i].attrLength= DecodeInt(s);
-        s += sizeof(int);
-    }
+    // for(int i=0; i<num_indexes; i++) {
+    //     indexes[i].indexNo = DecodeInt(s);
+    //     s += sizeof(int);
+    //     indexes[i].attrType = DecodeInt(s);
+    //     s += sizeof(int);
+    //     indexes[i].attrLength= DecodeInt(s);
+    //     s += sizeof(int);
+    // }
     return Table(&schema, (char*)name.c_str(), (char*)db_name.c_str(), false, indexes);
 }

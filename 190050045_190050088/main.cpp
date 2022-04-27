@@ -153,7 +153,7 @@ loadCSV() {
     cout<<"----------------------------------------------------------------"<<endl;
     char* tokens2[1];
     tokens2[0] = new char[100];
-    tokens2[0] = "Angola"; 
+    tokens2[0] = "Zimbabwe"; 
     char** data= (char**)tbl.getRow((void**)tokens2);
     for(int i=0; i<sch->numColumns; i++) {
         switch(sch->columns[i].type) {
@@ -174,6 +174,21 @@ loadCSV() {
                 break;
         }
     }
+    cout<<"\n----------------------------------------------------------------"<<endl;
+
+    cout<<tbl.deleteRow((void**)tokens2)<<' ';
+    cout<<"deleted"<<endl;
+    tbl.print();
+    
+    char name[] = "Zimbabwe";
+    char capital[] = "Harare";
+    char pop[] = "16529904";
+    void *data2[3] = {(void*)name, (void*)capital, (void*)pop};
+    tbl.addRow((void**)data2,false);
+
+    tbl.print();
+
+    cout<<"----------------------------------------------------------------"<<endl;
     tbl.close();
     // fclose(fp);
     // Table_Close(tbl);
