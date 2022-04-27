@@ -43,12 +43,13 @@ class Table {
     std::vector<IndexData> indexes;
 
     void deleteRow(int rowId);
+    bool addRowFromByte(byte* record, int len, bool update);
 
     public:
 
     std::string get_name();
 
-    Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes);
+    Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk);
 
     const Schema& getSchema();
 
@@ -67,6 +68,8 @@ class Table {
     bool eraseIndex(int id); //
 
     Table* query(bool (*callback)(RecId, byte*, int)); //
+
+    Table* queryIndex(int indexNo, int op, std::vector<void*> values); //
 
     bool close();
 

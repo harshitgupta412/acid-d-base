@@ -9,6 +9,17 @@
 
 #define END_OF_PAGE PF_PAGE_SIZE
 
+// get unique index number from cols of table
+int cols_to_indexNo(std::vector<int> cols, int maxcols)
+{
+    int indexNo = 0;
+    for (int i = cols.size() - 1; i >= 0; i--)
+    {
+        indexNo = indexNo * maxcols + cols[i];
+    }
+    return indexNo;
+}
+
 // get number of slots in the page buffer
 int  getNumSlots(byte *pageBuf)
 {
@@ -52,7 +63,7 @@ void Table::deleteRow(int rowId){
     }
 }
 
-Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes): schema(*_schema) {
+Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes = std::vector<IndexData>(), bool index_pk = true): schema(*_schema) {
     name += db_name;
     name += ".";
     name += table_name;
@@ -62,6 +73,7 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
         std::cout << "Error opening table " << name << std::endl;
         exit(1);
     }
+
     std::vector<int> _pk = _schema->getpk();
     pk_index = new int[_pk.size()];
     for(int i=0; i<_pk.size(); i++) {
@@ -69,6 +81,19 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
     }
     pk_size = _pk.size();
     indexes = _indexes;
+    
+    if (index_pk)
+    {
+        int pkindexNo = cols_to_indexNo(_pk, _schema->getSchema()->numColumns);
+        bool addDefaultIndex = true;
+        for (int i = 0; i < indexes.size(); ++i)
+            if (indexes[i].indexNo == pkindexNo)
+                addDefaultIndex = false;
+        if (addDefaultIndex)
+        {
+            createIndex(_pk);
+        }
+    }
 }
 
 const Schema& Table::getSchema() {
@@ -98,6 +123,32 @@ bool Table::addRow(void* data[], bool update) {
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
             AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
+        }
+    }
+    return true;
+}
+
+bool Table::addRowFromByte(byte *data, int len, bool update) {
+    byte** pk_value = new byte*[pk_size];
+    for(int i=0; i<pk_size; i++) {
+        pk_value[i] = (byte*)data[pk_index[i]];
+    }
+    int rid = Table_Search(table, pk_index, pk_value, pk_size);
+    if(rid != -1 && !update) return false;
+    else if(rid != -1) deleteRow(rid);
+    Schema_ sch = *schema.getSchema();
+
+    Table_Insert(table, data, len, &rid);
+    for(int i=0; i<indexes.size(); i++){
+        if(indexes[i].isOpen){
+            Schema_ sch = *schema.getSchema();
+            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(data, indexes[i].indexNo, &sch), rid);
+        }
+        else {
+            indexes[i].fileDesc = PF_OpenFile((char*)(name + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            indexes[i].isOpen = true;
+            Schema_ sch = *schema.getSchema();
+            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(data, indexes[i].indexNo, &sch), rid);
         }
     }
     return true;
@@ -140,7 +191,7 @@ void Table::print() {
 }
 
 Table* Table::query(bool (*callback)(RecId, byte*, int)){
-    Table *t = new Table(&schema, (char*)"result", (char*)this->db_name.c_str(), false, indexes);
+    Table *t = new Table(&schema, (char*)"result", (char*)this->db_name.c_str(), false, std::vector<IndexData>(), false);
     int pageNo, err;
     char *pageBuf;
     Schema_ sch = *schema.getSchema();
@@ -180,16 +231,6 @@ std::vector<char*> Table::getPrimaryKey() {
         pk.push_back(schema.getSchema()->columns[pk_index[i]].name);
     }
     return pk;
-}
-
-int cols_to_indexNo(std::vector<int> cols, int maxcols)
-{
-    int indexNo = 0;
-    for (int i = cols.size() - 1; i >= 0; i--)
-    {
-        indexNo = indexNo * maxcols + cols[i];
-    }
-    return indexNo;
 }
 
 int Table::createIndex(std::vector<int> cols) {
@@ -259,6 +300,93 @@ Table::~Table() {
         close();
     free (pk_index);
     free (table);
+}
+
+Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
+{
+    Table *t = new Table(&schema, (char*)"result", (char*)this->db_name.c_str(), false, std::vector<IndexData>(), false);
+    int pageNo, err;
+    char *pageBuf;
+    Schema_ sch = *schema.getSchema();
+
+    IndexData index;
+    bool index_present = false;
+    for (auto idx : indexes) {
+        if (idx.indexNo == indexNo) {
+            index_present = true;
+            index = idx;
+            break;
+        }
+    }
+
+    if (!index_present) {
+        fprintf(stderr, "Index not found in query index\n");
+        exit(1);
+    }
+
+    if (index.numCols != values.size()) {
+        fprintf(stderr, "Invalid number of values in query index\n");
+        exit(1);
+    }
+
+    byte key[256];
+    byte* keyPtr = key;
+    int remaining_len = 256;
+    for ( int i = 0; i < index.numCols; ++i )
+    {
+        switch ( index.attrType[i] )
+        {
+            case 'c':
+            {
+                int len = EncodeCString((char*)values[i], keyPtr, remaining_len);
+                remaining_len -= len;
+                keyPtr += len;
+                break;
+            }
+            case INT:
+            {
+                // assert(spaceLeft >= 4);
+                EncodeInt(*(int*)values[i], keyPtr);
+                remaining_len -= 4;
+                keyPtr += 4;
+                break;
+            }
+            case LONG:
+            {
+                // assert(spaceLeft >= 8);
+                EncodeLong(*(long*)values[i], keyPtr);
+                remaining_len -= 8;
+                keyPtr += 8;
+                break;
+            }
+            case FLOAT:
+            {
+                // assert(spaceLeft >= 4);
+                EncodeFloat(*(float*)values[i], keyPtr);
+                remaining_len -= 4;
+                keyPtr += 4;
+                break;
+            }
+            default:
+            {
+                printf("Unknown type %c in query index\n", index.attrType[i]);
+                exit(1);
+            }
+        }
+    }
+    int encoded_len = 256 - remaining_len;
+
+    int scanDesc = AM_OpenIndexScan(index.fileDesc, index.attrType, index.attrLen, index.numCols, op, key);
+    while(true){
+        int rid = AM_FindNextEntry(scanDesc);
+        if(rid == AME_EOF) break;
+        char record[MAX_PAGE_SIZE];
+        int num_bytes = Table_Get(table, rid, record, MAX_PAGE_SIZE);
+        t->addRowFromByte(record, encoded_len, 1);
+    }
+    AM_CloseIndexScan(scanDesc);
+
+    return t;
 }
 
 std::string Table::encodeTable() {
