@@ -128,29 +128,17 @@ loadCSV() {
     char *tokens[MAX_TOKENS];
     char record[MAX_PAGE_SIZE];
 
+    cout<<"Adding rows"<<endl;
     while ((line = fgets(buf, MAX_LINE_LEN, fp)) != NULL) {
-	cout<<line<<endl;
 	int n = split(line, ",", tokens);
 	assert (n == sch->numColumns);
-	cout<<"line"<<endl;
     tbl.addRow((void**)tokens,false);
-    
-    // int len = encode(sch, tokens, record, sizeof(record));
-	// RecId rid;
-
-    // Table_Insert(tbl, record, len, &rid);
-	// printf("%d %s\n", rid, tokens[0]);
-
-	// Indexing on the population column 
-	// int population = atoi(tokens[2]);
-
-	// Use the population field as the field to index on
-    // byte population_bytes[4];
-    // EncodeInt(population, population_bytes);
-	// AM_InsertEntry(index_fileDesc, 'i', 4, population_bytes, rid);
     }
+    cout<<"----------------------------------------------------------------"<<endl;
+    cout<<"Printing"<<endl;
     tbl.print();
     cout<<"----------------------------------------------------------------"<<endl;
+    cout<<"Get Rows"<<endl;
     char* tokens2[1];
     tokens2[0] = new char[100];
     tokens2[0] = "Zimbabwe"; 
@@ -175,7 +163,7 @@ loadCSV() {
         }
     }
     cout<<"\n----------------------------------------------------------------"<<endl;
-
+    cout<<"Delete Row"<<endl;
     cout<<tbl.deleteRow((void**)tokens2)<<' ';
     cout<<"deleted"<<endl;
     tbl.print();
@@ -189,6 +177,11 @@ loadCSV() {
     tbl.print();
 
     cout<<"----------------------------------------------------------------"<<endl;
+    cout<<"Encode Decode"<<endl;
+    string str = tbl.encodeTable();
+    Table tbl2 = decodeTable((char*)str.c_str(), str.size());
+    tbl2.print();
+    tbl2.close();
     tbl.close();
     // fclose(fp);
     // Table_Close(tbl);

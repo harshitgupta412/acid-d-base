@@ -59,7 +59,7 @@ AM_CreateIndex(
     header = &head;
 
     /* Get the filename with extension and create a paged file by that name*/
-    sprintf(indexfName,"%s.%d",fileName,indexNo);
+    sprintf(indexfName,"%s.%d.idx",fileName,indexNo);
     errVal = PF_CreateFile(indexfName);
     AM_Check;
 
@@ -116,7 +116,7 @@ AM_DestroyIndex(
     char indexfName[AM_MAX_FNAME_LENGTH];
     int errVal;
 
-    sprintf(indexfName,"%s.%d",fileName,indexNo);
+    sprintf(indexfName,"%s.%d.idx",fileName,indexNo);
     errVal = PF_DestroyFile(indexfName);
     AM_Check;
     return(AME_OK);

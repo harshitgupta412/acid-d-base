@@ -49,13 +49,13 @@ class Table {
 
     std::string get_name();
 
-    Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk);
+    Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk = true);
 
     const Schema& getSchema();
 
     bool addRow(void* data[], bool update);
 
-    bool deleteRow(void** pk); //
+    bool deleteRow(void** pk); 
     
     void** getRow(void** pk);
 

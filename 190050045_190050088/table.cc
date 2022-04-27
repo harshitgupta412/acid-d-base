@@ -44,26 +44,35 @@ int  getLen(int slot, byte *pageBuf)
 void Table::deleteRow(int rowId){
     char record[MAX_PAGE_SIZE];
     int num_bytes = Table_Get(table, rowId, record, MAX_PAGE_SIZE);
-    Table_Delete(table, rowId);
     if(num_bytes == -1) {
         return;
     }
 
+    // TODO: change indexeNo to columns[]
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();   
-            AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rowId);
+            // std::cout<<indexes[i].indexNo<<std::endl;
+            int err = AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rowId);
+            // std::cout<<"delte "<<err<<std::endl;
+            assert(err == AME_OK);
         }
         else {
-            indexes[i].fileDesc = PF_OpenFile((char*)(name + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            indexes[i].fileDesc = PF_OpenFile((char*)(name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
-            AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rowId);
+            int err = AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rowId);
+            // std::cout<<"delte "<<err<<std::endl;
+            assert(err == AME_OK);
+
         }
     }
+
+    Table_Delete(table, rowId);
 }
 
-Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes = std::vector<IndexData>(), bool index_pk = true): schema(*_schema) {
+Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes = std::vector<IndexData>(), bool index_pk): schema(*_schema) {
     name += db_name;
     name += ".";
     name += table_name;
@@ -73,7 +82,7 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
         std::cout << "Error opening table " << name << std::endl;
         exit(1);
     }
-
+    name = table_name;
     std::vector<int> _pk = _schema->getpk();
     pk_index = new int[_pk.size()];
     for(int i=0; i<_pk.size(); i++) {
@@ -116,13 +125,17 @@ bool Table::addRow(void* data[], bool update) {
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();
-            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
+            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
+            assert(err == AME_OK);
         }
         else {
-            indexes[i].fileDesc = PF_OpenFile((char*)(name + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            indexes[i].fileDesc = PF_OpenFile((char*)(name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            // std::cout<<(name + std::to_string(indexes[i].indexNo) + ".idx")<<std::endl;
+            assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
-            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
+            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
+            assert(err == AME_OK);
         }
     }
     return true;
@@ -142,13 +155,16 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();
-            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(data, indexes[i].indexNo, &sch), rid);
+            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(data, indexes[i].indexNo, &sch), rid);
+            assert(err == AME_OK);
         }
         else {
-            indexes[i].fileDesc = PF_OpenFile((char*)(name + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            indexes[i].fileDesc = PF_OpenFile((char*)(name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
+            assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
-            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(data, indexes[i].indexNo, &sch), rid);
+            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(data, indexes[i].indexNo, &sch), rid);
+            assert(err == AME_OK);
         }
     }
     return true;
@@ -197,7 +213,7 @@ void** Table::getRow(void** pk) {
     int len = Table_Get(table, rid, record, MAX_PAGE_SIZE);
     void** data = new void*[schema.getSchema()->numColumns];
     Schema_ sch = *schema.getSchema();
-    decode(&sch, (char**)data, record+2, len);
+    decode(&sch, (char**)data, record, len);
     return data;
 }
 
@@ -261,6 +277,7 @@ int Table::createIndex(std::vector<int> cols) {
     index.numCols = cols.size();
     index.attrType = new char[cols.size()];
     index.attrLen = new int[cols.size()];
+    index.isOpen = false;
     for (int i = 0; i < cols.size(); i++) {
         switch(schema.getSchema()->columns[cols[i]].type) {
             case VARCHAR:
@@ -284,7 +301,17 @@ int Table::createIndex(std::vector<int> cols) {
                 exit(1);
         }
     }
-    assert(AM_CreateIndex((char*)name.c_str(), index.indexNo, index.attrType, index.attrLen, index.numCols) == AME_OK);
+    int err = AM_CreateIndex((char*)name.c_str(), index.indexNo, index.attrType, index.attrLen, index.numCols);
+    if(err == AME_PF) {
+        int fd = PF_OpenFile((char*)(name + "." + std::to_string(index.indexNo) + ".idx").c_str());
+        if(fd >= 0) {
+            PF_CloseFile(fd);
+        }
+        else {
+            fprintf(stderr, "Table createIndex : cannot create index. Your PF layer sucks\n");
+            exit(1);
+        }
+    }
     indexes.push_back(index);
     return indexNo;
 }
@@ -300,11 +327,16 @@ bool Table::eraseIndex(int id) {
     return false;
 }
 
+
+
 bool Table::close() {
     Table_Close(table);
     for(int i=0; i<indexes.size(); i++) {
         if(indexes[i].isOpen) {
-            assert(PF_CloseFile(indexes[i].fileDesc) == PFE_OK);
+            // assert(PF_UnfixPage(indexes[i].fileDesc, pageNo, 0) == PFE_OK);
+            int err = PF_CloseFile(indexes[i].fileDesc);
+            // std::cout<<"table close "<<err<<std::endl;
+            assert(err == PFE_OK);
             indexes[i].isOpen = false;
         }
     }
@@ -449,20 +481,20 @@ Table decodeTable(byte* s, int max_len ) {
     char* r;
     int len = DecodeCString2(s, &r, max_len);
     std::string db_name(r,len);
-    std::cout<<len<<std::endl;
+    // std::cout<<len<<std::endl;
     free(r);
     s += len+2;
     len = DecodeCString2(s, &r, max_len);
-    std::cout<<len<<std::endl;
+    // std::cout<<len<<std::endl;
     std::string name(r,len);
     free(r);
     s += len+2;
     Schema schema = decodeSchema(s, max_len, &len);
-    std::cout<<name<<' '<<db_name<<std::endl;
+    // std::cout<<name<<' '<<db_name<<std::endl;
     schema.print();
     s+=len;
     int num_indexes = DecodeInt(s);
-    std::cout<<num_indexes<<std::endl;
+    // std::cout<<num_indexes<<std::endl;
     s += sizeof(int);
     std::vector<IndexData> indexes(num_indexes);
     for(int i=0; i<num_indexes; i++) {

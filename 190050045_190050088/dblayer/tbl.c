@@ -180,12 +180,12 @@ Table_Get(Table_ *tbl, RecId rid, byte *record, int maxlen) {
     if ( (err = PF_GetThisPage(tbl->fileDesc, pageNum, &pageBuf)) == PFE_PAGEFIXED );
     else checkerr(err, "Table_ get : get page");
     int len = getLen(slot, pageBuf);
-    printf("numSlots: %d\n",getNumSlots(pageBuf));
+    // printf("numSlots: %d\n",getNumSlots(pageBuf));
     fflush(stdout);
     if(len == -1) return -1;
     // the first 2 bytes in record indicate the length of the record
     if (len + 2 > maxlen) len = maxlen - 2;
-    memcpy(record, pageBuf + getNthSlotOffset(slot, pageBuf), len + SIZE_OFFSET);
+    memcpy(record, pageBuf + getNthSlotOffset(slot, pageBuf)+ SIZE_OFFSET, len );
     if (err != PFE_PAGEFIXED) PF_UnfixPage(tbl->fileDesc, pageNum, 0);
     return len; // return size of record
 }
@@ -206,7 +206,7 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
         do
         {
             int nslots = getNumSlots(pageBuf);
-            printf("%d\n",nslots);
+            // printf("%d\n",nslots);
             fflush(stdout);
             for (int i = 0; i < nslots; i++)
             {
@@ -439,7 +439,7 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
 
 char* getNthfield(char* record, int n, Schema_* sch)
 {
-    char* cursor = record + 2;
+    char* cursor = record;
     for (int i = 0; i < n; ++i)
     {
         switch (sch->columns[i].type)
