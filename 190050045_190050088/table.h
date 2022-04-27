@@ -70,8 +70,8 @@ class Table {
 
     ~Table();
 
-    char* encodeTable();
+    std::string encodeTable();
 };
 
-
+Table decodeTable(byte* s, int max_len );
 #endif

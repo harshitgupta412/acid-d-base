@@ -4,6 +4,10 @@
 #include <iostream>
 using namespace std;
 
+string char2string(char* x, int size) {
+    return string(x, size);
+}
+
 Schema::Schema(std::vector<std::pair<std::string, int> > cols, std::vector<int> _pk) {
     schema = new Schema_;
     schema->numColumns = cols.size();
@@ -16,21 +20,26 @@ Schema::Schema(std::vector<std::pair<std::string, int> > cols, std::vector<int> 
 }
 
 Schema::Schema(Schema_ *sch, std::vector<int> _pk) {
-    schema = sch;
+    schema = new Schema_;
+    schema->columns = sch->columns;
+    schema->numColumns = sch->numColumns;
     pk = _pk;
 }
 
-Schema decodeSchema(char * &s, int max_len) {
+Schema decodeSchema(char * s, int max_len, int* length) {
+    char* old_s = s;
     int len = DecodeInt(s);
     s += 4;
     Schema_ sch;
     sch.numColumns = len;
     sch.columns = new ColumnDesc[sch.numColumns];
     for(int i=0; i<sch.numColumns; i++) {
-        int strlen = DecodeCString2(s, sch.columns[i].name, max_len);
-        s += strlen;
+        int strlen = DecodeCString2(s, &sch.columns[i].name, max_len);
+        s += strlen+2;
+        // cout<<"columns"<<' '<<strlen<<' '<<s-strlen<<' '<<sch.columns[i].name[0]<<endl;
         sch.columns[i].type = DecodeShort(s);
         s += 2;
+        // cout<<sch.columns[i].name<<' '<<sch.columns[i].type<< endl; 
     }
     len = DecodeInt(s);
     s += 4;
@@ -51,14 +60,22 @@ Schema decodeSchema(char * &s, int max_len) {
             ref_cols[i] = DecodeInt(s);
             s += 4;
         }
-        Table* ref_tbl = (Table*) DecodeInt(s);
-        s += 4;
-        schema.fk.insert(std::pair<std::vector<int>, Table*>(ref_cols, (Table*)ref_tbl));
+        char * ref_tbl;
+        int strlen = DecodeCString2(s, &ref_tbl, max_len);
+        s += strlen;
+        schema.fk.insert(std::pair<std::vector<int>, std::string>(ref_cols, ref_tbl));
+        free(ref_tbl);
     }
+
+    if(length != NULL)  
+        *length = s - old_s;
+    return schema;
 }
 
-bool Schema::foreignKey(std::vector<int> ref_cols, Table* refT) {
-    fk.insert(std::pair<std::vector<int>, Table*>(ref_cols, refT));
+bool Schema::foreignKey(std::vector<int> ref_cols, char* refT) {
+    if(fk.count(ref_cols)) return false;
+    fk.insert(std::pair<std::vector<int>, std::string>(ref_cols, refT));
+    return true;
 }
 
 Schema_ Schema::getSchema() {
@@ -69,49 +86,52 @@ std::vector<int> Schema::getpk() {
     return pk;
 }
 
-char* Schema::encodeSchema() {
+string Schema::encodeSchema() {
     std::string encoded = "";
     char* r = (char*) malloc(sizeof(int));
     EncodeInt(schema->numColumns, r);
-    encoded += r;
+    encoded.append(r, 4);
     free(r);
     for(int i=0; i<schema->numColumns; i++) {
-        int len = 4+strlen(schema->columns[i].name);
+        int len = 2+strlen(schema->columns[i].name);
         char* r = (char*)malloc(len*sizeof(char));
         len = EncodeCString(schema->columns[i].name, r, len);
-        EncodeShort(schema->columns[i].type, r+len);
-        encoded += r;
+        encoded.append(r, len);
+        EncodeShort(schema->columns[i].type, r);
+        encoded.append(r, 2);
         free(r);
     }
     r = (char*) malloc(sizeof(int));
     EncodeInt(pk.size(), r);
-    encoded += r;
+    encoded.append(r,4);
     free(r);
     for(int i=0; i<pk.size(); i++) {
         char* r = (char*) malloc(sizeof(int));
         EncodeInt(pk[i], r);
-        encoded += r;
+        encoded.append(r,4);
         free(r);
     }
     r = (char*) malloc(sizeof(int));
     EncodeInt(fk.size(), r);
-    encoded += r;
+    encoded.append(r,4);
     free(r);
     for(auto i: fk) {
         char* r = (char*) malloc(sizeof(int));
         EncodeInt(i.first.size(), r);
-        encoded += r;
+        encoded.append(r,4);
         free(r);
         for(int j=0; j<i.first.size(); j++) {
             r = (char*) malloc(sizeof(int));
             EncodeInt(i.first[j], r);
-            encoded += r;
+            encoded.append(r,4);
             free(r);
         }
-        r = (char*) malloc(sizeof(int));
+        r = (char*) malloc(i.second.size()+2);
         // fix this
-        EncodeInt((int)(size_t)i.second, r);
-        encoded += r;
+        int len = EncodeCString((char*)i.second.c_str(), r, i.second.size()+2);
+        encoded.append(r, len);
+        free(r);
     }
-    return (char*)encoded.c_str();
+    cout<<encoded<<endl;
+    return encoded;
 }   

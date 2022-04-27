@@ -104,14 +104,11 @@ DecodeCString(byte *bytes, char *str, int max_len) {
 }
 
 int 
-DecodeCString2(byte *bytes, char *str, int max_len) {
+DecodeCString2(byte *bytes, char ** str, int max_len) {
     int len = DecodeShort(bytes);
-    str = (char*) malloc(len*sizeof(char));
-    if (len + 1 > max_len) { // account for null terminator.
-	len = max_len - 1; 
-    }
-    memcpy(str, bytes+2, len);
-    str[len] = '\0';
+    *str = (char*) malloc((1+len)*sizeof(char));
+    memcpy(*str, bytes+2, len);
+    (*str)[len] = '\0';
     return len;
 }
 
