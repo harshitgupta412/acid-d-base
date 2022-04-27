@@ -13,10 +13,12 @@ Schema::Schema(std::vector<std::pair<std::string, int> > cols, std::vector<int> 
     schema->numColumns = cols.size();
     schema->columns = new ColumnDesc[schema->numColumns];
     for(int i=0; i<schema->numColumns;i++) {
-        schema->columns[i].name = (char*)cols[i].first.c_str();
+        schema->columns[i].name = new char[cols[i].first.length() + 1];
+        strcpy(schema->columns[i].name, cols[i].first.c_str());
         schema->columns[i].type = cols[i].second;
     }
     pk = _pk;
+    pk.insert(pk.begin(),0);
 }
 
 Schema::Schema(Schema_ *sch, std::vector<int> _pk) {
@@ -132,6 +134,12 @@ string Schema::encodeSchema() {
         encoded.append(r, len);
         free(r);
     }
-    cout<<encoded<<endl;
+    // cout<<encoded<<endl;
     return encoded;
-}   
+}  
+
+void Schema::print() {
+    std::cout << "Number of Columns: " << schema->numColumns << std::endl;
+    for (int i = 0; i < schema->numColumns; i++) 
+        std::cout << schema->columns[i].name << " " << schema->columns[i].type << " " << pk[i] << std::endl;
+}

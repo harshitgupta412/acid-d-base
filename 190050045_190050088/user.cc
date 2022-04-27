@@ -24,9 +24,12 @@ User::User(string username, string password){
 
     user_table = new Table(schema, (char*) user_table_name.c_str(), user_db_name, false, vi);
 
-    char user[username.length()];
+    char *user = new char[username.length()];
     strcpy(user,username.c_str());
-    void** data = user_table->getRow((void*) user);
+
+    void** pk_s = new void*[1];
+    pk_s[0] = (void*) user;
+    void** data = user_table->getRow(pk_s);
 
     if (data == NULL) {
         status = false;

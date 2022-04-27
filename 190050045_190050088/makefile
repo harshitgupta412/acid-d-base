@@ -5,16 +5,16 @@ OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./a
 all: table.o schema.o main.o user.o db.o
 	$(CC) -o main $(OBJ) schema.o table.o user.o main.o
 
-main.o:
+main.o: main.cpp
 	$(CC) -c -g main.cpp
-schema.o:
+schema.o: schema.cc
 	$(CC) -c -g schema.cc
-table.o:
+table.o: table.cc
 	$(CC) -c -g table.cc
-user.o:
+user.o: user.cc
 	$(CC) -c -g user.cc
-db.o:
+db.o: db.cc
 	$(CC) -c -g db.cc
 
 clean:
-	rm *.o
+	rm -f *.o

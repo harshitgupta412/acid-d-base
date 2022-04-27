@@ -18,6 +18,7 @@ class Database {
     public:
     Database();
     bool connect(std::string name, User *current_user);
+    bool create(std::string name, User *current_user);
 
     bool createTable(Table* t);
     bool deleteTable(Table* t);
