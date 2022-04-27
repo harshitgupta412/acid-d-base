@@ -78,7 +78,7 @@ Table_Open(char *dbname, Schema_ *schema, bool overwrite, Table_ **ptable)
     // The Table_ structure only stores the schema. The current functionality
     // does not really need the schema, because we are only concentrating
     // on record storage. 
-    PF_Init();
+    // PF_Init();
 
     int fileDesc;
     if (!overwrite)
