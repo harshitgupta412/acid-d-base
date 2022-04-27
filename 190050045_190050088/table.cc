@@ -41,13 +41,13 @@ void Table::deleteRow(int rowId){
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();   
-            AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLength, getNthfield(record, indexes[i].indexNo, &sch), rowId);
+            AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rowId);
         }
         else {
             indexes[i].fileDesc = PF_OpenFile((char*)(name + std::to_string(indexes[i].indexNo) + ".idx").c_str());
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
-            AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLength, getNthfield(record, indexes[i].indexNo, &sch), rowId);
+            AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rowId);
         }
     }
 }
@@ -91,13 +91,13 @@ bool Table::addRow(void* data[], bool update) {
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();
-            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLength, getNthfield(record, indexes[i].indexNo, &sch), rid);
+            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
         }
         else {
             indexes[i].fileDesc = PF_OpenFile((char*)(name + std::to_string(indexes[i].indexNo) + ".idx").c_str());
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
-            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLength, getNthfield(record, indexes[i].indexNo, &sch), rid);
+            AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
         }
     }
     return true;
@@ -106,29 +106,12 @@ bool Table::addRow(void* data[], bool update) {
 std::string Table::get_name(){
     return this->name;
 }
-
 void print_row(void* callbackObj, int rid, byte* row, int len) {
     Schema_ *schema = (Schema_ *) callbackObj;
-    char* data[schema->numColumns];
-    decode(schema, (char**)data, row+2, len);
+    void** data = new void*[schema->numColumns];
+    decode(schema, (char**)data, row, len);
     for(int i=0; i<schema->numColumns; i++) {
-        switch(schema->columns[i].type) {
-            case INT:
-                printf("%d\t", DecodeInt(data[i]));
-                break;
-            case FLOAT:
-                printf("%f\t", DecodeFloat(data[i]));
-                break;
-            case LONG:
-                printf("%lld\t", DecodeLong(data[i]));
-                break;
-            case VARCHAR:
-                printf("%s\t", (char*)data[i]);
-                break;
-            default:
-                printf("%s\t", (char*)data[i]);
-                break;
-        }
+        std::cout << data[i] << " ";
     }
     std::cout << std::endl;
 }
@@ -143,19 +126,16 @@ bool Table::deleteRow(void** pk) {
 void** Table::getRow(void** pk) {
     int rid = Table_Search(table, pk_index, (byte**)pk, pk_size);
     if(rid == -1) return NULL;
-    // std::cout<<rid<<std::endl;
     char record[MAX_PAGE_SIZE];
     int len = Table_Get(table, rid, record, MAX_PAGE_SIZE);
-    // std::cout<<len<<std::endl;
     void** data = new void*[schema.getSchema()->numColumns];
     Schema_ sch = *schema.getSchema();
-    decode(&sch, (char**)data, record+2, len);
+    decode(&sch, (char**)data, record, len);
     return data;
 }
 
 void Table::print() {
     Schema_ sch = *schema.getSchema();   
-    schema.print();
     Table_Scan(table, &sch, print_row);
 }
 
@@ -176,10 +156,10 @@ Table* Table::query(bool (*callback)(RecId, byte*, int)){
             {
                 int len = getLen(i, pageBuf);
                 if(len == -1) continue;
-                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
+                bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf), len);
                 if (result){
                     void** data = new void*[sch.numColumns];
-                    decode(&sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
+                    decode(&    sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf), len);
                     t->addRow(data, false);
                 }
             }
@@ -202,30 +182,53 @@ std::vector<char*> Table::getPrimaryKey() {
     return pk;
 }
 
-int Table::createIndex(int col) {
+int cols_to_indexNo(std::vector<int> cols, int maxcols)
+{
+    int indexNo = 0;
+    for (int i = cols.size() - 1; i >= 0; i--)
+    {
+        indexNo = indexNo * maxcols + cols[i];
+    }
+    return indexNo;
+}
+
+int Table::createIndex(std::vector<int> cols) {
+    int indexNo = cols_to_indexNo(cols, schema.getSchema()->numColumns);
     for(int i=0; i<indexes.size(); i++) {
-        if(indexes[i].indexNo == col) return -1;
+        if(indexes[i].indexNo == indexNo) return -1;
     }
 
     IndexData index;
-    index.indexNo = col;
-    switch(schema.getSchema()->columns[col].type) {
-        case VARCHAR:
-            index.attrType = 'c';
-            index.attrLength = MAX_VARCHAR_LENGTH;
-            break;
-        case INT:
-            index.attrType = 'i';
-            index.attrLength = 4;
-            break;
-        case FLOAT:
-            index.attrType = 'f';
-            index.attrLength = 4;
-            break;
+    index.indexNo = indexNo;
+    index.numCols = cols.size();
+    index.attrType = new char[cols.size()];
+    index.attrLen = new int[cols.size()];
+    for (int i = 0; i < cols.size(); i++) {
+        switch(schema.getSchema()->columns[cols[i]].type) {
+            case VARCHAR:
+                index.attrType[i] = 'c';
+                index.attrLen[i] = MAX_VARCHAR_LENGTH;
+                break;
+            case INT:
+                index.attrType[i] = 'i';
+                index.attrLen[i] = 4;
+                break;
+            case FLOAT:
+                index.attrType[i] = 'f';
+                index.attrLen[i] = 4;
+                break;
+            case LONG:
+                index.attrType[i] = 'l';
+                index.attrLen[i] = 8;
+                break;
+            default:
+                fprintf(stderr, "invalid type : create index");
+                exit(1);
+        }
     }
-
-    assert(AM_CreateIndex((char*)name.c_str(), index.indexNo, index.attrType, index.attrLength) == AME_OK);
-    return col;
+    assert(AM_CreateIndex((char*)name.c_str(), index.indexNo, index.attrType, index.attrLen, index.numCols) == AME_OK);
+    indexes.push_back(index);
+    return indexNo;
 }
 
 bool Table::eraseIndex(int id) {
@@ -293,7 +296,6 @@ Table decodeTable(byte* s, int max_len ) {
     std::string name(r,len);
     free(r);
     s += len;
-    
     Schema schema = decodeSchema(s, max_len, &len);
     s+=len;
     int num_indexes = DecodeInt(s);

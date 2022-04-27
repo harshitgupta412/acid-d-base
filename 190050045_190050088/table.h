@@ -25,8 +25,9 @@ extern "C" {
 #define MAX_VARCHAR_LENGTH 100
 struct IndexData {
     int indexNo;
-    char attrType;
-    int attrLength;
+    int numCols;
+    char* attrType;
+    int* attrLen;
     bool isOpen = false;
     int fileDesc;
 };
@@ -61,7 +62,7 @@ class Table {
 
     std::vector<char*> getPrimaryKey(); //
 
-    int createIndex(int col); //
+    int createIndex(std::vector<int> col); //
 
     bool eraseIndex(int id); //
 
@@ -75,4 +76,5 @@ class Table {
 };
 
 Table decodeTable(byte* s, int max_len ); //
+
 #endif
