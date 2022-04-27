@@ -33,7 +33,7 @@ class Schema {
 
     bool foreignKey(std::vector<int> ref_cols, char* ref_tbl);
 
-    Schema_ getSchema();
+    const Schema_* getSchema();
     
 
     std::vector<int> getpk();

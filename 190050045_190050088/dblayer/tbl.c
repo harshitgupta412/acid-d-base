@@ -109,6 +109,7 @@ Table_Open(char *dbname, Schema_ *schema, bool overwrite, Table_ **ptable)
         // No pages in file, so create one
         checkerr(PF_AllocPage(fileDesc, &pageNo, &pageBuf), "Table_ open : allocate page");
         initializePage(pageBuf);
+        checkerr(PF_UnfixPage(fileDesc, pageNo, 0), "Table_ Open : unfix page");
     }
     else if ( err >= 0 )
     {   
@@ -122,7 +123,7 @@ Table_Open(char *dbname, Schema_ *schema, bool overwrite, Table_ **ptable)
     else
         checkerr(err, "Table_ open : get first page");
     table->lastPageNo = pageNo;
-    table->pageBuf = pageBuf;
+    // table->pageBuf = pageBuf;
     table->name = dbname;
     *ptable = table;
     return 0;
@@ -131,10 +132,10 @@ Table_Open(char *dbname, Schema_ *schema, bool overwrite, Table_ **ptable)
 void
 Table_Close(Table_ *tbl) {    
     // Unfix any dirty pages, close file.
-    int err = PF_UnfixPage(tbl->fileDesc, tbl->lastPageNo, 1);
+    // int err = PF_UnfixPage(tbl->fileDesc, tbl->lastPageNo, 1);
     // if the page is already unfixed, don't unfix it again
-    if(err != PFE_OK && err != PFE_PAGEUNFIXED)
-        checkerr(err, "Table_ close : unfix page");
+    // if(err != PFE_OK && err != PFE_PAGEUNFIXED)
+        // checkerr(err, "Table_ close : unfix page");
     checkerr(PF_CloseFile(tbl->fileDesc), "Table_ close : close file");
 }
 
@@ -145,18 +146,19 @@ Table_Insert(Table_ *tbl, byte *record, int len, RecId *rid) {
     // Get the next free slot on page, and copy record in the free
     // space
     // Update slot and free space index information on top of page.
-    if (insertRecord(tbl->pageBuf, record, len) < 0)
+    char *pageBuf;
+    PF_GetThisPage(tbl->fileDesc, tbl->lastPageNo, &pageBuf);
+    if (insertRecord(pageBuf, record, len) < 0)
     {
         int pageNo;
-        char *pageBuf;
         checkerr(PF_AllocPage(tbl->fileDesc, &pageNo, &pageBuf), "Table_ insert : allocate page");
         initializePage(pageBuf);
         checkerr(PF_UnfixPage(tbl->fileDesc, tbl->lastPageNo, 1), "Table_ insert : unfix page");
         tbl->lastPageNo = pageNo;
-        tbl->pageBuf = pageBuf;
-        insertRecord(tbl->pageBuf, record, len);
+        insertRecord(pageBuf, record, len);
     }
-    *rid = (tbl->lastPageNo << 16) | (getNumSlots(tbl->pageBuf) - 1);
+    *rid = (tbl->lastPageNo << 16) | (getNumSlots(pageBuf) - 1);
+    checkerr(PF_UnfixPage(tbl->fileDesc, tbl->lastPageNo, 1), "Table_ insert : unfix page");
     return 0;
 }
 
@@ -193,6 +195,8 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
     //          callbackfn(callbackObj, rid, record, recordLen)
     int pageNo, err;
     char *pageBuf;
+    // printf("check");
+    fflush(stdout);
     if ( (err = PF_GetFirstPage(tbl->fileDesc, &pageNo, &pageBuf)) == PFE_EOF)
         return;
     else if ( err >= 0 || err == PFE_PAGEFIXED )
@@ -231,19 +235,48 @@ Table_Search(Table_ *tbl, int pk_index[], char* pk_value[], int numAttr) {
         do
         {
             int nslots = getNumSlots(pageBuf);
+            // printf("numSlots %d\n", nslots);
+            fflush(stdout);
             for (int i = 0; i < nslots; i++)
             {
                 int len = getLen(i, pageBuf);
                 if(len == -1) continue;
+                // printf("%d\nDecoding\n", len);
+                fflush(stdout);
                 char** fields = malloc(tbl->schema->numColumns * sizeof(char*));
-                decode(tbl->schema, fields, pageBuf + getNthSlotOffset(i, pageBuf), len);
+                // char** fields = malloc(tbl->schema->numColumns * sizeof(char*));
+                // printf("%d\nDecoding\n", len);
+                fflush(stdout);
+                decode(tbl->schema, fields, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
+                // printf("X");
+                fflush(stdout);
+                for(int i=0;i < tbl->schema->numColumns; i++) 
+                    // printf("Check: %d %s ", i, fields[i]);
+                fflush(stdout);
                 for(int j=0; j<numAttr; j++) {
-                    if(strcmp(fields[pk_index[j]], pk_value[j]) != 0) {
-                        free(fields);
-                        break;
+                    bool flag = false;
+                    if(tbl->schema->columns[pk_index[j]].type == VARCHAR) {
+                        if(strcmp(fields[pk_index[j]], pk_value[j]) != 0) {
+                            // printf("Differ at               %d %s %s %d %ld %ld\n", j, fields[pk_index[j]], pk_value[j],tbl->schema->columns[pk_index[j]].type, strlen(fields[pk_index[j]]),strlen( pk_value[j]));
+                            free(fields);
+                            break;
+                        }
+                    }
+                    else{
+                        switch(tbl->schema->columns[pk_index[j]].type) {
+                            case INT: flag = DecodeInt(fields[pk_index[j]]) ==  DecodeInt(pk_value[j]); 
+                            case FLOAT: flag = DecodeFloat(fields[pk_index[j]]) ==  DecodeFloat(pk_value[j]); 
+                            case LONG: flag = DecodeLong(fields[pk_index[j]]) ==  DecodeLong(pk_value[j]); 
+                        }
+                        if(!flag) {
+                            // printf("2Differ at               %d %s %s %d\n", j, fields[pk_index[j]], pk_value[j],tbl->schema->columns[pk_index[j]].type);
+                            free(fields);
+                            break;
+                        }
                     }
                     if(j == numAttr-1) {
                         free(fields);
+                        if (err != PFE_PAGEFIXED) checkerr(PF_UnfixPage(tbl->fileDesc, pageNo, 0), "Table_ scan : unfix page");
                         return (pageNo << 16) | i;
                     }
                 }
@@ -341,23 +374,23 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
     //        LONG: DecodeLong
     // return the total number of bytes decoded into record
     int bytes_decoded = 0;
-    byte *cursor = record + 2;
+    byte *cursor = record ;
 
     for ( int i = 0; i < sch->numColumns; ++i )
     {
+        // printf("%d %d\n", i, sch->columns[i].type);
+        fflush(stdout);
         switch ( sch->columns[i].type )
         {
             case VARCHAR:
             {
                 short string_len = DecodeShort(cursor);
-                char* x = (char*)malloc(len + 1);
-                int strlen = DecodeCString(cursor, x, len)+2;
-                cursor += strlen;
-                bytes_decoded += strlen;
-                len -= strlen;
                 fields[i] = (char *)malloc(string_len+1);
-                strncpy(fields[i], x, string_len);
-                fields[i][string_len] = '\0';
+                int strlen = DecodeCString(cursor, fields[i], len);
+                cursor += strlen+2;
+                bytes_decoded += strlen+2;
+                len -= strlen+2;
+                // printf("%d %s\n", len, fields[i]);
                 break;
             }
             case INT:
@@ -367,6 +400,7 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
                 cursor += 4;
                 bytes_decoded += 4;
                 len -= 4;
+                // printf("%d\n",atoi(fields[i]));
                 break;
             }
             case LONG:
@@ -376,6 +410,7 @@ decode(Schema_ *sch, char *fields[], byte *record, int len) {
                 cursor += 8;
                 bytes_decoded += 8;
                 len -= 8;
+                // printf("%ld\n",atol(fields[i]));
                 break;
             }
             case FLOAT:

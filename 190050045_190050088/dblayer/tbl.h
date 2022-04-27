@@ -22,7 +22,6 @@ typedef struct {
 typedef struct {
     Schema_ *schema;
     int fileDesc;
-    byte* pageBuf;
     int lastPageNo;
     char* name;
 } Table_ ;

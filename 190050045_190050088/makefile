@@ -3,7 +3,7 @@ CFLAGS = -g
 OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./amlayer/amlayer.a
 
 all: table.o schema.o main.o user.o db.o
-	$(CC) -o main main.o schema.o table.o user.o $(OBJ)
+	$(CC) -o main $(OBJ) schema.o table.o user.o main.o
 
 main.o:
 	$(CC) -c -g main.cpp

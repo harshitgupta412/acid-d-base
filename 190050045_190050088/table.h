@@ -41,9 +41,10 @@ class Table {
     int pk_size;
     std::vector<IndexData> indexes;
 
+    void deleteRow(int rowId);
+
     public:
 
-    void deleteRow(int rowId);
 
     Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes);
 
@@ -51,26 +52,26 @@ class Table {
 
     bool addRow(void* data[], bool update);
 
-    bool deleteRow(void** pk);
+    bool deleteRow(void** pk); //
     
-    void** getRow(void* pk);
+    void** getRow(void* pk); //
 
-    void print();
+    void print(); //
 
-    std::vector<char*> getPrimaryKey();
+    std::vector<char*> getPrimaryKey(); //
 
-    int createIndex(int col);
+    int createIndex(int col); //
 
-    bool eraseIndex(int id);
+    bool eraseIndex(int id); //
 
-    Table* query(bool (*callback)(RecId, byte*, int));
+    Table* query(bool (*callback)(RecId, byte*, int)); //
 
     bool close();
 
     ~Table();
 
-    std::string encodeTable();
+    std::string encodeTable(); //
 };
 
-Table decodeTable(byte* s, int max_len );
+Table decodeTable(byte* s, int max_len ); //
 #endif

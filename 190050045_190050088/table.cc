@@ -40,13 +40,13 @@ void Table::deleteRow(int rowId){
 
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
-            Schema_ sch = schema.getSchema();   
+            Schema_ sch = *schema.getSchema();   
             AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLength, getNthfield(record, indexes[i].indexNo, &sch), rowId);
         }
         else {
             indexes[i].fileDesc = PF_OpenFile((char*)(name + std::to_string(indexes[i].indexNo) + ".idx").c_str());
             indexes[i].isOpen = true;
-            Schema_ sch = schema.getSchema();
+            Schema_ sch = *schema.getSchema();
             AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLength, getNthfield(record, indexes[i].indexNo, &sch), rowId);
         }
     }
@@ -58,8 +58,7 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
     name += table_name;
     name += ".tbl";
     this->db_name = db_name;
-    Schema_ sch = _schema->getSchema();
-    if(Table_Open((char*)name.c_str(), &sch, overwrite, &table)== -1){
+    if(Table_Open((char*)name.c_str(), (Schema_*)_schema->getSchema(), overwrite, &table)== -1){
         std::cout << "Error opening table " << name << std::endl;
         exit(1);
     }
@@ -71,32 +70,33 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
     pk_size = _pk.size();
     indexes = _indexes;
 }
+
 const Schema& Table::getSchema() {
     return schema;
 }
+
 bool Table::addRow(void* data[], bool update) {
     byte** pk_value = new byte*[pk_size];
     for(int i=0; i<pk_size; i++) {
         pk_value[i] = (byte*)data[pk_index[i]];
     }
     int rid = Table_Search(table, pk_index, pk_value, pk_size);
-
     if(rid != -1 && !update) return false;
     else if(rid != -1) deleteRow(rid);
     char record[MAX_PAGE_SIZE];
-    Schema_ sch = schema.getSchema();
+    Schema_ sch = *schema.getSchema();
 
     int len = encode(&sch, (char**)data, record, MAX_PAGE_SIZE);
     Table_Insert(table, record, len, &rid);
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
-            Schema_ sch = schema.getSchema();
+            Schema_ sch = *schema.getSchema();
             AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLength, getNthfield(record, indexes[i].indexNo, &sch), rid);
         }
         else {
             indexes[i].fileDesc = PF_OpenFile((char*)(name + std::to_string(indexes[i].indexNo) + ".idx").c_str());
             indexes[i].isOpen = true;
-            Schema_ sch = schema.getSchema();
+            Schema_ sch = *schema.getSchema();
             AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLength, getNthfield(record, indexes[i].indexNo, &sch), rid);
         }
     }
@@ -125,13 +125,14 @@ void** Table::getRow(void* pk) {
     if(rid == -1) return NULL;
     char record[MAX_PAGE_SIZE];
     int len = Table_Get(table, rid, record, MAX_PAGE_SIZE);
-    void** data = new void*[schema.getSchema().numColumns];
-    Schema_ sch = schema.getSchema();
+    void** data = new void*[schema.getSchema()->numColumns];
+    Schema_ sch = *schema.getSchema();
     decode(&sch, (char**)data, record, len);
     return data;
 }
+
 void Table::print() {
-    Schema_ sch = schema.getSchema();   
+    Schema_ sch = *schema.getSchema();   
     Table_Scan(table, &sch, print_row);
 }
 
@@ -139,7 +140,7 @@ Table* Table::query(bool (*callback)(RecId, byte*, int)){
     Table *t = new Table(&schema, (char*)"result", (char*)this->db_name.c_str(), false, indexes);
     int pageNo, err;
     char *pageBuf;
-    Schema_ sch = schema.getSchema();
+    Schema_ sch = *schema.getSchema();
 
     if ( (err = PF_GetFirstPage(table->fileDesc, &pageNo, &pageBuf)) == PFE_EOF)
         return t;
@@ -169,10 +170,11 @@ Table* Table::query(bool (*callback)(RecId, byte*, int)){
 
     return t;
 }
+
 std::vector<char*> Table::getPrimaryKey() {
     std::vector<char*> pk;
     for(int i=0; i<pk_size; i++) {
-        pk.push_back(schema.getSchema().columns[pk_index[i]].name);
+        pk.push_back(schema.getSchema()->columns[pk_index[i]].name);
     }
     return pk;
 }
@@ -184,7 +186,7 @@ int Table::createIndex(int col) {
 
     IndexData index;
     index.indexNo = col;
-    switch(schema.getSchema().columns[col].type) {
+    switch(schema.getSchema()->columns[col].type) {
         case VARCHAR:
             index.attrType = 'c';
             index.attrLength = MAX_VARCHAR_LENGTH;
@@ -213,6 +215,7 @@ bool Table::eraseIndex(int id) {
     }
     return false;
 }
+
 bool Table::close() {
     Table_Close(table);
     for(int i=0; i<indexes.size(); i++) {
@@ -221,10 +224,13 @@ bool Table::close() {
             indexes[i].isOpen = false;
         }
     }
+    table = NULL;
     return true;
 }
+
 Table::~Table() {
-    close();
+    if(table != NULL)
+        close();
     free (pk_index);
     free (table);
 }
