@@ -120,6 +120,7 @@ loadCSV() {
     Schema_ *sch = parseSchema(line);
     Schema s(sch, vector<int>(1,0));
     Table tbl(&s,DB_NAME,"",true,vector<IndexData>());
+    tbl.createIndex(std::vector(1,2));
     // checkerr(Table_Open(DB_NAME, sch, true, &tbl), "Loadcsv : table open");
     // AM_DestroyIndex(DB_NAME, 0);
     // assert(AM_CreateIndex(DB_NAME, 0, 'i', 4) == AME_OK);
@@ -182,6 +183,8 @@ loadCSV() {
     Table tbl2 = decodeTable((char*)str.c_str(), str.size());
     tbl2.print();
     tbl2.close();
+    cout<<"----------------------------------------------------------------"<<endl;    
+    tbl.eraseIndex(2);
     tbl.close();
     // fclose(fp);
     // Table_Close(tbl);

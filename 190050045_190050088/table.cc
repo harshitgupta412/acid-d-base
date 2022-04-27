@@ -319,7 +319,14 @@ int Table::createIndex(std::vector<int> cols) {
 bool Table::eraseIndex(int id) {
     for(int i=0; i<indexes.size(); i++) {
         if(indexes[i].indexNo == id) {
-            assert(AM_DestroyIndex((char*)(db_name + "." + name).c_str(), id) == AME_OK);
+            if(indexes[i].isOpen) {
+                int err = PF_CloseFile(indexes[i].fileDesc);
+                // std::cout<<"table close "<<err<<std::endl;
+                assert(err == PFE_OK);
+                indexes[i].isOpen = false;
+            }
+            int err = AM_DestroyIndex((char*)(db_name + "." + name).c_str(), id);
+            assert(err == AME_OK);
             indexes.erase(indexes.begin() + i);
             return true;
         }
