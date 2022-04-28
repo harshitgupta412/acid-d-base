@@ -125,13 +125,20 @@ loadCSV() {
     // Open main db file
     Schema_ *sch = parseSchema(line);
     Schema s(sch, vector<int>(1,0));
-    Table tbl(&s,DB_NAME,"",true,vector<IndexData>());
+    cout<<"Schema loaded"<<endl;
+    Table tbl(&s,DB_NAME,"check",true,vector<IndexData>());
+    cout<<"Table created"<<endl;
+    cout<<"----------------------------------------------------------------"<<endl;
     tbl.createIndex(std::vector(1,2));
+    cout<<"Index created"<<endl;
+    cout<<"----------------------------------------------------------------"<<endl;
+    char c[] = "";
+    tbl.queryIndex(0,GREATER_THAN_EQUAL, vector<void*>(1,(void*)c));
+    cout<<"Query done"<<endl;
     // checkerr(Table_Open(DB_NAME, sch, true, &tbl), "Loadcsv : table open");
     // AM_DestroyIndex(DB_NAME, 0);
     // assert(AM_CreateIndex(DB_NAME, 0, 'i', 4) == AME_OK);
     // int index_fileDesc = PF_OpenFile(INDEX_NAME);
-    cout<<"Created Table"<<endl;
     char *tokens[MAX_TOKENS];
     char record[MAX_PAGE_SIZE];
 
@@ -191,7 +198,11 @@ loadCSV() {
     tbl2.close();
     cout<<"----------------------------------------------------------------"<<endl;    
     tbl.eraseIndex(2);
+    cout<<"Erased Index"<<endl;
+    cout<<"----------------------------------------------------------------"<<endl;    
     tbl.close();
+    cout<<"Table Closed"<<endl;
+    cout<<"----------------------------------------------------------------"<<endl;    
     // fclose(fp);
     // Table_Close(tbl);
     // checkerr(PF_CloseFile(index_fileDesc), "Loadcsv : close file");
@@ -200,7 +211,7 @@ loadCSV() {
 
 
 int main(){
-    // loadCSV();
+    loadCSV();
 
     // ONLY RUN THESE THE FIRST TIME TO CREATE SUPERUSER
     bool success = createUserDb();

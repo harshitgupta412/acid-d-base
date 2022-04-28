@@ -91,8 +91,12 @@ void Table::deleteRow(int rowId){
 
             int err = AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rowId);
             // std::cout<<"delte "<<err<<std::endl;
-            assert(err == AME_OK);
-
+            if (err != AME_OK)
+            {
+                std::cout << "Error " << err << " deleteRow into index " << indexes[i].indexNo << std::endl;
+                exit(1);
+            }
+            // assert(err == AME_OK);
         }
     }
 
@@ -125,10 +129,15 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
         for (int i = 0; i < indexes.size(); ++i)
             if (indexes[i].indexNo == pkindexNo)
                 addDefaultIndex = false;
-        if (addDefaultIndex)
-        {
-            createIndex(_pk);
-        }
+        if (addDefaultIndex) createIndex(_pk);
+    }
+
+    if(overwrite) {
+        for(auto index: indexes) {
+            eraseIndex(index.indexNo);
+            std::cout<<index.indexNo<<std::endl;
+            createIndex(indexNo_to_cols(index.indexNo, schema.getSchema()->numColumns, index.numCols));
+        } 
     }
 }
 
@@ -468,8 +477,8 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
             case 'c':
             {
                 int len = EncodeCString((char*)values[i], keyPtr, remaining_len);
-                remaining_len -= len;
-                keyPtr += len;
+                remaining_len -= MAX_VARCHAR_LENGTH;
+                keyPtr += MAX_VARCHAR_LENGTH;
                 break;
             }
             case INT:
@@ -504,15 +513,27 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
         }
     }
     int encoded_len = 256 - remaining_len;
-
+    if(!index.isOpen) {
+        index.fileDesc = PF_OpenFile((char*)(db_name + "." + name + "." + std::to_string(index.indexNo) + ".idx").c_str());
+        assert(index.fileDesc >= 0);
+        index.isOpen = true;    
+    }
     int scanDesc = AM_OpenIndexScan(index.fileDesc, index.attrType, index.attrLen, index.numCols, op, key);
+    if(scanDesc < 0) {
+        fprintf(stderr, "AM_OpenIndexScan failed in query index\n");
+        exit(1);
+    }
+    int x = 0;
     while(true){
         int rid = AM_FindNextEntry(scanDesc);
         if(rid == AME_EOF) break;
         char record[MAX_PAGE_SIZE];
+        std::cout<<rid<<std::endl;
         int num_bytes = Table_Get(table, rid, record, MAX_PAGE_SIZE);
         t->addRowFromByte(record, encoded_len, 1);
+        x++;
     }
+    std::cout<<x<<std::endl;
     AM_CloseIndexScan(scanDesc);
 
     return t;
