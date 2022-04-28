@@ -200,8 +200,9 @@ loadCSV() {
 
 
 int main(){
-    loadCSV();
+    // loadCSV();
 
+    // ONLY RUN THESE THE FIRST TIME TO CREATE SUPERUSER
     bool success = createUserDb();
     createPrivilegeTable();
     createPrivilegeDb();
@@ -212,6 +213,38 @@ int main(){
     User u2("weakling", "boi");
     u.assignPerm(u2, "MAIN_DB", 1);
     u.assignPerm(u2, "MAIN_DB", "MAIN_TABLE", 1);
+
+    Database db(&u);
+    db.create("TEMP_DB");
+    db.create("MAIN_DB");
+    db.drop();
+    db.connect("TEMP_DB");
+
+    vector<string> db_name = {"TEMP_DB", "NEW_DB"};
+    vector<string> table_name = {"TEMP_TABLE_1", "TEMP_TABLE_2"}; 
+    Table* tables[2];
+    for(int i =0; i<2; i++){
+        std::vector<std::pair<std::string, int> > cols;
+        cols.push_back({"KEY", VARCHAR});
+        cols.push_back({"VALUE", VARCHAR});  
+        std::vector<int> pk = {0};
+
+        char* table_cstr = new char[table_name[i].size()+1];
+        memcpy(table_cstr, table_name[i].c_str(), table_name[i].size()+1);
+
+        char* db_cstr = new char[db_name[0].size()+1];
+        memcpy(db_cstr, db_name[0].c_str(), db_name[0].size()+1);
+
+        Schema *schema = new Schema(cols, pk);
+        vector<IndexData> vi;
+        tables[i] = new Table(schema, table_cstr, db_cstr, false, vi);
+        db.createTable(tables[i]);
+        delete table_cstr, db_cstr;
+    }
+    cout << "Deleting Now" << endl;
+    db.deleteTable(tables[0]);
+    tables[0]->close();
+    tables[1]->close();
 
     return 0;
 }

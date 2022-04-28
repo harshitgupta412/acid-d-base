@@ -69,7 +69,6 @@ void Table::deleteRow(int rowId){
         return;
     }
 
-    // TODO: change indexeNo to columns[]
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();   
@@ -144,7 +143,10 @@ bool Table::addRow(void* data[], bool update) {
     }
     int rid = Table_Search(table, pk_index, pk_value, pk_size);
     if(rid != -1 && !update) return false;
-    else if(rid != -1) deleteRow(rid);
+    else if(rid != -1){
+        // std::cout << rid << std::endl;
+        deleteRow(rid);
+    }
     char record[MAX_PAGE_SIZE];
     Schema_ sch = *schema.getSchema();
 
@@ -155,10 +157,6 @@ bool Table::addRow(void* data[], bool update) {
             Schema_ sch = *schema.getSchema();
             std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
             char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
-
-            for(int j =0; j< indexes[i].numCols; j++)
-                std::cout << indexes[i].attrLen[j] << " ";
-            std::cout << std::endl;
 
             int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
             assert(err == AME_OK);
@@ -174,7 +172,7 @@ bool Table::addRow(void* data[], bool update) {
             char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
 
             int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
-            std::cout << err << std::endl;
+            // std::cout << err << std::endl;
             assert(err == AME_OK);
         }
     }
@@ -188,7 +186,10 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
     }
     int rid = Table_Search(table, pk_index, pk_value, pk_size);
     if(rid != -1 && !update) return false;
-    else if(rid != -1) deleteRow(rid);
+    else if(rid != -1){
+        // std::cout << rid << std::endl;
+        deleteRow(rid);
+    }
     Schema_ sch = *schema.getSchema();
 
     Table_Insert(table, data, len, &rid);
@@ -219,6 +220,12 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
 
 std::string Table::get_name(){
     return db_name + "." + this->name;
+}
+std::string Table::get_db_name(){
+    return db_name;
+}
+std::string Table::get_table_name(){
+    return name;
 }
 void print_row(void* callbackObj, int rid, byte* row, int len) {
     Schema_ *schema = (Schema_ *) callbackObj;

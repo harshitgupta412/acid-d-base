@@ -31,5 +31,7 @@ class Database {
     
 };
 
+Table* connectDbList();
+Table* connectDbTableList();
 
 #endif
