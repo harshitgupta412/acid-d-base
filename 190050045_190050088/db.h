@@ -28,10 +28,15 @@ class Database {
     bool initTransaction();
     bool commit();
     bool rollback();
-    
+
+    bool isAllowed(std::string dbName, int perm);
+    bool isAllowed(std::string dbName, std::string tableName, int perm);
 };
 
 Table* connectDbList();
 Table* connectDbTableList();
+
+bool isDb(std::string dbName);
+bool isTable(std::string dbName, std::string tableName);
 
 #endif

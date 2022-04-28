@@ -70,7 +70,7 @@ bool Database::create(std::string name) {
     if (status){
         current = name;
     }
-    db_table->print();
+    // db_table->print();
     db_table->close();
     return status;
 }
@@ -87,7 +87,7 @@ bool Database::drop(){
     pk[0] = (void*) db_n;
 
     bool status = db_table->deleteRow(pk);
-    db_table->print();
+    // db_table->print();
     db_table->close();
     current = "";
     return status;
@@ -157,7 +157,7 @@ bool Database::createTable(Table *t) {
     data[2] = (void*) encoded_c;
 
     bool status = db_cross_table->addRow(data, true);
-    db_cross_table->print();
+    // db_cross_table->print();
     db_cross_table->close();
     return status;
 
@@ -189,9 +189,44 @@ bool Database::deleteTable(Table *t) {
     data[1] = (void*) table_name;
 
     bool status = db_cross_table->deleteRow(data);
-    db_cross_table->print(); 
+    // db_cross_table->print(); 
     db_cross_table->close();
     return status; 
+}
+
+bool Database::isAllowed(std::string dbName, int perm) {
+    return user->isAllowed(dbName, perm);
+}
+
+bool Database::isAllowed(std::string dbName, std::string tableName, int perm) {
+    return user->isAllowed(dbName, tableName, perm);
+}
+
+bool isDb(std::string dbName) {
+    Table* db_table = connectDbList();
+
+    void** pk_s = new void*[1];
+    pk_s[0] = (void*) dbName.c_str();
+    void** data = db_table->getRow(pk_s);
+
+    db_table->close();
+    delete[] pk_s;
+
+    return data != NULL;
+}
+
+bool isTable(std::string dbName, std::string tableName) {
+    Table* db_cross_table = connectDbTableList();
+
+    void** pk_s = new void*[2];
+    pk_s[0] = (void*) dbName.c_str();
+    pk_s[1] = (void*) tableName.c_str();
+    void** data = db_cross_table->getRow(pk_s);
+
+    db_cross_table->close();
+    delete[] pk_s;
+
+    return data != NULL;
 }
 
 Table* connectDbList() {

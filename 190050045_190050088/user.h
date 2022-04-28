@@ -25,6 +25,10 @@ class User {
     std::string get_user();
     bool assignPerm(User& user, std::string dbName, int perm);
     bool assignPerm(User& user, std::string dbName, std::string tableName, int perm);
+
+    // true if user has the following permission
+    bool isAllowed(std::string dbName, int perm);
+    bool isAllowed(std::string dbName, std::string tableName, int perm);
     
 };
 
