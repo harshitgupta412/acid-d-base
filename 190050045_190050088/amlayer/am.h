@@ -1,3 +1,5 @@
+#include <assert.h>
+
 typedef struct am_leafheader {
     char pageType;
     int nextLeafPage;
@@ -21,7 +23,7 @@ extern int AM_RootPageNum; /* The page number of the root */
 extern int AM_LeftPageNum; /* The page Number of the leftmost leaf */
 extern int AM_Errno; /* last error in AM layer */
 
-# define AM_Check if (errVal != PFE_OK) {AM_Errno = AME_PF; return(AME_PF) ;}
+# define AM_Check if (errVal != PFE_OK) {AM_Errno = AME_PF; if(errVal != -5) assert(0); return(AME_PF) ;}
 # define AM_si sizeof(int)
 # define AM_ss sizeof(short)
 # define AM_sli sizeof(long)
