@@ -48,6 +48,8 @@ class Table {
     public:
 
     std::string get_name();
+    std::string get_db_name();
+    std::string get_table_name();
 
     Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk = true);
 

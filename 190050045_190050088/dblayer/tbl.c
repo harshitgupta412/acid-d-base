@@ -309,7 +309,7 @@ void Table_Delete(Table_ *tbl, RecId rid) {
     // Delete the record from the page
     // Update slot and free space index information on top of page.
     EncodeShort(-1, pageBuf + HEADER_SIZE_OFFSET + slot * SLOT_OFFSET);
-    if (err != PFE_PAGEFIXED) PF_UnfixPage(tbl->fileDesc, pageNo, 0);
+    if (err != PFE_PAGEFIXED) PF_UnfixPage(tbl->fileDesc, pageNo, 1);
 }
 
 int

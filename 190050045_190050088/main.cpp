@@ -125,13 +125,20 @@ loadCSV() {
     // Open main db file
     Schema_ *sch = parseSchema(line);
     Schema s(sch, vector<int>(1,0));
-    Table tbl(&s,DB_NAME,"",true,vector<IndexData>());
+    cout<<"Schema loaded"<<endl;
+    Table tbl(&s,DB_NAME,"check",true,vector<IndexData>());
+    cout<<"Table created"<<endl;
+    cout<<"----------------------------------------------------------------"<<endl;
     tbl.createIndex(std::vector(1,2));
+    cout<<"Index created"<<endl;
+    cout<<"----------------------------------------------------------------"<<endl;
+    char c[] = "";
+    tbl.queryIndex(0,GREATER_THAN_EQUAL, vector<void*>(1,(void*)c));
+    cout<<"Query done"<<endl;
     // checkerr(Table_Open(DB_NAME, sch, true, &tbl), "Loadcsv : table open");
     // AM_DestroyIndex(DB_NAME, 0);
     // assert(AM_CreateIndex(DB_NAME, 0, 'i', 4) == AME_OK);
     // int index_fileDesc = PF_OpenFile(INDEX_NAME);
-    cout<<"Created Table"<<endl;
     char *tokens[MAX_TOKENS];
     char record[MAX_PAGE_SIZE];
 
@@ -191,7 +198,11 @@ loadCSV() {
     tbl2.close();
     cout<<"----------------------------------------------------------------"<<endl;    
     tbl.eraseIndex(2);
+    cout<<"Erased Index"<<endl;
+    cout<<"----------------------------------------------------------------"<<endl;    
     tbl.close();
+    cout<<"Table Closed"<<endl;
+    cout<<"----------------------------------------------------------------"<<endl;    
     // fclose(fp);
     // Table_Close(tbl);
     // checkerr(PF_CloseFile(index_fileDesc), "Loadcsv : close file");
@@ -200,8 +211,9 @@ loadCSV() {
 
 
 int main(){
-    loadCSV();
+    // loadCSV();
 
+    // ONLY RUN THESE THE FIRST TIME TO CREATE SUPERUSER
     bool success = createUserDb();
     createPrivilegeTable();
     createPrivilegeDb();
@@ -211,7 +223,58 @@ int main(){
     u.addUser("weakling", "boi");
     User u2("weakling", "boi");
     u.assignPerm(u2, "MAIN_DB", 1);
-    u.assignPerm(u2, "MAIN_DB", "MAIN_TABLE", 1);
+    u.assignPerm(u2, "MAIN_DB", "MAIN_TABLE", 2);
+
+    Database db(&u);
+    db.create("MAIN_DB");
+    db.create("TEMP_DB");
+    db.drop();
+    db.connect("MAIN_DB");
+
+    std::string db_name = "MAIN_DB";
+    vector<string> table_name = {"MAIN_TABLE", "TEMP_TABLE_2"}; 
+    Table* tables[2];
+    for(int i =0; i<2; i++){
+        std::vector<std::pair<std::string, int> > cols;
+        cols.push_back({"KEY", VARCHAR});
+        cols.push_back({"VALUE", VARCHAR});  
+        std::vector<int> pk = {0};
+
+        char* table_cstr = new char[table_name[i].size()+1];
+        memcpy(table_cstr, table_name[i].c_str(), table_name[i].size()+1);
+
+        char* db_cstr = new char[db_name.size()+1];
+        memcpy(db_cstr, db_name.c_str(), db_name.size()+1);
+
+        Schema *schema = new Schema(cols, pk);
+        vector<IndexData> vi;
+        tables[i] = new Table(schema, table_cstr, db_cstr, false, vi);
+        db.createTable(tables[i]);
+        delete table_cstr, db_cstr;
+    }
+
+    cout<<"\n----------------------------------------------------------------"<<endl;
+    cout << "Table and Db Checking" << endl;
+    cout << "MAIN_DB Exists? " << isDb("MAIN_DB") << endl;
+    cout << "MAIN_TABLE Exists? " << isTable("MAIN_DB", "MAIN_TABLE") << endl;
+    cout << "TEMP_DB Exists? " << isDb("TEMP_DB") << endl;
+    cout << "TEMP_TABLE Exists? " << isTable("MAIN_DB", "TEMP_TABLE") << endl;
+
+    Database db1(&u2);
+
+    cout<<"\n----------------------------------------------------------------"<<endl;
+    cout << "User permission validity" << endl;
+    cout << "MAIN_DB Allowed to Read? " << db1.isAllowed("MAIN_DB", 1) << endl;
+    cout << "MAIN_DB Allowed to Write? " << db1.isAllowed("MAIN_DB", 2) << endl;
+    cout << "MAIN_TABLE Allowed to Read? " << db1.isAllowed("MAIN_DB", "MAIN_TABLE", 1) << endl;
+    cout << "MAIN_TABLE Allowed to Write? " << db1.isAllowed("MAIN_DB", "MAIN_TABLE", 2) << endl;
+    cout << "TEMP_TABLE_1 Allowed to Write? " << db1.isAllowed("MAIN_DB", "TEMP_TABLE_1", 2) << endl; 
+    cout<<"\n----------------------------------------------------------------"<<endl;
+
+    cout << "Deleting Now" << endl;
+    db.deleteTable(tables[0]);
+    tables[0]->close();
+    tables[1]->close();
 
     return 0;
 }

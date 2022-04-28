@@ -76,7 +76,7 @@ std::string User::get_user() {
 bool User::assignPerm(User& user, std::string dbName, int perm) {
     if (!is_admin) return false;
 
-    Table* user_table = connectUserPrivDb();
+    user_table = connectUserPrivDb();
     if (perm < 0 || perm > 2) return false;
 
     void* data[3];
@@ -93,7 +93,7 @@ bool User::assignPerm(User& user, std::string dbName, int perm) {
 bool User::assignPerm(User& user, std::string dbName, std::string tableName, int perm) {
     if (!is_admin) return false;
 
-    Table* user_table = connectUserPrivTable();
+    user_table = connectUserPrivTable();
     if (perm < 0 || perm > 2) return false;
 
     void* data[4];
@@ -107,6 +107,54 @@ bool User::assignPerm(User& user, std::string dbName, std::string tableName, int
     user_table->close();
     return ret;
 }   
+
+bool User::isAllowed(std::string dbName, int perm) {
+    if (is_admin)
+        return true;
+    user_table = connectUserPrivDb();
+
+    void** pk_s = new void*[2];
+    pk_s[0] = (void*) uname.c_str();
+    pk_s[1] = (void*) dbName.c_str();
+    void** data = user_table->getRow(pk_s);
+
+    if (data == NULL) {
+        user_table->close();
+        delete[] pk_s;
+        return false;
+    }
+
+    int user_perm = DecodeInt((char*)data[2]);
+    user_table->close();
+    delete[] pk_s;
+    return user_perm >= perm;
+}
+
+bool User::isAllowed(std::string dbName, std::string tableName, int perm) {
+    if (is_admin)
+        return true;
+    if (isAllowed(dbName, perm))
+        return true;
+
+    user_table = connectUserPrivTable();
+
+    void** pk_s = new void*[3];
+    pk_s[0] = (void*) uname.c_str();
+    pk_s[1] = (void*) dbName.c_str();
+    pk_s[2] = (void*) tableName.c_str();
+    void** data = user_table->getRow(pk_s);
+
+    if (data == NULL) {
+        user_table->close();
+        delete[] pk_s;
+        return false;
+    }
+
+    int user_perm = DecodeInt((char*)data[3]);
+    user_table->close();
+    delete[] pk_s;
+    return user_perm >= perm;
+}
 
 Table* connectUserTable() {
     // Create table of users
