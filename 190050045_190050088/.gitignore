@@ -1,3 +1,5 @@
 .vscode/**
 *.idx
 *.tbl
+dblayer/dumpdb
+dblayer/loaddb
