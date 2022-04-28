@@ -157,9 +157,17 @@ bool Table::addRow(void* data[], bool update) {
             Schema_ sch = *schema.getSchema();
             std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
             char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
-
+/*
+            for(int j =0; j< indexes[i].numCols; j++)
+                std::cout << indexes[i].attrLen[j] << " ";
+            std::cout << std::endl;
+*/
             int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
-            assert(err == AME_OK);
+            if (err != AME_OK)
+            {
+                std::cout << "Error " << err << " inserting into index " << indexes[i].indexNo << std::endl;
+                exit(1);
+            }
         }
         else {
             indexes[i].fileDesc = PF_OpenFile((char*)(db_name + "." + name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
@@ -172,8 +180,11 @@ bool Table::addRow(void* data[], bool update) {
             char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
 
             int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
-            // std::cout << err << std::endl;
-            assert(err == AME_OK);
+            if (err != AME_OK)
+            {
+                std::cout << "Error " << err << " inserting into index " << indexes[i].indexNo << std::endl;
+                exit(1);
+            }
         }
     }
     return true;
@@ -200,7 +211,11 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
             char* result = cols_to_char(indexes[i].attrLen, cols, &sch, data);
 
             int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
-            assert(err == AME_OK);
+            if (err != AME_OK)
+            {
+                std::cout << "Error " << err << " deleting from index " << indexes[i].indexNo << std::endl;
+                exit(1);
+            }
         }
         else {
             indexes[i].fileDesc = PF_OpenFile((char*)(db_name + "." + name + "." + std::to_string(indexes[i].indexNo) + ".idx").c_str());
@@ -212,7 +227,11 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
             char* result = cols_to_char(indexes[i].attrLen, cols, &sch, data);
 
             int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
-            assert(err == AME_OK);
+            if (err != AME_OK)
+            {
+                std::cout << "Error " << err << " deleting from index " << indexes[i].indexNo << std::endl;
+                exit(1);
+            }
         }
     }
     return true;
