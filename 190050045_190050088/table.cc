@@ -155,11 +155,11 @@ bool Table::addRow(void* data[], bool update) {
             Schema_ sch = *schema.getSchema();
             std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
             char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
-
+/*
             for(int j =0; j< indexes[i].numCols; j++)
                 std::cout << indexes[i].attrLen[j] << " ";
             std::cout << std::endl;
-
+*/
             int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
             assert(err == AME_OK);
         }
@@ -174,7 +174,7 @@ bool Table::addRow(void* data[], bool update) {
             char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
 
             int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
-            std::cout << err << std::endl;
+            // std::cout << err << std::endl;
             assert(err == AME_OK);
         }
     }
