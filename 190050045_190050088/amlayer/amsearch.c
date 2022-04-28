@@ -44,12 +44,14 @@ AM_Search(
     {
         bcopy(*pageBuf,lheader,AM_sl);
         if (lheader->attrLength != totalAttrLength) {
+            PF_UnfixPage(fileDesc,*pageNum,FALSE);
             return(AME_INVALIDATTRLENGTH);
         }
 
     } else { /* root is not a leaf */
         bcopy(*pageBuf,iheader,AM_sint);
         if (iheader->attrLength != totalAttrLength) {
+            PF_UnfixPage(fileDesc,*pageNum,FALSE);
             return(AME_INVALIDATTRLENGTH);
         }
     }
@@ -77,12 +79,14 @@ AM_Search(
             /* if next page is a leaf */
             bcopy(*pageBuf,lheader,AM_sl);
             if (lheader->attrLength != totalAttrLength) {
+                PF_UnfixPage(fileDesc,*pageNum,FALSE);
                 return(AME_INVALIDATTRLENGTH);
             }
         } else {
             /* if next page is an internal node */
             bcopy(*pageBuf,iheader,AM_sint);
             if (iheader->attrLength != totalAttrLength) {
+                PF_UnfixPage(fileDesc,*pageNum,FALSE);
                 return(AME_INVALIDATTRLENGTH);
             }
         }

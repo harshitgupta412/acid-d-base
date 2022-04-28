@@ -186,6 +186,7 @@ AM_DeleteEntry(
     /* The key is not in the tree */
     if (status == AM_NOT_FOUND) {
         AM_Errno = AME_NOTFOUND;
+        PF_UnfixPage(fileDesc,pageNum,FALSE);
         return(AME_NOTFOUND);
     }
 
@@ -217,6 +218,7 @@ AM_DeleteEntry(
     /* if end of list reached then key not in tree */
     if (nextRec == AM_NULL) {
         AM_Errno = AME_NOTFOUND;
+        PF_UnfixPage(fileDesc,pageNum,FALSE);
         return(AME_NOTFOUND);
     }
 
