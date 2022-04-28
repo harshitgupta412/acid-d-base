@@ -22,7 +22,7 @@ extern "C" {
 #include <assert.h>
 
 #define MAX_PAGE_SIZE 4000
-#define MAX_VARCHAR_LENGTH 100
+#define MAX_VARCHAR_LENGTH 50
 struct IndexData {
     int indexNo;
     int numCols;

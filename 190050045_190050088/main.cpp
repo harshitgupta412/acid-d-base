@@ -1,9 +1,15 @@
+#include <bits/stdc++.h>
+#include <utility>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include "schema.h"
 #include "table.h"
+#include "db.h"
+#include "user.h"
+
 #define checkerr(err, message) {if (err < 0) {PF_PrintError(message); exit(1);}}
 
 #define MAX_PAGE_SIZE 4000
@@ -133,7 +139,7 @@ loadCSV() {
     while ((line = fgets(buf, MAX_LINE_LEN, fp)) != NULL) {
 	int n = split(line, ",", tokens);
 	assert (n == sch->numColumns);
-    tbl.addRow((void**)tokens,false);
+    tbl.addRow((void**)tokens,true);
     }
     cout<<"----------------------------------------------------------------"<<endl;
     cout<<"Printing"<<endl;
@@ -192,7 +198,20 @@ loadCSV() {
     return sch;
 }
 
-int
-main() {
+
+int main(){
     loadCSV();
+
+    bool success = createUserDb();
+    createPrivilegeTable();
+    createPrivilegeDb();
+
+    User u("SUPERUSER", "SUPERUSER_PASSWORD");
+
+    u.addUser("weakling", "boi");
+    User u2("weakling", "boi");
+    u.assignPerm(u2, "MAIN_DB", 1);
+    u.assignPerm(u2, "MAIN_DB", "MAIN_TABLE", 1);
+
+    return 0;
 }

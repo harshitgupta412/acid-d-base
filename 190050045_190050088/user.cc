@@ -38,6 +38,7 @@ User::User(string username, string password){
         return;
     }
     is_admin = (bool) DecodeInt((char*)data[2]);
+    // user_table->print();
     user_table->close();
 }
 
@@ -84,7 +85,7 @@ bool User::assignPerm(User& user, std::string dbName, int perm) {
     data[2] = (void*) std::to_string(perm).c_str();
 
     bool ret = user_table->addRow(data,true);
-    user_table->print();
+    // user_table->print();
     user_table->close();
     return ret;
 }   
@@ -102,7 +103,7 @@ bool User::assignPerm(User& user, std::string dbName, std::string tableName, int
     data[3] = (void*) std::to_string(perm).c_str();
 
     bool ret = user_table->addRow(data,true);
-    user_table->print();
+    // user_table->print();
     user_table->close();
     return ret;
 }   
@@ -134,8 +135,8 @@ Table* connectUserPrivTable() {
     cols.push_back({"DBNAME", VARCHAR});
     cols.push_back({"TABLE", VARCHAR});
     cols.push_back({"PRIV_LEVEL", INT});
-    // vector<int> pk = {0,1,2};
-    vector<int> pk = {0};
+    vector<int> pk = {0,1,2};
+    // vector<int> pk = {0};
 
     Schema* schema = new Schema(cols, pk);
     vector<IndexData> vi;
@@ -152,8 +153,8 @@ Table* connectUserPrivDb() {
     cols.push_back({"username", VARCHAR});
     cols.push_back({"DBNAME", VARCHAR});
     cols.push_back({"PRIV_LEVEL", INT});
-    // vector<int> pk = {0,1};
-    vector<int> pk = {0};
+    vector<int> pk = {0,1};
+    // vector<int> pk = {0};
 
     Schema* schema = new Schema(cols, pk);
     vector<IndexData> vi;

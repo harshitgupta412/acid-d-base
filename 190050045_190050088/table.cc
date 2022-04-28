@@ -20,6 +20,27 @@ int cols_to_indexNo(std::vector<int> cols, int maxcols)
     return indexNo;
 }
 
+std::vector<int> indexNo_to_cols(int indexNo, int maxcols, int numCols) 
+{
+    std::vector<int> cols;
+    for(int i = 0; i < numCols; i++)
+    {
+        cols.push_back(indexNo % maxcols);
+        indexNo /= maxcols;
+    }
+    return cols;
+}
+
+char* cols_to_char(int attrLength[], std::vector<int> cols, Schema_ *sch, char* record) {
+    char* result = new char[MAX_PAGE_SIZE];
+    for(int i = 0; i < cols.size(); i++) {
+        char* res = getNthfield(record, cols[i], sch);
+        memcpy(result, res, attrLength[i]);
+        result += attrLength[i];
+    }
+    return result;
+}
+
 // get number of slots in the page buffer
 int  getNumSlots(byte *pageBuf)
 {
@@ -53,7 +74,10 @@ void Table::deleteRow(int rowId){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();   
             // std::cout<<indexes[i].indexNo<<std::endl;
-            int err = AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rowId);
+            std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
+            char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
+
+            int err = AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rowId);
             // std::cout<<"delte "<<err<<std::endl;
             assert(err == AME_OK);
         }
@@ -62,7 +86,11 @@ void Table::deleteRow(int rowId){
             assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
-            int err = AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rowId);
+
+            std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
+            char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
+
+            int err = AM_DeleteEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rowId);
             // std::cout<<"delte "<<err<<std::endl;
             assert(err == AME_OK);
 
@@ -125,7 +153,14 @@ bool Table::addRow(void* data[], bool update) {
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();
-            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
+            std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
+            char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
+
+            for(int j =0; j< indexes[i].numCols; j++)
+                std::cout << indexes[i].attrLen[j] << " ";
+            std::cout << std::endl;
+
+            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
             assert(err == AME_OK);
         }
         else {
@@ -134,7 +169,12 @@ bool Table::addRow(void* data[], bool update) {
             assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
-            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(record, indexes[i].indexNo, &sch), rid);
+
+            std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
+            char* result = cols_to_char(indexes[i].attrLen, cols, &sch, record);
+
+            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
+            std::cout << err << std::endl;
             assert(err == AME_OK);
         }
     }
@@ -155,7 +195,10 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();
-            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(data, indexes[i].indexNo, &sch), rid);
+            std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
+            char* result = cols_to_char(indexes[i].attrLen, cols, &sch, data);
+
+            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
             assert(err == AME_OK);
         }
         else {
@@ -163,7 +206,11 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
             assert(indexes[i].fileDesc >= 0);
             indexes[i].isOpen = true;
             Schema_ sch = *schema.getSchema();
-            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, getNthfield(data, indexes[i].indexNo, &sch), rid);
+
+            std::vector<int> cols = indexNo_to_cols(indexes[i].indexNo, sch.numColumns, indexes[i].numCols);
+            char* result = cols_to_char(indexes[i].attrLen, cols, &sch, data);
+
+            int err = AM_InsertEntry(indexes[i].fileDesc, indexes[i].attrType, indexes[i].attrLen, indexes[i].numCols, result, rid);
             assert(err == AME_OK);
         }
     }

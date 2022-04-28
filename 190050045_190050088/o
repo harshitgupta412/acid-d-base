@@ -1,9 +1,2017 @@
+l
+lheader attrLength: 50
+header attrLength: 0
+total attr 50
+50 
+l
+lheader attrLength: 50
+header attrLength: 0
+total attr 50
+Number of Columns: 3
+username	password	admin	
+weakling	6267296772345388567	0	
+SUPERUSER	-8852202266529446395	1	
+l
+lheader attrLength: 50
+header attrLength: 0
+total attr 50
+50 
+l
+lheader attrLength: 50
+header attrLength: 0
+total attr 50
+Number of Columns: 3
+username	password	admin	
+SUPERUSER	-8852202266529446395	1	
+weakling	6267296772345388567	0	
+l
+lheader attrLength: 100
+header attrLength: 0
+total attr 100
+50 50 
+l
+lheader attrLength: 100
+header attrLength: 0
+total attr 100
+Number of Columns: 3
+username	DBNAME	PRIV_LEVEL	
+weakling	MAIN_DB	1	
+l
+lheader attrLength: 150
+header attrLength: 0
+total attr 150
+50 50 50 
+l
+lheader attrLength: 150
+header attrLength: 0
+total attr 150
+Number of Columns: 4
+username	DBNAME	TABLE	PRIV_LEVEL	
+weakling	MAIN_DB	MAIN_TABLE	1	
 Created Table
 Adding rows
+i
+lheader attrLength: 18308
+header attrLength: 50
+total attr 50
+0
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+0
+i
+lheader attrLength: -12288
+header attrLength: 50
+total attr 50
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18628
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 17552
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 26240
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -14012
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 18560
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: 16736
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
+50 
+i
+lheader attrLength: -13984
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
 ----------------------------------------------------------------
 Printing
 Number of Columns: 3
-Country	Capital	Population	
+Àc@NÙ	Capital	Population	
 Afghanistan	Kabul	35530081	
 Albania	Tirana	2930187	
 Algeria	Algiers	41318142	
@@ -203,9 +2211,17 @@ Get Rows
 Zimbabwe	Harare	16529904	
 ----------------------------------------------------------------
 Delete Row
+i
+lheader attrLength: -12288
+header attrLength: 50
+total attr 50
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
 1 deleted
 Number of Columns: 3
-Country	Capital	Population	
+Àc@NÙ	Capital	Population	
 Afghanistan	Kabul	35530081	
 Albania	Tirana	2930187	
 Algeria	Algiers	41318142	
@@ -399,8 +2415,18 @@ Venezuela	Caracas	31977065
 Vietnam	Hanoi	95540800	
 Yemen	Sana'a	28250420	
 Zambia	Lusaka	17094130	
+50 
+i
+lheader attrLength: -928
+header attrLength: 50
+total attr 50
+4 
+l
+lheader attrLength: 4
+header attrLength: 0
+total attr 4
 Number of Columns: 3
-Country	Capital	Population	
+Àc@NÙ	Capital	Population	
 Afghanistan	Kabul	35530081	
 Albania	Tirana	2930187	
 Algeria	Algiers	41318142	
@@ -598,7 +2624,7 @@ Zimbabwase	Harare	16529904
 ----------------------------------------------------------------
 Encode Decode
 Number of Columns: 3
-Country	Capital	Population	
+Àc@NÙ	Capital	Population	
 Number of Columns: 3
-Country	Capital	Population	
+Àc@NÙ	Capital	Population	
 ----------------------------------------------------------------
