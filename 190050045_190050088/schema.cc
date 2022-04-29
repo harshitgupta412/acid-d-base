@@ -79,7 +79,7 @@ bool Schema::foreignKey(std::vector<int> ref_cols, char* refT) {
     return true;
 }
 
-const Schema_* Schema::getSchema() {
+Schema_* Schema::getSchema() {
     return schema;
 }
 

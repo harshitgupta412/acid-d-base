@@ -622,3 +622,139 @@ Table decodeTable(byte* s, int max_len ) {
     }
     return Table(&schema, (char*)name.c_str(), (char*)db_name.c_str(), false, indexes);
 }
+
+void append(void* callbackObj, int rid, byte* row, int len){
+    std::vector<std::pair<std::pair<int, int>, byte*>> * p = (std::vector<std::pair<std::pair<int, int>, byte*>> *) callbackObj;
+
+    p->push_back({{rid, len}, row});
+}
+std::vector<std::pair<int, void**>> Table::get_records(){
+    std::vector<std::pair<std::pair<int, int>, byte*>> returnal;
+    std::vector<std::pair<int, void**>> final_res;
+    Table_Scan(table, &returnal, append);
+
+    Schema_ *sch = schema.getSchema();
+    for (std::pair<std::pair<int,int>, byte*> p : returnal){
+        char* data[sch->numColumns];
+        void* ret[sch->numColumns];
+
+        decode(sch, (char**)data, p.second+2, p.first.second);
+
+        for(int i=0; i<sch->numColumns; i++) {
+            ret[i] = (void*) data[i];
+        }
+        final_res.push_back({p.first.first, (void**)ret});
+
+    }
+    
+    return final_res;
+}
+Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2){
+    Schema s1 = t1->getSchema();
+    Schema s2 = t1->getSchema();
+
+    const Schema_ *sch1 = s1.getSchema();
+    const Schema_ *sch2 = s2.getSchema();
+
+    if (t1->get_db_name() != t2->get_db_name()){
+        return NULL;
+    }
+    if (t1->get_db_name() != t2->get_db_name() || cols1.size() != cols2.size()){
+        return NULL;
+    }
+    
+    for (int i=0; i<cols1.size(); ++i){
+        if (cols1[i] >= sch1->numColumns || cols2[i] >= sch2->numColumns || cols1[i] < 0 || cols2[i] < 0){
+            return NULL;
+        }
+        if (sch1->columns[cols1[i]].type != sch2->columns[cols2[i]].type){
+            return NULL;
+        }
+    }
+    
+    std::vector<std::pair<std::string, int> > cols_join;
+
+    for (int i=0; i<sch1->numColumns; ++i){
+        cols_join.push_back({t1->get_name() + "." + sch1->columns[i].name, sch1->columns[i].type});
+    }
+    for (int i=0; i<sch2->numColumns; ++i){
+        cols_join.push_back({t2->get_name() + "." + sch2->columns[i].name, sch2->columns[i].type});
+    }
+
+    std::vector<int> pk;
+    std::vector<int> pk1 = s1.getpk(); 
+    std::vector<int> pk2 = s2.getpk();
+
+    for (int i: pk1){
+        pk.push_back(i);
+    }
+    for (int i: pk2){
+        pk.push_back(sch1->numColumns + i);
+    }
+    Schema *common = new Schema(cols_join, pk);
+    Table* t = new Table(common, (char*)"result", (char*)t1->get_db_name().c_str(), true);
+
+    std::vector<std::pair<int, void**>> t1_rows = t1->get_records();
+    std::vector<std::pair<int, void**>> t2_rows = t2->get_records();
+
+
+    for (std::pair<int, void**> r1: t1_rows){
+        for (std::pair<int, void**> r2: t2_rows){
+            std::vector<void*> d1(cols1.size());
+            std::vector<void*> d2(cols2.size());
+
+            void* union_row[sch1->numColumns + sch2->numColumns];
+
+            int j = 0;
+            for (int i=0; i<sch1->numColumns; ++i){
+                union_row[i] = r1.second[i];
+                if (i == cols1[j]){
+                    d1[j] = r1.second[i];
+                    j++;
+                }
+            }
+            j = 0;
+            for (int i=0; i<sch2->numColumns; ++i){
+                union_row[sch1->numColumns + i] = r2.second[i];
+                if (i == cols2[j]){
+                    d2[j] = r2.second[i];
+                    j++;
+                }
+            }
+            bool match =true;
+            int i1, i2;
+            float f1, f2;
+            long l1, l2;
+            char *s1, *s2;
+            for (int i=0; i<cols1.size(); ++i){
+                switch(sch1->columns[cols1[i]].type){
+                    case INT:
+                        i1 =  DecodeInt((char*)d1[i]);
+                        i2 =  DecodeInt((char*)d2[i]);
+                        if (i1 != i2) match = false;
+                        break;
+                    case FLOAT:
+                        f1 =  DecodeFloat((char*)d1[i]);
+                        f2 =  DecodeFloat((char*)d2[i]);
+                        if (f1 != f2) match = false;
+                        break;
+                    case LONG:
+                        l1 =  DecodeLong((char*)d1[i]);
+                        l2 =  DecodeLong((char*)d2[i]);
+                        if (l1 != l2) match = false;
+                        break;
+                    case VARCHAR:
+                        s1 = (char*)d1[i];
+                        s2 = (char*)d2[i];
+                        if (strcmp(s1, s2) != 0) match = false;
+                        break;
+                }
+            }
+
+            if (match){
+                t->addRow(union_row, true);
+            }
+        }
+    }
+    return t;
+}
