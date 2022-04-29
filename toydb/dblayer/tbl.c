@@ -336,6 +336,7 @@ encode(Schema_ *sch, char **fields, byte *record, int spaceLeft) {
             {
                 // assert(spaceLeft >= 4);
                 EncodeInt(atoi(fields[i]), record);
+
                 spaceLeft -= 4;
                 record += 4;
                 bytes_encoded += 4;
