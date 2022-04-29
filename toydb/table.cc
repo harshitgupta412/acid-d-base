@@ -957,8 +957,8 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int>
     Table* t = new Table(common, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
 
     common->print();
-    std::vector<std::pair<int, void**>> t1_rows = t1->get_records();
-    std::vector<std::pair<int, void**>> t2_rows = t2->get_records();
+    std::vector<std::pair<int, void**>> t1_rows = t1->get_records2();
+    std::vector<std::pair<int, void**>> t2_rows = t2->get_records2();
 
 
     for (std::pair<int, void**> r1: t1_rows){
@@ -970,11 +970,7 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int>
 
             int j = 0;
             for (int i=0; i<sch1->numColumns; ++i){
-                if(sch1->columns[i].type == VARCHAR) {
-                    union_row[i] = (void*)new char[strlen((char*)r1.second[i]) + 3];
-                    EncodeCString((char*)r1.second[i], (char*)union_row[i], strlen((char*)r1.second[i]) + 3);
-                }
-                else union_row[i] = r1.second[i];
+                union_row[i] = r1.second[i];
                 // union_row[i] = r1.second[i];
                 if (i == cols1[j]){
                     d1[j] = r1.second[i];
@@ -983,23 +979,14 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int>
             }
             j = 0;
             for (int i=0; i<sch2->numColumns; ++i){
-                if(sch2->columns[i].type == VARCHAR) {
-                    union_row[sch1->numColumns + i] = (void*)new char[strlen((char*)r2.second[i]) + 3];
-                    EncodeCString((char*)r2.second[i], (char*)union_row[sch1->numColumns + i], strlen((char*)r2.second[i]) + 3);
-                }
-                else union_row[sch1->numColumns + i] = r2.second[i];
+                union_row[sch1->numColumns + i] = r2.second[i];
                 // union_row[sch1->numColumns + i] = r2.second[i];
                 if (i == cols2[j]){
                     d2[j] = r2.second[i];
                     j++;
                 }
             }
-            std::cout<<"SAds"<<std::endl;
 
-            for(int i=0;i<sch1->numColumns+sch2->numColumns;i++){
-                std::cout<<" "<< (char*)(2+union_row[i])<<std::endl;
-            }
-            std::cout<<"SAds"<<std::endl;
             bool match = true;
             int i1, i2;
             float f1, f2;
@@ -1008,33 +995,30 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int>
             for (int i=0; i<cols1.size(); ++i){
                 switch(sch1->columns[cols1[i]].type){
                     case INT:
-                        i1 =  DecodeInt((char*)d1[i]);
-                        i2 =  DecodeInt((char*)d2[i]);
-                        std::cout << i1 << " and " << i2 << std::endl;
+                        i1 =  atoi((char*)d1[i]);
+                        i2 =  atoi((char*)d2[i]);
                         if (i1 != i2) match = false;
                         break;
                     case FLOAT:
-                        f1 =  DecodeFloat((char*)d1[i]);
-                        f2 =  DecodeFloat((char*)d2[i]);
+                        f1 =  atof((char*)d1[i]);
+                        f2 =  atof((char*)d2[i]);
                         if (f1 != f2) match = false;
                         break;
                     case LONG:
-                        l1 =  DecodeLong((char*)d1[i]);
-                        l2 =  DecodeLong((char*)d2[i]);
+                        l1 =  atoll((char*)d1[i]);
+                        l2 =  atoll((char*)d2[i]);
                         if (l1 != l2) match = false;
                         break;
                     case VARCHAR:
                         s1 = (char*)d1[i];
                         s2 = (char*)d2[i];
-                        std::cout<<s1<<' '<<s2<<std::endl;
                         if (strcmp(s1, s2) != 0) match = false;
                         break;
                 }
             }
             
             if (match){
-            std::cout<<"SAds"<<std::endl;
-                t->addRow(union_row, true);
+               t->addRow(union_row, true);
             }
         }
     }

@@ -33,13 +33,15 @@ int main(){
     Table t(&s, "a", DB_NAME, true, {}, false);
 
     char **array = new char*[4];
-    array[0] = array[2] = "1";
+    array[0] = "1"; array[2] = "2";
     array[1] = "2"; array[3] = "3";
 
     void** row1 = new void*[2];
     row1[0] = (void*)(array[0]); row1[1] = (void*)(array[1]);
     void** row2 = new void*[2];
     row2[0] = (void*)(array[2]); row2[1] = (void*)(array[3]);
+
+    
 
     t.addRow(row1, true);
     t.addRow(row2, true);
@@ -51,7 +53,7 @@ int main(){
     Table t2(&s, "b", DB_NAME, true, {}, false);
 
     char **array2 = new char*[4];
-    array2[0] = array2[2] = "1";
+    array2[0] = "1" ;  array2[2] = "2";
     array2[1] = "4"; array2[3] = "5";
 
     void** row3 = new void*[2];
