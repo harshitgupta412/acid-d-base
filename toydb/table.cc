@@ -159,7 +159,7 @@ void Table::deleteRow(int rowId, bool log){
     Table_Delete(table, rowId);
 }
 
-Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes = std::vector<IndexData>(), bool index_pk): schema(*_schema) {
+Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk): schema(*_schema) {
     name += db_name;
     name += ".";
     name += table_name;
