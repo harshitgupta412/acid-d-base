@@ -65,11 +65,42 @@ int  getLen(int slot, byte *pageBuf)
     return DecodeShort(pageBuf + offset);
 }
 
-void Table::deleteRow(int rowId){
+void print_row(void* callbackObj, int rid, byte* row, int len) {
+    Schema_ *schema = (Schema_ *) callbackObj;
+    char* data[schema->numColumns];
+    decode(schema, (char**)data, row+2, len);
+    for(int i=0; i<schema->numColumns; i++) {
+        switch(schema->columns[i].type) {
+            case INT:
+                printf("%d\t", DecodeInt(data[i]));
+                break;
+            case FLOAT:
+                printf("%f\t", DecodeFloat(data[i]));
+                break;
+            case LONG:
+                printf("%lld\t", DecodeLong(data[i]));
+                break;
+            case VARCHAR:
+                printf("%s\t", (char*)data[i]);
+                break;
+            default:
+                printf("%s\t", (char*)data[i]);
+                break;
+        }
+    }
+    std::cout << std::endl;
+}
+
+void Table::deleteRow(int rowId, bool log){
     char record[MAX_PAGE_SIZE];
     int num_bytes = Table_Get(table, rowId, record, MAX_PAGE_SIZE);
     if(num_bytes == -1) {
         return;
+    }
+    
+    if(log){
+        std::string val(record, num_bytes);
+        table_logs.push_back({'d',val});
     }
 
     for(int i=0; i<indexes.size(); i++){
@@ -148,7 +179,7 @@ const Schema& Table::getSchema() {
     return schema;
 }
 
-bool Table::addRow(void* data[], bool update) {
+bool Table::addRow(void* data[], bool update, bool log) {
     byte** pk_value = new byte*[pk_size];
     for(int i=0; i<pk_size; i++) {
         pk_value[i] = (byte*)data[pk_index[i]];
@@ -157,13 +188,20 @@ bool Table::addRow(void* data[], bool update) {
     if(rid != -1 && !update) return false;
     else if(rid != -1){
         // std::cout << rid << std::endl;
-        deleteRow(rid);
+        deleteRow(rid, log);
     }
     char record[MAX_PAGE_SIZE];
     Schema_ sch = *schema.getSchema();
 
     int len = encode(&sch, (char**)data, record, MAX_PAGE_SIZE);
+    // add to log before continuing
     Table_Insert(table, record, len, &rid);
+
+    if(log){
+        table_logs.push_back({'a', std::to_string(rid)});
+        std::cout << "Adding Record " << rid << std::endl;
+    }
+
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
             Schema_ sch = *schema.getSchema();
@@ -260,36 +298,11 @@ std::string Table::get_db_name(){
 std::string Table::get_table_name(){
     return name;
 }
-void print_row(void* callbackObj, int rid, byte* row, int len) {
-    Schema_ *schema = (Schema_ *) callbackObj;
-    char* data[schema->numColumns];
-    decode(schema, (char**)data, row+2, len);
-    for(int i=0; i<schema->numColumns; i++) {
-        switch(schema->columns[i].type) {
-            case INT:
-                printf("%d\t", DecodeInt(data[i]));
-                break;
-            case FLOAT:
-                printf("%f\t", DecodeFloat(data[i]));
-                break;
-            case LONG:
-                printf("%lld\t", DecodeLong(data[i]));
-                break;
-            case VARCHAR:
-                printf("%s\t", (char*)data[i]);
-                break;
-            default:
-                printf("%s\t", (char*)data[i]);
-                break;
-        }
-    }
-    std::cout << std::endl;
-}
 
-bool Table::deleteRow(void** pk) {
+bool Table::deleteRow(void** pk, bool log) {
     int rid = Table_Search(table, pk_index, (byte**)pk, pk_size);
     if(rid == -1) return true;
-    deleteRow(rid);
+    deleteRow(rid, log);
     return true;
 }
 
@@ -583,6 +596,24 @@ std::string Table::encodeTable() {
         }
     }
     return str;
+}
+
+bool Table::rollback() 
+{
+    while(!table_logs.empty()) {
+        std::pair<char, std::string> log = table_logs.back();
+        table_logs.pop_back();
+        if(log.first == 'a') {
+            deleteRow(stoi(log.second), false);
+            std::cout << "Rollback Delete: rid " << stoi(log.second) << std::endl;
+            std::cout << "Rollback: Deleting row" << std::endl;
+        }
+        else {
+            std::cout << "Rollback Add: " << std::endl;
+            addRowFromByte((char*)log.second.c_str(), log.second.length(), true);
+            std::cout << "Rollback: Adding row" << std::endl;
+        }
+    }
 }
 
 

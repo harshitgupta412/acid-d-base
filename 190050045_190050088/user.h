@@ -29,7 +29,6 @@ class User {
     // true if user has the following permission
     bool isAllowed(std::string dbName, int perm);
     bool isAllowed(std::string dbName, std::string tableName, int perm);
-    
 };
 
 Table* connectUserTable();
