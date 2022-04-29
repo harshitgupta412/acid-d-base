@@ -62,3 +62,7 @@ QueryObj QueryObj::Intersection(QueryObj *q1, QueryObj *q2) {
     newQuery.usedTables.insert(q2->usedTables.begin(), q2->usedTables.end());
     return newQuery;
 }
+
+QueryObj::QueryObj() {
+    
+}
