@@ -114,6 +114,8 @@ AM_OpenIndexScan(
 
     /* search for the pagenumber and index of value */
     status = AM_Search(fileDesc,attrType,attrLength, numCols, value,&pageNum,&pageBuf,&index);
+    // printf("page Num %d\n", pageNum);
+    // fflush(stdout);
     searchpageNum = pageNum;
     /* check for errors */
     if (status < 0) {
@@ -129,6 +131,8 @@ AM_OpenIndexScan(
 
     /* value is not in leaf but if inserted will have to be inserted after the last
        key */
+    // printf("Index %d\nNum keys %d\nNext Page %d\n", index, header->numKeys, header->nextLeafPage);
+    // fflush(stdout);
     if (index > header->numKeys) {
         if (header->nextLeafPage != AM_NULL_PAGE) {
             errVal = PF_GetThisPage(fileDesc,header->nextLeafPage,&pageBuf);
@@ -238,6 +242,10 @@ AM_OpenIndexScan(
     }
     case GREATER_THAN_EQUAL : {
         AM_scanTable[scanDesc].nextpageNum = pageNum;
+        // printf("Page Num %d\n", pageNum);
+        // fflush(stdout);
+        // printf("Next page num: %d\n", AM_scanTable[scanDesc].nextpageNum);
+        // fflush(stdout);
         AM_scanTable[scanDesc].nextIndex = index;
         AM_scanTable[scanDesc].actindex = index;
         bcopy(pageBuf + AM_sl + (index - 1)*recSize + totalAttrLength,
@@ -299,10 +307,14 @@ AM_FindNextEntry(int scanDesc/* index scan descriptor */)
     if (AM_scanTable[scanDesc].status == OVER) {
         return(AME_EOF);
     }
+    // printf("Is not over\n");
+    // fflush(stdout);
     if (AM_scanTable[scanDesc].nextpageNum == AM_NULL_PAGE) {
         AM_scanTable[scanDesc].status = OVER;
         return(AME_EOF);
     }
+    // printf("Is not null page\n");
+    // fflush(stdout);
 
     header = &head;
     errVal = PF_GetThisPage(AM_scanTable[scanDesc].fileDesc

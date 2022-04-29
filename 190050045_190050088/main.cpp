@@ -132,9 +132,9 @@ loadCSV() {
     tbl.createIndex(std::vector(1,2));
     cout<<"Index created"<<endl;
     cout<<"----------------------------------------------------------------"<<endl;
-    char c[] = "";
-    tbl.queryIndex(0,GREATER_THAN_EQUAL, vector<void*>(1,(void*)c));
-    cout<<"Query done"<<endl;
+    // char c[] = "Taiwan";
+    // tbl.queryIndex(0,GREATER_THAN_EQUAL, vector<void*>(1,(void*)c));
+    // cout<<"Query done"<<endl;
     // checkerr(Table_Open(DB_NAME, sch, true, &tbl), "Loadcsv : table open");
     // AM_DestroyIndex(DB_NAME, 0);
     // assert(AM_CreateIndex(DB_NAME, 0, 'i', 4) == AME_OK);
@@ -189,6 +189,13 @@ loadCSV() {
     tbl.addRow((void**)data2,false);
 
     tbl.print();
+    cout<<"\n----------------------------------------------------------------"<<endl;
+    
+    char c[] = "Yemen";
+    int i = 100000;
+    Table* out = tbl.queryIndex(0,GREATER_THAN_EQUAL, vector<void*>(1,(void*)c));
+    out->print();
+    cout<<"Query done"<<endl;
 
     cout<<"----------------------------------------------------------------"<<endl;
     cout<<"Encode Decode"<<endl;
@@ -211,7 +218,7 @@ loadCSV() {
 
 
 int main(){
-    // loadCSV();
+    loadCSV();
 
     // ONLY RUN THESE THE FIRST TIME TO CREATE SUPERUSER
     bool success = createUserDb();

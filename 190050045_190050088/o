@@ -1,0 +1,1420 @@
+Schema loaded
+0
+Table created
+----------------------------------------------------------------
+Index created
+----------------------------------------------------------------
+Adding rows
+----------------------------------------------------------------
+Printing
+Number of Columns: 3
+Country	Capital	Population	
+Afghanistan	Kabul	35530081	
+Albania	Tirana	2930187	
+Algeria	Algiers	41318142	
+Andorra	Andorra La Vella	76965	
+Angola	Luanda	29784193	
+Antigua & Barbuda	Saint John's	102012	
+Argentina	Buenos Aires	44271041	
+Armenia	Yerevan	2930450	
+Australia	Canberra	24450561	
+Austria	Vienna	8735453	
+Azerbaijan	Baku	9827589	
+Bahamas	Nassau	395361	
+Bahrain	Manama	1492584	
+Bangladesh	Dhaka	164669751	
+Barbados	Bridgetown	285719	
+Belarus	Minsk	9468338	
+Belgium	Brussels	11429336	
+Belize	Belmopan	374681	
+Benin	Porto-Novo	11175692	
+Bhutan	Thimphu	807610	
+Bolivia	Sucre	11051600	
+Bosnia & Herzegovina	Sarajevo	3507017	
+Botswana	Gaborone	2291661	
+Brazil	Brasilia	209288278	
+Brunei	Bandar Seri Begawan	428697	
+Bulgaria	Sofia	7084571	
+Burkina Faso	Ouagadougou	19193382	
+Burundi	Bujumbura	10864245	
+Cambodia	Phnom Penh	16005373	
+Cameroon	Yaounde	24053727	
+Canada	Ottawa	36624199	
+Cabo Verde	Praia	546388	
+Central African Republic	Bangui	4659080	
+Chad	N'Djamena	14899994	
+Chile	Santiago	18054726	
+China	Beijing	1409517397	
+Colombia	BogotÁ	49065615	
+Comoros	Moroni	813912	
+Republic of the Congo	Brazzaville	5260750	
+Costa Rica	San Jose	4905769	
+Croatia	Zagreb	4189353	
+Cuba	Havana	11484636	
+Cyprus	Nicosia	1179551	
+Czech Republic	Prague	10618303	
+Democratic Republic of the Congo	Kinshasa	81339988	
+Denmark	Copenhagen	5733551	
+Djibouti	Djibouti (City)	956985	
+Dominica	Roseau	73925	
+Dominican Republic	Santo Domingo	10766998	
+East Timor	Dili	1296311	
+Ecuador	Quito	16624858	
+Egypt	Cairo	97553151	
+El Salvador	San Salvador	6377853	
+Equatorial Guinea	Malabo	1267689	
+Eritrea	Asmara	5068831	
+Estonia	Tallinn	1309632	
+Ethiopia	Addis Ababa	104957438	
+Federated States of Micronesia	Palikir	105544	
+Fiji	Suva	905502	
+Finland	Helsinki	5523231	
+France	Paris	64979548	
+Gabon	Libreville	2025137	
+Georgia	Tbilisi	3912061	
+Germany	Berlin	82114224	
+Ghana	Accra	28833629	
+Greece	Athens	11159773	
+Grenada	Saint George's	107825	
+Guatemala	Guatemala City	16913503	
+Guinea	Conakry	12717176	
+Guinea-Bissau	Bissau	1861283	
+Guyana	Georgetown	777859	
+Haiti	Port-Au-Prince	10981229	
+Honduras	Tegucigalpa	9265067	
+Hungary	Budapest	9721559	
+Iceland	Reykjavik	335025	
+India	New Delhi	1339180127	
+Indonesia	Jakarta	263991379	
+Iran	Tehran	81162788	
+Iraq	Baghdad	38274618	
+Ireland	Dublin	4761657	
+Israel	Jerusalem/Tel Aviv	8321570	
+Italy	Rome	59359900	
+Jamaica	Kingston	2890299	
+Japan	Tokyo	127484450	
+Jordan	Amman	9702353	
+Kazakhstan	Astana	18204499	
+Kenya	Nairobi	49699862	
+Kiribati	South Tarawa	116398	
+Kuwait	Kuwait City	4136528	
+Kyrgyzstan	Bishkek	6045117	
+Laos	Vientiane	6858160	
+Latvia	Riga	1949670	
+Lebanon	Beirut	6082357	
+Lesotho	Maseru	2233339	
+Liberia	Monrovia	4731906	
+Libya	Tripoli	6374616	
+Liechtenstein	Vaduz	37922	
+Lithuania	Vilnius	2890297	
+Luxembourg	Luxembourg	583455	
+Madagascar	Antananarivo	25570895	
+Malawi	Lilongwe	18622104	
+Malaysia	Kuala Lumpur	31624264	
+Maldives	Male	436330	
+Mali	Bamako	18541980	
+Malta	Valletta	430835	
+Marshall Islands	Majuro	53127	
+Mauritania	Nouakchott	4420184	
+Mauritius	Port Louis	1265138	
+Mexico	Mexico City	129163276	
+Moldova	Chisinau	4051212	
+Monaco	Monaco	38695	
+Mongolia	Ulaanbaatar	3075647	
+Montenegro	Podgorica	628960	
+Morocco	Rabat	35739580	
+Mozambique	Maputo	29668834	
+Myanmar	Nay Pyi Taw	53370609	
+Namibia	Windhoek	2533794	
+Nauru	Yaren District	11359	
+Nepal	Kathmandu	29304998	
+Netherlands	Amsterdam	17035938	
+New Zealand	Wellington	4705818	
+Nicaragua	Managua	6217581	
+Niger	Niamey	21477348	
+Nigeria	Abuja	190886311	
+North Korea	Pyongyang	25490965	
+Norway	Oslo	5305383	
+Oman	Muscat	4636262	
+Pakistan	Islamabad	197015955	
+Palau	Ngerulmud	21729	
+Palestine	Jerusalem/Ramallah	4920724	
+Panama	Panama City	4098587	
+Papua New Guinea	Port Moresby	8251162	
+Paraguay	AsunciÓN	6811297	
+Peru	Lima	32165485	
+Philippines	Manila	104918090	
+Poland	Warsaw	38170712	
+Portugal	Lisbon	10329506	
+Qatar	Doha	2639211	
+Republic of Macedonia	Skopje	2083160	
+Romania	Bucharest	19679306	
+Russia	Moscow	143989754	
+Rwanda	Kigali	12208407	
+Saint Kitts & Nevis	Basseterre	55345	
+Saint Lucia	Castries	178844	
+Saint Vincent & the Grenadines	Kingstown	109897	
+Samoa	Apia	196440	
+San Marino	San Marino	33400	
+Sao Tome & Principe	Sao Tome	204327	
+Saudi Arabia	Riyadh	32938213	
+Senegal	Dakar	15850567	
+Serbia	Belgrade	8790574	
+Seychelles	Victoria	94737	
+Sierra Leone	Freetown	7557212	
+Singapore	Singapore	5708844	
+Slovakia	Bratislava	5447662	
+Slovenia	Ljubljana	2079976	
+Solomon Islands	Honiara	611343	
+Somalia	Mogadishu	14742523	
+South Africa	Bloemfontein/Cape Town/Pretoria	56717156	
+South Korea	Seoul	50982212	
+South Sudan	Juba	12575714	
+Spain	Madrid	46354321	
+Sri Lanka	Colombo/Sri Jayawardenepura Kotte	20876917	
+Sudan	Khartoum	40533330	
+Suriname	Paramaribo	563402	
+Sweden	Stockholm	9910701	
+Switzerland	Bern	8476005	
+Syria	Damascus	18269868	
+Taiwan	Taipei	23626456	
+Tajikistan	Dushanbe	8921343	
+Tanzania	Dodoma	57310019	
+Thailand	Bangkok	69037513	
+The Gambia	Banjul	2100568	
+Togo	LomÉ	7797694	
+Tonga	NukuʻAlofa	108020	
+Trinidad & Tobago	Port Of Spain	1369125	
+Tunisia	Tunis	11532127	
+Turkey	Ankara	80745020	
+Turkmenistan	Ashgabat	5758075	
+Tuvalu	Funafuti	11192	
+Uganda	Kampala	42862958	
+Ukraine	Kiev	44222947	
+United Arab Emirates	Abu Dhabi	9400145	
+United Kingdom	London	66181585	
+United States	Washington D.C.	324459463	
+Uruguay	Montevideo	3456750	
+Uzbekistan	Tashkent	31910641	
+Vanuatu	Port Vila	276244	
+Vatican City	Vatican City	792	
+Venezuela	Caracas	31977065	
+Vietnam	Hanoi	95540800	
+Yemen	Sana'a	28250420	
+Zambia	Lusaka	17094130	
+Zimbabwe	Harare	16529904	
+----------------------------------------------------------------
+Get Rows
+Zimbabwe	Harare	16529904	
+----------------------------------------------------------------
+Delete Row
+1 deleted
+Number of Columns: 3
+Country	Capital	Population	
+Afghanistan	Kabul	35530081	
+Albania	Tirana	2930187	
+Algeria	Algiers	41318142	
+Andorra	Andorra La Vella	76965	
+Angola	Luanda	29784193	
+Antigua & Barbuda	Saint John's	102012	
+Argentina	Buenos Aires	44271041	
+Armenia	Yerevan	2930450	
+Australia	Canberra	24450561	
+Austria	Vienna	8735453	
+Azerbaijan	Baku	9827589	
+Bahamas	Nassau	395361	
+Bahrain	Manama	1492584	
+Bangladesh	Dhaka	164669751	
+Barbados	Bridgetown	285719	
+Belarus	Minsk	9468338	
+Belgium	Brussels	11429336	
+Belize	Belmopan	374681	
+Benin	Porto-Novo	11175692	
+Bhutan	Thimphu	807610	
+Bolivia	Sucre	11051600	
+Bosnia & Herzegovina	Sarajevo	3507017	
+Botswana	Gaborone	2291661	
+Brazil	Brasilia	209288278	
+Brunei	Bandar Seri Begawan	428697	
+Bulgaria	Sofia	7084571	
+Burkina Faso	Ouagadougou	19193382	
+Burundi	Bujumbura	10864245	
+Cambodia	Phnom Penh	16005373	
+Cameroon	Yaounde	24053727	
+Canada	Ottawa	36624199	
+Cabo Verde	Praia	546388	
+Central African Republic	Bangui	4659080	
+Chad	N'Djamena	14899994	
+Chile	Santiago	18054726	
+China	Beijing	1409517397	
+Colombia	BogotÁ	49065615	
+Comoros	Moroni	813912	
+Republic of the Congo	Brazzaville	5260750	
+Costa Rica	San Jose	4905769	
+Croatia	Zagreb	4189353	
+Cuba	Havana	11484636	
+Cyprus	Nicosia	1179551	
+Czech Republic	Prague	10618303	
+Democratic Republic of the Congo	Kinshasa	81339988	
+Denmark	Copenhagen	5733551	
+Djibouti	Djibouti (City)	956985	
+Dominica	Roseau	73925	
+Dominican Republic	Santo Domingo	10766998	
+East Timor	Dili	1296311	
+Ecuador	Quito	16624858	
+Egypt	Cairo	97553151	
+El Salvador	San Salvador	6377853	
+Equatorial Guinea	Malabo	1267689	
+Eritrea	Asmara	5068831	
+Estonia	Tallinn	1309632	
+Ethiopia	Addis Ababa	104957438	
+Federated States of Micronesia	Palikir	105544	
+Fiji	Suva	905502	
+Finland	Helsinki	5523231	
+France	Paris	64979548	
+Gabon	Libreville	2025137	
+Georgia	Tbilisi	3912061	
+Germany	Berlin	82114224	
+Ghana	Accra	28833629	
+Greece	Athens	11159773	
+Grenada	Saint George's	107825	
+Guatemala	Guatemala City	16913503	
+Guinea	Conakry	12717176	
+Guinea-Bissau	Bissau	1861283	
+Guyana	Georgetown	777859	
+Haiti	Port-Au-Prince	10981229	
+Honduras	Tegucigalpa	9265067	
+Hungary	Budapest	9721559	
+Iceland	Reykjavik	335025	
+India	New Delhi	1339180127	
+Indonesia	Jakarta	263991379	
+Iran	Tehran	81162788	
+Iraq	Baghdad	38274618	
+Ireland	Dublin	4761657	
+Israel	Jerusalem/Tel Aviv	8321570	
+Italy	Rome	59359900	
+Jamaica	Kingston	2890299	
+Japan	Tokyo	127484450	
+Jordan	Amman	9702353	
+Kazakhstan	Astana	18204499	
+Kenya	Nairobi	49699862	
+Kiribati	South Tarawa	116398	
+Kuwait	Kuwait City	4136528	
+Kyrgyzstan	Bishkek	6045117	
+Laos	Vientiane	6858160	
+Latvia	Riga	1949670	
+Lebanon	Beirut	6082357	
+Lesotho	Maseru	2233339	
+Liberia	Monrovia	4731906	
+Libya	Tripoli	6374616	
+Liechtenstein	Vaduz	37922	
+Lithuania	Vilnius	2890297	
+Luxembourg	Luxembourg	583455	
+Madagascar	Antananarivo	25570895	
+Malawi	Lilongwe	18622104	
+Malaysia	Kuala Lumpur	31624264	
+Maldives	Male	436330	
+Mali	Bamako	18541980	
+Malta	Valletta	430835	
+Marshall Islands	Majuro	53127	
+Mauritania	Nouakchott	4420184	
+Mauritius	Port Louis	1265138	
+Mexico	Mexico City	129163276	
+Moldova	Chisinau	4051212	
+Monaco	Monaco	38695	
+Mongolia	Ulaanbaatar	3075647	
+Montenegro	Podgorica	628960	
+Morocco	Rabat	35739580	
+Mozambique	Maputo	29668834	
+Myanmar	Nay Pyi Taw	53370609	
+Namibia	Windhoek	2533794	
+Nauru	Yaren District	11359	
+Nepal	Kathmandu	29304998	
+Netherlands	Amsterdam	17035938	
+New Zealand	Wellington	4705818	
+Nicaragua	Managua	6217581	
+Niger	Niamey	21477348	
+Nigeria	Abuja	190886311	
+North Korea	Pyongyang	25490965	
+Norway	Oslo	5305383	
+Oman	Muscat	4636262	
+Pakistan	Islamabad	197015955	
+Palau	Ngerulmud	21729	
+Palestine	Jerusalem/Ramallah	4920724	
+Panama	Panama City	4098587	
+Papua New Guinea	Port Moresby	8251162	
+Paraguay	AsunciÓN	6811297	
+Peru	Lima	32165485	
+Philippines	Manila	104918090	
+Poland	Warsaw	38170712	
+Portugal	Lisbon	10329506	
+Qatar	Doha	2639211	
+Republic of Macedonia	Skopje	2083160	
+Romania	Bucharest	19679306	
+Russia	Moscow	143989754	
+Rwanda	Kigali	12208407	
+Saint Kitts & Nevis	Basseterre	55345	
+Saint Lucia	Castries	178844	
+Saint Vincent & the Grenadines	Kingstown	109897	
+Samoa	Apia	196440	
+San Marino	San Marino	33400	
+Sao Tome & Principe	Sao Tome	204327	
+Saudi Arabia	Riyadh	32938213	
+Senegal	Dakar	15850567	
+Serbia	Belgrade	8790574	
+Seychelles	Victoria	94737	
+Sierra Leone	Freetown	7557212	
+Singapore	Singapore	5708844	
+Slovakia	Bratislava	5447662	
+Slovenia	Ljubljana	2079976	
+Solomon Islands	Honiara	611343	
+Somalia	Mogadishu	14742523	
+South Africa	Bloemfontein/Cape Town/Pretoria	56717156	
+South Korea	Seoul	50982212	
+South Sudan	Juba	12575714	
+Spain	Madrid	46354321	
+Sri Lanka	Colombo/Sri Jayawardenepura Kotte	20876917	
+Sudan	Khartoum	40533330	
+Suriname	Paramaribo	563402	
+Sweden	Stockholm	9910701	
+Switzerland	Bern	8476005	
+Syria	Damascus	18269868	
+Taiwan	Taipei	23626456	
+Tajikistan	Dushanbe	8921343	
+Tanzania	Dodoma	57310019	
+Thailand	Bangkok	69037513	
+The Gambia	Banjul	2100568	
+Togo	LomÉ	7797694	
+Tonga	NukuʻAlofa	108020	
+Trinidad & Tobago	Port Of Spain	1369125	
+Tunisia	Tunis	11532127	
+Turkey	Ankara	80745020	
+Turkmenistan	Ashgabat	5758075	
+Tuvalu	Funafuti	11192	
+Uganda	Kampala	42862958	
+Ukraine	Kiev	44222947	
+United Arab Emirates	Abu Dhabi	9400145	
+United Kingdom	London	66181585	
+United States	Washington D.C.	324459463	
+Uruguay	Montevideo	3456750	
+Uzbekistan	Tashkent	31910641	
+Vanuatu	Port Vila	276244	
+Vatican City	Vatican City	792	
+Venezuela	Caracas	31977065	
+Vietnam	Hanoi	95540800	
+Yemen	Sana'a	28250420	
+Zambia	Lusaka	17094130	
+Number of Columns: 3
+Country	Capital	Population	
+Afghanistan	Kabul	35530081	
+Albania	Tirana	2930187	
+Algeria	Algiers	41318142	
+Andorra	Andorra La Vella	76965	
+Angola	Luanda	29784193	
+Antigua & Barbuda	Saint John's	102012	
+Argentina	Buenos Aires	44271041	
+Armenia	Yerevan	2930450	
+Australia	Canberra	24450561	
+Austria	Vienna	8735453	
+Azerbaijan	Baku	9827589	
+Bahamas	Nassau	395361	
+Bahrain	Manama	1492584	
+Bangladesh	Dhaka	164669751	
+Barbados	Bridgetown	285719	
+Belarus	Minsk	9468338	
+Belgium	Brussels	11429336	
+Belize	Belmopan	374681	
+Benin	Porto-Novo	11175692	
+Bhutan	Thimphu	807610	
+Bolivia	Sucre	11051600	
+Bosnia & Herzegovina	Sarajevo	3507017	
+Botswana	Gaborone	2291661	
+Brazil	Brasilia	209288278	
+Brunei	Bandar Seri Begawan	428697	
+Bulgaria	Sofia	7084571	
+Burkina Faso	Ouagadougou	19193382	
+Burundi	Bujumbura	10864245	
+Cambodia	Phnom Penh	16005373	
+Cameroon	Yaounde	24053727	
+Canada	Ottawa	36624199	
+Cabo Verde	Praia	546388	
+Central African Republic	Bangui	4659080	
+Chad	N'Djamena	14899994	
+Chile	Santiago	18054726	
+China	Beijing	1409517397	
+Colombia	BogotÁ	49065615	
+Comoros	Moroni	813912	
+Republic of the Congo	Brazzaville	5260750	
+Costa Rica	San Jose	4905769	
+Croatia	Zagreb	4189353	
+Cuba	Havana	11484636	
+Cyprus	Nicosia	1179551	
+Czech Republic	Prague	10618303	
+Democratic Republic of the Congo	Kinshasa	81339988	
+Denmark	Copenhagen	5733551	
+Djibouti	Djibouti (City)	956985	
+Dominica	Roseau	73925	
+Dominican Republic	Santo Domingo	10766998	
+East Timor	Dili	1296311	
+Ecuador	Quito	16624858	
+Egypt	Cairo	97553151	
+El Salvador	San Salvador	6377853	
+Equatorial Guinea	Malabo	1267689	
+Eritrea	Asmara	5068831	
+Estonia	Tallinn	1309632	
+Ethiopia	Addis Ababa	104957438	
+Federated States of Micronesia	Palikir	105544	
+Fiji	Suva	905502	
+Finland	Helsinki	5523231	
+France	Paris	64979548	
+Gabon	Libreville	2025137	
+Georgia	Tbilisi	3912061	
+Germany	Berlin	82114224	
+Ghana	Accra	28833629	
+Greece	Athens	11159773	
+Grenada	Saint George's	107825	
+Guatemala	Guatemala City	16913503	
+Guinea	Conakry	12717176	
+Guinea-Bissau	Bissau	1861283	
+Guyana	Georgetown	777859	
+Haiti	Port-Au-Prince	10981229	
+Honduras	Tegucigalpa	9265067	
+Hungary	Budapest	9721559	
+Iceland	Reykjavik	335025	
+India	New Delhi	1339180127	
+Indonesia	Jakarta	263991379	
+Iran	Tehran	81162788	
+Iraq	Baghdad	38274618	
+Ireland	Dublin	4761657	
+Israel	Jerusalem/Tel Aviv	8321570	
+Italy	Rome	59359900	
+Jamaica	Kingston	2890299	
+Japan	Tokyo	127484450	
+Jordan	Amman	9702353	
+Kazakhstan	Astana	18204499	
+Kenya	Nairobi	49699862	
+Kiribati	South Tarawa	116398	
+Kuwait	Kuwait City	4136528	
+Kyrgyzstan	Bishkek	6045117	
+Laos	Vientiane	6858160	
+Latvia	Riga	1949670	
+Lebanon	Beirut	6082357	
+Lesotho	Maseru	2233339	
+Liberia	Monrovia	4731906	
+Libya	Tripoli	6374616	
+Liechtenstein	Vaduz	37922	
+Lithuania	Vilnius	2890297	
+Luxembourg	Luxembourg	583455	
+Madagascar	Antananarivo	25570895	
+Malawi	Lilongwe	18622104	
+Malaysia	Kuala Lumpur	31624264	
+Maldives	Male	436330	
+Mali	Bamako	18541980	
+Malta	Valletta	430835	
+Marshall Islands	Majuro	53127	
+Mauritania	Nouakchott	4420184	
+Mauritius	Port Louis	1265138	
+Mexico	Mexico City	129163276	
+Moldova	Chisinau	4051212	
+Monaco	Monaco	38695	
+Mongolia	Ulaanbaatar	3075647	
+Montenegro	Podgorica	628960	
+Morocco	Rabat	35739580	
+Mozambique	Maputo	29668834	
+Myanmar	Nay Pyi Taw	53370609	
+Namibia	Windhoek	2533794	
+Nauru	Yaren District	11359	
+Nepal	Kathmandu	29304998	
+Netherlands	Amsterdam	17035938	
+New Zealand	Wellington	4705818	
+Nicaragua	Managua	6217581	
+Niger	Niamey	21477348	
+Nigeria	Abuja	190886311	
+North Korea	Pyongyang	25490965	
+Norway	Oslo	5305383	
+Oman	Muscat	4636262	
+Pakistan	Islamabad	197015955	
+Palau	Ngerulmud	21729	
+Palestine	Jerusalem/Ramallah	4920724	
+Panama	Panama City	4098587	
+Papua New Guinea	Port Moresby	8251162	
+Paraguay	AsunciÓN	6811297	
+Peru	Lima	32165485	
+Philippines	Manila	104918090	
+Poland	Warsaw	38170712	
+Portugal	Lisbon	10329506	
+Qatar	Doha	2639211	
+Republic of Macedonia	Skopje	2083160	
+Romania	Bucharest	19679306	
+Russia	Moscow	143989754	
+Rwanda	Kigali	12208407	
+Saint Kitts & Nevis	Basseterre	55345	
+Saint Lucia	Castries	178844	
+Saint Vincent & the Grenadines	Kingstown	109897	
+Samoa	Apia	196440	
+San Marino	San Marino	33400	
+Sao Tome & Principe	Sao Tome	204327	
+Saudi Arabia	Riyadh	32938213	
+Senegal	Dakar	15850567	
+Serbia	Belgrade	8790574	
+Seychelles	Victoria	94737	
+Sierra Leone	Freetown	7557212	
+Singapore	Singapore	5708844	
+Slovakia	Bratislava	5447662	
+Slovenia	Ljubljana	2079976	
+Solomon Islands	Honiara	611343	
+Somalia	Mogadishu	14742523	
+South Africa	Bloemfontein/Cape Town/Pretoria	56717156	
+South Korea	Seoul	50982212	
+South Sudan	Juba	12575714	
+Spain	Madrid	46354321	
+Sri Lanka	Colombo/Sri Jayawardenepura Kotte	20876917	
+Sudan	Khartoum	40533330	
+Suriname	Paramaribo	563402	
+Sweden	Stockholm	9910701	
+Switzerland	Bern	8476005	
+Syria	Damascus	18269868	
+Taiwan	Taipei	23626456	
+Tajikistan	Dushanbe	8921343	
+Tanzania	Dodoma	57310019	
+Thailand	Bangkok	69037513	
+The Gambia	Banjul	2100568	
+Togo	LomÉ	7797694	
+Tonga	NukuʻAlofa	108020	
+Trinidad & Tobago	Port Of Spain	1369125	
+Tunisia	Tunis	11532127	
+Turkey	Ankara	80745020	
+Turkmenistan	Ashgabat	5758075	
+Tuvalu	Funafuti	11192	
+Uganda	Kampala	42862958	
+Ukraine	Kiev	44222947	
+United Arab Emirates	Abu Dhabi	9400145	
+United Kingdom	London	66181585	
+United States	Washington D.C.	324459463	
+Uruguay	Montevideo	3456750	
+Uzbekistan	Tashkent	31910641	
+Vanuatu	Port Vila	276244	
+Vatican City	Vatican City	792	
+Venezuela	Caracas	31977065	
+Vietnam	Hanoi	95540800	
+Yemen	Sana'a	28250420	
+Zambia	Lusaka	17094130	
+Zimbabwase	Harare	16529904	
+
+----------------------------------------------------------------
+0
+page Num 0
+Index 1
+Num keys 1
+Next Page -1
+Page Num 0
+Next page num: 0
+Is not over
+Is not null page
+65586
+Is not over
+Is not null page
+65584
+Is not over
+Is not null page
+65583
+Is not over
+Is not null page
+65582
+Is not over
+Is not null page
+65581
+Is not over
+Is not null page
+65580
+Is not over
+Is not null page
+65579
+Is not over
+Is not null page
+65578
+Is not over
+Is not null page
+65577
+Is not over
+Is not null page
+65576
+Is not over
+Is not null page
+65575
+Is not over
+Is not null page
+65574
+Is not over
+Is not null page
+65573
+Is not over
+Is not null page
+65572
+Is not over
+Is not null page
+65571
+Is not over
+Is not null page
+65570
+Is not over
+Is not null page
+65569
+Is not over
+Is not null page
+65568
+Is not over
+Is not null page
+65567
+Is not over
+Is not null page
+65566
+Is not over
+Is not null page
+65565
+Is not over
+Is not null page
+65564
+Is not over
+Is not null page
+65563
+Is not over
+Is not null page
+65562
+Is not over
+Is not null page
+65561
+Is not over
+Is not null page
+65560
+Is not over
+Is not null page
+65559
+Is not over
+Is not null page
+65558
+Is not over
+Is not null page
+65557
+Is not over
+Is not null page
+65556
+Is not over
+Is not null page
+65555
+Is not over
+Is not null page
+65554
+Is not over
+Is not null page
+65553
+Is not over
+Is not null page
+65552
+Is not over
+Is not null page
+65551
+Is not over
+Is not null page
+65550
+Is not over
+Is not null page
+65549
+Is not over
+Is not null page
+65548
+Is not over
+Is not null page
+65547
+Is not over
+Is not null page
+65546
+Is not over
+Is not null page
+65545
+Is not over
+Is not null page
+65544
+Is not over
+Is not null page
+65543
+Is not over
+Is not null page
+65542
+Is not over
+Is not null page
+65541
+Is not over
+Is not null page
+65540
+Is not over
+Is not null page
+65539
+Is not over
+Is not null page
+65538
+Is not over
+Is not null page
+65537
+Is not over
+Is not null page
+65536
+Is not over
+Is not null page
+144
+Is not over
+Is not null page
+143
+Is not over
+Is not null page
+142
+Is not over
+Is not null page
+141
+Is not over
+Is not null page
+140
+Is not over
+Is not null page
+139
+Is not over
+Is not null page
+138
+Is not over
+Is not null page
+137
+Is not over
+Is not null page
+136
+Is not over
+Is not null page
+135
+Is not over
+Is not null page
+134
+Is not over
+Is not null page
+133
+Is not over
+Is not null page
+132
+Is not over
+Is not null page
+131
+Is not over
+Is not null page
+130
+Is not over
+Is not null page
+129
+Is not over
+Is not null page
+128
+Is not over
+Is not null page
+127
+Is not over
+Is not null page
+126
+Is not over
+Is not null page
+125
+Is not over
+Is not null page
+124
+Is not over
+Is not null page
+123
+Is not over
+Is not null page
+122
+Is not over
+Is not null page
+121
+Is not over
+Is not null page
+120
+Is not over
+Is not null page
+119
+Is not over
+Is not null page
+118
+Is not over
+Is not null page
+117
+Is not over
+Is not null page
+116
+Is not over
+Is not null page
+115
+Is not over
+Is not null page
+114
+Is not over
+Is not null page
+113
+Is not over
+Is not null page
+112
+Is not over
+Is not null page
+111
+Is not over
+Is not null page
+110
+Is not over
+Is not null page
+109
+Is not over
+Is not null page
+108
+Is not over
+Is not null page
+107
+Is not over
+Is not null page
+106
+Is not over
+Is not null page
+105
+Is not over
+Is not null page
+104
+Is not over
+Is not null page
+103
+Is not over
+Is not null page
+102
+Is not over
+Is not null page
+101
+Is not over
+Is not null page
+100
+Is not over
+Is not null page
+99
+Is not over
+Is not null page
+98
+Is not over
+Is not null page
+97
+Is not over
+Is not null page
+96
+Is not over
+Is not null page
+95
+Is not over
+Is not null page
+94
+Is not over
+Is not null page
+93
+Is not over
+Is not null page
+92
+Is not over
+Is not null page
+91
+Is not over
+Is not null page
+90
+Is not over
+Is not null page
+89
+Is not over
+Is not null page
+88
+Is not over
+Is not null page
+87
+Is not over
+Is not null page
+86
+Is not over
+Is not null page
+85
+Is not over
+Is not null page
+84
+Is not over
+Is not null page
+83
+Is not over
+Is not null page
+82
+Is not over
+Is not null page
+81
+Is not over
+Is not null page
+80
+Is not over
+Is not null page
+79
+Is not over
+Is not null page
+78
+Is not over
+Is not null page
+77
+Is not over
+Is not null page
+76
+Is not over
+Is not null page
+75
+Is not over
+Is not null page
+74
+Is not over
+Is not null page
+73
+Is not over
+Is not null page
+72
+Is not over
+Is not null page
+71
+Is not over
+Is not null page
+70
+Is not over
+Is not null page
+69
+Is not over
+Is not null page
+68
+Is not over
+Is not null page
+67
+Is not over
+Is not null page
+66
+Is not over
+Is not null page
+65
+Is not over
+Is not null page
+64
+Is not over
+Is not null page
+63
+Is not over
+Is not null page
+62
+Is not over
+Is not null page
+61
+Is not over
+Is not null page
+60
+Is not over
+Is not null page
+59
+Is not over
+Is not null page
+58
+Is not over
+Is not null page
+57
+Is not over
+Is not null page
+56
+Is not over
+Is not null page
+55
+Is not over
+Is not null page
+54
+Is not over
+Is not null page
+53
+Is not over
+Is not null page
+52
+Is not over
+Is not null page
+51
+Is not over
+Is not null page
+50
+Is not over
+Is not null page
+49
+Is not over
+Is not null page
+48
+Is not over
+Is not null page
+47
+Is not over
+Is not null page
+46
+Is not over
+Is not null page
+45
+Is not over
+Is not null page
+44
+Is not over
+Is not null page
+43
+Is not over
+Is not null page
+42
+Is not over
+Is not null page
+41
+Is not over
+Is not null page
+40
+Is not over
+Is not null page
+39
+Is not over
+Is not null page
+38
+Is not over
+Is not null page
+37
+Is not over
+Is not null page
+36
+Is not over
+Is not null page
+35
+Is not over
+Is not null page
+34
+Is not over
+Is not null page
+33
+Is not over
+Is not null page
+32
+Is not over
+Is not null page
+31
+Is not over
+Is not null page
+30
+Is not over
+Is not null page
+29
+Is not over
+Is not null page
+28
+Is not over
+Is not null page
+27
+Is not over
+Is not null page
+26
+Is not over
+Is not null page
+25
+Is not over
+Is not null page
+24
+Is not over
+Is not null page
+23
+Is not over
+Is not null page
+22
+Is not over
+Is not null page
+21
+Is not over
+Is not null page
+20
+Is not over
+Is not null page
+19
+Is not over
+Is not null page
+18
+Is not over
+Is not null page
+17
+Is not over
+Is not null page
+16
+Is not over
+Is not null page
+15
+Is not over
+Is not null page
+14
+Is not over
+Is not null page
+13
+Is not over
+Is not null page
+12
+Is not over
+Is not null page
+11
+Is not over
+Is not null page
+10
+Is not over
+Is not null page
+9
+Is not over
+Is not null page
+8
+Is not over
+Is not null page
+7
+Is not over
+Is not null page
+6
+Is not over
+Is not null page
+5
+Is not over
+Is not null page
+4
+Is not over
+Is not null page
+3
+Is not over
+Is not null page
+2
+Is not over
+Is not null page
+1
+194
+Number of Columns: 3
+Country	Capital	Population	
+Zimbabwase	Harare	16529904	
+Zambia	Lusaka	17094130	
+Yemen	Sana'a	28250420	
+Vietnam	Hanoi	95540800	
+Venezuela	Caracas	31977065	
+Vatican City	Vatican City	792	
+Vanuatu	Port Vila	276244	
+Uzbekistan	Tashkent	31910641	
+Uruguay	Montevideo	3456750	
+United States	Washington D.C.	324459463	
+United Kingdom	London	66181585	
+United Arab Emirates	Abu Dhabi	9400145	
+Ukraine	Kiev	44222947	
+Uganda	Kampala	42862958	
+Tuvalu	Funafuti	11192	
+Turkmenistan	Ashgabat	5758075	
+Turkey	Ankara	80745020	
+Tunisia	Tunis	11532127	
+Trinidad & Tobago	Port Of Spain	1369125	
+Tonga	NukuʻAlofa	108020	
+Togo	LomÉ	7797694	
+The Gambia	Banjul	2100568	
+Thailand	Bangkok	69037513	
+Tanzania	Dodoma	57310019	
+Tajikistan	Dushanbe	8921343	
+Taiwan	Taipei	23626456	
+Syria	Damascus	18269868	
+Switzerland	Bern	8476005	
+Sweden	Stockholm	9910701	
+Suriname	Paramaribo	563402	
+Sudan	Khartoum	40533330	
+Sri Lanka	Colombo/Sri Jayawardenepura Kotte	20876917	
+Spain	Madrid	46354321	
+South Sudan	Juba	12575714	
+South Korea	Seoul	50982212	
+South Africa	Bloemfontein/Cape Town/Pretoria	56717156	
+Somalia	Mogadishu	14742523	
+Solomon Islands	Honiara	611343	
+Slovenia	Ljubljana	2079976	
+Slovakia	Bratislava	5447662	
+Singapore	Singapore	5708844	
+Sierra Leone	Freetown	7557212	
+Seychelles	Victoria	94737	
+Serbia	Belgrade	8790574	
+Senegal	Dakar	15850567	
+Saudi Arabia	Riyadh	32938213	
+Sao Tome & Principe	Sao Tome	204327	
+San Marino	San Marino	33400	
+Samoa	Apia	196440	
+Saint Vincent & the Grenadines	Kingstown	109897	
+Saint Lucia	Castries	178844	
+Saint Kitts & Nevis	Basseterre	55345	
+Rwanda	Kigali	12208407	
+Russia	Moscow	143989754	
+Romania	Bucharest	19679306	
+Republic of Macedonia	Skopje	2083160	
+Qatar	Doha	2639211	
+Portugal	Lisbon	10329506	
+Poland	Warsaw	38170712	
+Philippines	Manila	104918090	
+Peru	Lima	32165485	
+Paraguay	AsunciÓN	6811297	
+Papua New Guinea	Port Moresby	8251162	
+Panama	Panama City	4098587	
+Palestine	Jerusalem/Ramallah	4920724	
+Palau	Ngerulmud	21729	
+Pakistan	Islamabad	197015955	
+Oman	Muscat	4636262	
+Norway	Oslo	5305383	
+North Korea	Pyongyang	25490965	
+Nigeria	Abuja	190886311	
+Niger	Niamey	21477348	
+Nicaragua	Managua	6217581	
+New Zealand	Wellington	4705818	
+Netherlands	Amsterdam	17035938	
+Nepal	Kathmandu	29304998	
+Nauru	Yaren District	11359	
+Namibia	Windhoek	2533794	
+Myanmar	Nay Pyi Taw	53370609	
+Mozambique	Maputo	29668834	
+Morocco	Rabat	35739580	
+Montenegro	Podgorica	628960	
+Mongolia	Ulaanbaatar	3075647	
+Monaco	Monaco	38695	
+Moldova	Chisinau	4051212	
+Mexico	Mexico City	129163276	
+Mauritius	Port Louis	1265138	
+Mauritania	Nouakchott	4420184	
+Marshall Islands	Majuro	53127	
+Malta	Valletta	430835	
+Mali	Bamako	18541980	
+Maldives	Male	436330	
+Malaysia	Kuala Lumpur	31624264	
+Malawi	Lilongwe	18622104	
+Madagascar	Antananarivo	25570895	
+Luxembourg	Luxembourg	583455	
+Lithuania	Vilnius	2890297	
+Liechtenstein	Vaduz	37922	
+Libya	Tripoli	6374616	
+Liberia	Monrovia	4731906	
+Lesotho	Maseru	2233339	
+Lebanon	Beirut	6082357	
+Latvia	Riga	1949670	
+Laos	Vientiane	6858160	
+Kyrgyzstan	Bishkek	6045117	
+Kuwait	Kuwait City	4136528	
+Kiribati	South Tarawa	116398	
+Kenya	Nairobi	49699862	
+Kazakhstan	Astana	18204499	
+Jordan	Amman	9702353	
+Japan	Tokyo	127484450	
+Jamaica	Kingston	2890299	
+Italy	Rome	59359900	
+Israel	Jerusalem/Tel Aviv	8321570	
+Ireland	Dublin	4761657	
+Iraq	Baghdad	38274618	
+Iran	Tehran	81162788	
+Indonesia	Jakarta	263991379	
+India	New Delhi	1339180127	
+Iceland	Reykjavik	335025	
+Hungary	Budapest	9721559	
+Honduras	Tegucigalpa	9265067	
+Haiti	Port-Au-Prince	10981229	
+Guyana	Georgetown	777859	
+Guinea-Bissau	Bissau	1861283	
+Guinea	Conakry	12717176	
+Guatemala	Guatemala City	16913503	
+Grenada	Saint George's	107825	
+Greece	Athens	11159773	
+Ghana	Accra	28833629	
+Germany	Berlin	82114224	
+Georgia	Tbilisi	3912061	
+Gabon	Libreville	2025137	
+France	Paris	64979548	
+Finland	Helsinki	5523231	
+Fiji	Suva	905502	
+Federated States of Micronesia	Palikir	105544	
+Ethiopia	Addis Ababa	104957438	
+Estonia	Tallinn	1309632	
+Eritrea	Asmara	5068831	
+Equatorial Guinea	Malabo	1267689	
+El Salvador	San Salvador	6377853	
+Egypt	Cairo	97553151	
+Ecuador	Quito	16624858	
+East Timor	Dili	1296311	
+Dominican Republic	Santo Domingo	10766998	
+Dominica	Roseau	73925	
+Djibouti	Djibouti (City)	956985	
+Denmark	Copenhagen	5733551	
+Democratic Republic of the Congo	Kinshasa	81339988	
+Czech Republic	Prague	10618303	
+Cyprus	Nicosia	1179551	
+Cuba	Havana	11484636	
+Croatia	Zagreb	4189353	
+Costa Rica	San Jose	4905769	
+Republic of the Congo	Brazzaville	5260750	
+Comoros	Moroni	813912	
+Colombia	BogotÁ	49065615	
+China	Beijing	1409517397	
+Chile	Santiago	18054726	
+Chad	N'Djamena	14899994	
+Central African Republic	Bangui	4659080	
+Cabo Verde	Praia	546388	
+Canada	Ottawa	36624199	
+Cameroon	Yaounde	24053727	
+Cambodia	Phnom Penh	16005373	
+Burundi	Bujumbura	10864245	
+Burkina Faso	Ouagadougou	19193382	
+Bulgaria	Sofia	7084571	
+Brunei	Bandar Seri Begawan	428697	
+Brazil	Brasilia	209288278	
+Botswana	Gaborone	2291661	
+Bosnia & Herzegovina	Sarajevo	3507017	
+Bolivia	Sucre	11051600	
+Bhutan	Thimphu	807610	
+Benin	Porto-Novo	11175692	
+Belize	Belmopan	374681	
+Belgium	Brussels	11429336	
+Belarus	Minsk	9468338	
+Barbados	Bridgetown	285719	
+Bangladesh	Dhaka	164669751	
+Bahrain	Manama	1492584	
+Bahamas	Nassau	395361	
+Azerbaijan	Baku	9827589	
+Austria	Vienna	8735453	
+Australia	Canberra	24450561	
+Armenia	Yerevan	2930450	
+Argentina	Buenos Aires	44271041	
+Antigua & Barbuda	Saint John's	102012	
+Angola	Luanda	29784193	
+Andorra	Andorra La Vella	76965	
+Algeria	Algiers	41318142	
+Albania	Tirana	2930187	
+Afghanistan	Kabul	35530081	
+Query done
+----------------------------------------------------------------
+Encode Decode
+Number of Columns: 3
+Country	Capital	Population	
+Number of Columns: 3
+Country	Capital	Population	
+----------------------------------------------------------------
+Erased Index
+----------------------------------------------------------------
+Table Closed
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+Table and Db Checking
+MAIN_DB Exists? 1
+MAIN_TABLE Exists? 1
+TEMP_DB Exists? 0
+TEMP_TABLE Exists? 0
+
+----------------------------------------------------------------
+User permission validity
+MAIN_DB Allowed to Read? 1
+MAIN_DB Allowed to Write? 0
+MAIN_TABLE Allowed to Read? 1
+MAIN_TABLE Allowed to Write? 1
+TEMP_TABLE_1 Allowed to Write? 0
+
+----------------------------------------------------------------
+Deleting Now

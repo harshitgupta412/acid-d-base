@@ -342,7 +342,7 @@ AM_Compare(
                 break;
             }
             case 'c' : {
-                int res = strncmp(valPtr,bufPtr,attrLength[i]);
+                int res = strncmp(valPtr+2,bufPtr+2,attrLength[i]-2);
                 if (res != 0)
                     return(res);
                 bufPtr += attrLength[i];

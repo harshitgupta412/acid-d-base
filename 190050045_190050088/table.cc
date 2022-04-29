@@ -33,12 +33,15 @@ std::vector<int> indexNo_to_cols(int indexNo, int maxcols, int numCols)
 
 char* cols_to_char(int attrLength[], std::vector<int> cols, Schema_ *sch, char* record) {
     char* result = new char[MAX_PAGE_SIZE];
+    memset(result, 0, MAX_PAGE_SIZE*sizeof(char));
+    int encoded_len = 0;
     for(int i = 0; i < cols.size(); i++) {
         char* res = getNthfield(record, cols[i], sch);
         memcpy(result, res, attrLength[i]);
+        encoded_len += attrLength[i];
         result += attrLength[i];
     }
-    return result;
+    return result-encoded_len;
 }
 
 // get number of slots in the page buffer
@@ -202,9 +205,11 @@ bool Table::addRow(void* data[], bool update) {
 bool Table::addRowFromByte(byte *data, int len, bool update) {
     byte** pk_value = new byte*[pk_size];
     for(int i=0; i<pk_size; i++) {
-        pk_value[i] = (byte*)data[pk_index[i]];
+        pk_value[i] = (byte*)getNthfield(data, pk_index[i], (Schema_ *)schema.getSchema());
     }
+    // std::cout << "Table Search Starting" << std::endl;
     int rid = Table_Search(table, pk_index, pk_value, pk_size);
+    // std::cout << ".Table Searched" << std::endl;
     if(rid != -1 && !update) return false;
     else if(rid != -1){
         // std::cout << rid << std::endl;
@@ -467,8 +472,9 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
         exit(1);
     }
 
-    byte key[256];
-    byte* keyPtr = key;
+    // byte key[256];
+    byte* keyPtr = new byte[256];
+    memset(keyPtr, 0, 256*sizeof(char));
     int remaining_len = 256;
     for ( int i = 0; i < index.numCols; ++i )
     {
@@ -481,7 +487,7 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
                 keyPtr += MAX_VARCHAR_LENGTH;
                 break;
             }
-            case INT:
+            case 'i':
             {
                 // assert(spaceLeft >= 4);
                 EncodeInt(*(int*)values[i], keyPtr);
@@ -489,7 +495,7 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
                 keyPtr += 4;
                 break;
             }
-            case LONG:
+            case 'l':
             {
                 // assert(spaceLeft >= 8);
                 EncodeLong(*(long*)values[i], keyPtr);
@@ -497,7 +503,7 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
                 keyPtr += 8;
                 break;
             }
-            case FLOAT:
+            case 'f':
             {
                 // assert(spaceLeft >= 4);
                 EncodeFloat(*(float*)values[i], keyPtr);
@@ -518,7 +524,7 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
         assert(index.fileDesc >= 0);
         index.isOpen = true;    
     }
-    int scanDesc = AM_OpenIndexScan(index.fileDesc, index.attrType, index.attrLen, index.numCols, op, key);
+    int scanDesc = AM_OpenIndexScan(index.fileDesc, index.attrType, index.attrLen, index.numCols, op, keyPtr - encoded_len);
     if(scanDesc < 0) {
         fprintf(stderr, "AM_OpenIndexScan failed in query index\n");
         exit(1);
@@ -530,12 +536,14 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
         char record[MAX_PAGE_SIZE];
         std::cout<<rid<<std::endl;
         int num_bytes = Table_Get(table, rid, record, MAX_PAGE_SIZE);
-        t->addRowFromByte(record, encoded_len, 1);
+        // std::cout << "Row fetched " << num_bytes << std::endl;
+        t->addRowFromByte(record, num_bytes, 1);
+        // std::cout << "Row added" << std::endl;
         x++;
     }
     std::cout<<x<<std::endl;
     AM_CloseIndexScan(scanDesc);
-
+    // delete keyPtr;
     return t;
 }
 
