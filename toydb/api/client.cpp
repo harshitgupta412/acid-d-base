@@ -118,10 +118,9 @@ Table* evalQueryTree(QueryObj* q, User user) {
     }
     else if( q->type == Project_) {
         Table* t = evalQueryTree(q->left, user);
-        // Table* t2 = Table_Project(t, q->cols1);
-        // delete t;
-        // return t2;
-        return t;
+        Table* t2 = t->project(q->cols1);
+        delete t;
+        return t2;
     }
     else if( q->type == Join_) {
         Table* t1 = evalQueryTree(q->left, user);
@@ -134,20 +133,18 @@ Table* evalQueryTree(QueryObj* q, User user) {
     else if( q->type == Union_) {
         Table* t1 = evalQueryTree(q->left, user);
         Table* t2 = evalQueryTree(q->right, user);
-        // Table* t3 = Table_Union(t1, t2);
+        Table* t3 = table_union(t1, t2);
         delete t1;
         delete t2;
-        // return t3;
-        return t2;
+        return t3;
     }
     else {
         Table* t1 = evalQueryTree(q->left, user);
         Table* t2 = evalQueryTree(q->right, user);
-        // Table* t3 = Table_Intersection(t1, t2);
+        Table* t3 = table_intersect(t1, t2);
         delete t1;
         delete t2;
-        // return t3;
-        return t2;
+        return t3;
     }
 }
 

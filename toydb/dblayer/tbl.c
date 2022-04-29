@@ -198,9 +198,6 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
     //          callbackfn(callbackObj, rid, record, recordLen)
     int pageNo, err;
     char *pageBuf;
-    // printf("check");
-    printf("scan %d", tbl->fileDesc);
-    fflush(stdout);
     if ( (err = PF_GetFirstPage(tbl->fileDesc, &pageNo, &pageBuf)) == PFE_EOF)
         return;
     else if ( err >= 0 || err == PFE_PAGEFIXED )
@@ -208,8 +205,6 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
         do
         {
             int nslots = getNumSlots(pageBuf);
-            // printf("%d\n",nslots);
-            fflush(stdout);
             for (int i = 0; i < nslots; i++)
             {
                 int len = getLen(i, pageBuf);

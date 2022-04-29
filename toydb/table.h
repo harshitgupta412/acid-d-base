@@ -57,7 +57,7 @@ class Table {
     std::string get_db_name();
     std::string get_table_name();
 
-    Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk = true);
+    Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes = std::vector<IndexData> (), bool index_pk = true);
 
     Table(Table* t2);
 
@@ -97,7 +97,7 @@ class Table {
 
 Table decodeTable(byte* s, int max_len ); //
 Table* table_union(Table* t1, Table* t2);
-Table* tabe_intersect(Table* t1, Table* t2);
-Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2);
+Table* table_intersect(Table* t1, Table* t2);
+Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int> cols2);
 
 #endif

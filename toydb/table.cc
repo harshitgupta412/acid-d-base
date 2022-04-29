@@ -821,7 +821,7 @@ Table* table_intersect(Table* t1, Table *t2) {
     return t;
 }
 
-Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2){
+Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int> cols2){
     Schema s1 = t1->getSchema();
     Schema s2 = t1->getSchema();
 

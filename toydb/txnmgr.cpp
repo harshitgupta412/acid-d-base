@@ -35,11 +35,23 @@ void initialize_globals()
 {
 	User u("SUPERUSER", "SUPERUSER_PASSWORD");
 	Database db(&u);
-	db.connect("DB");
+	bool status = db.connect("DB");
+	if (status)
+	{
+		printf("Connected to DB\n");
+	}
+	else
+	{
+		printf("Failed to connect to DB\n");
+		exit(1);
+	}
 
 	// databases
 	Table *tbl = db.load("DB_TABLE");
+	
 	std::vector<std::pair<int, void **>> dbs = tbl->get_records();
+	printf("aaaaa\n");
+	fflush(stdout);
 	for (int i = 0; i < dbs.size(); i++)
 	{
 		global_db.insert(std::string((char *)(dbs[i].second[0])));
@@ -247,7 +259,7 @@ void printTxn(Transaction txn)
 
 int main(int argc, char *argv[])
 {
-	// initialize_globals();
+	initialize_globals();
 
 	int master_sock, c, read_size;
 	std::vector<int> client_sock;
