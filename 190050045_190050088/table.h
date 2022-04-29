@@ -42,7 +42,9 @@ class Table {
     int pk_size;
     std::vector<IndexData> indexes;
 
-    void deleteRow(int rowId);
+    std::vector<std::pair<char, std::string> > table_logs;
+
+    void deleteRow(int rowId, bool log = false);
     bool addRowFromByte(byte* record, int len, bool update);
 
     public:
@@ -56,9 +58,9 @@ class Table {
 
     const Schema& getSchema();
 
-    bool addRow(void* data[], bool update);
+    bool addRow(void* data[], bool update, bool log = false);
 
-    bool deleteRow(void** pk); 
+    bool deleteRow(void** pk, bool log = false); 
     
     void** getRow(void** pk);
 
@@ -79,6 +81,9 @@ class Table {
     ~Table();
 
     std::string encodeTable(); //
+
+    void rollback();
+    void clear_logs();
 };
 
 Table decodeTable(byte* s, int max_len ); //

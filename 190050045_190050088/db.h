@@ -21,7 +21,7 @@ class Database {
     bool connect(std::string name);
     bool drop();
     bool create(std::string name);
-    Table* load(std::string db_name);
+    Table* load(std::string name);
 
     bool createTable(Table* t);
     bool deleteTable(Table* t);
