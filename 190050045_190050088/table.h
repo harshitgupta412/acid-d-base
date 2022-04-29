@@ -82,7 +82,8 @@ class Table {
 
     std::string encodeTable(); //
 
-    bool rollback();
+    void rollback();
+    void clear_logs();
 };
 
 Table decodeTable(byte* s, int max_len ); //

@@ -33,11 +33,15 @@ void initialize_globals()
 {
     User u("SUPERUSER", "SUPERUSER_PASSWORD");
     Database db(&u);
-	printf("kk1");
+	printf("kk1\n");
+	fflush(stdout);
     db.connect("DB");
-	printf("kk2");
+	printf("kk2\n");
+	fflush(stdout);
 
     // databases
+	printf("loading database now\n");
+	fflush(stdout);
     Table *tbl = db.load("DB_TABLE");
     std::vector< std::pair <int, void**> > dbs = tbl->get_records();
     for(int i = 0; i < dbs.size(); i++)
@@ -47,6 +51,7 @@ void initialize_globals()
     tbl->close();
 
     // tables
+
     tbl = db.load("DB_CROSS_TABLE");
     dbs = tbl->get_records();
     for(int i = 0; i < dbs.size(); i++)
@@ -60,6 +65,8 @@ void initialize_globals()
     // users
     db.connect("DB_USER_DB");
     tbl = db.load("DB_USER_TABLE");
+	printf("loading records now\n");
+	fflush(stdout);
     dbs = tbl->get_records();
     for(int i = 0; i < dbs.size(); i++)
     {

@@ -598,22 +598,29 @@ std::string Table::encodeTable() {
     return str;
 }
 
-bool Table::rollback() 
+void Table::rollback() 
 {
-    while(!table_logs.empty()) {
-        std::pair<char, std::string> log = table_logs.back();
-        table_logs.pop_back();
+    int i = table_logs.size();
+    return;
+    i--;
+    for(i; i>=0; i--) {
+        std::pair<char, std::string> log = table_logs[i];
         if(log.first == 'a') {
             deleteRow(stoi(log.second), false);
-            std::cout << "Rollback Delete: rid " << stoi(log.second) << std::endl;
-            std::cout << "Rollback: Deleting row" << std::endl;
+            // std::cout << "Rollback Delete: rid " << stoi(log.second) << std::endl;
+            // std::cout << "Rollback: Deleting row" << std::endl;
         }
         else {
-            std::cout << "Rollback Add: " << std::endl;
+            // std::cout << "Rollback Add: " << std::endl;
             addRowFromByte((char*)log.second.c_str(), log.second.length(), true);
-            std::cout << "Rollback: Adding row" << std::endl;
+            // std::cout << "Rollback: Adding row" << std::endl;
         }
     }
+    table_logs.clear();
+}
+
+void Table::clear_logs() {
+    table_logs.clear();
 }
 
 
@@ -655,31 +662,30 @@ Table decodeTable(byte* s, int max_len ) {
 }
 
 void append(void* callbackObj, int rid, byte* row, int len){
-    std::vector<std::pair<std::pair<int, int>, byte*>> * p = (std::vector<std::pair<std::pair<int, int>, byte*>> *) callbackObj;
-
-    p->push_back({{rid, len}, row});
+    std::vector<std::pair<int, std::string> > * p = (std::vector<std::pair<int, std::string> > *) callbackObj;
+    std::string str(row, len);
+    p->push_back({rid, str});
 }
 std::vector<std::pair<int, void**>> Table::get_records(){
-    std::vector<std::pair<std::pair<int, int>, byte*>> returnal;
+    std::vector<std::pair<int, std::string> > returnal;
     std::vector<std::pair<int, void**>> final_res;
     Table_Scan(table, &returnal, append);
 
     Schema_ *sch = schema.getSchema();
-    for (std::pair<std::pair<int,int>, byte*> p : returnal){
-        char* data[sch->numColumns];
-        void* ret[sch->numColumns];
-
-        decode(sch, (char**)data, p.second+2, p.first.second);
+    for (std::pair<int, std::string> p : returnal){
+        char** data = new char*[sch->numColumns];
+        decode(sch, data, (char*)p.second.c_str() + 2, p.second.length());
 
         for(int i=0; i<sch->numColumns; i++) {
-            ret[i] = (void*) data[i];
+            std::cout << data[i] << std::endl;
         }
-        final_res.push_back({p.first.first, (void**)ret});
+        final_res.push_back({p.first, (void**)data});
 
     }
     
     return final_res;
 }
+
 Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2){
     Schema s1 = t1->getSchema();
     Schema s2 = t1->getSchema();

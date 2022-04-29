@@ -194,7 +194,32 @@ loadCSV() {
     tbl.rollback();
     tbl.print();
     cout<<"\n----------------------------------------------------------------"<<endl;
-    
+    cout << "Getting Records" << endl;
+    std::vector<std::pair<int, void**> > res = tbl.get_records();
+    for(auto rec: res) {
+        for(int i=0; i<sch->numColumns; i++) {
+            switch(sch->columns[i].type) {
+                case INT:
+                    printf("%d\t", DecodeInt((char*)rec.second[i]));
+                    break;
+                case FLOAT:
+                    printf("%f\t", DecodeFloat((char*)rec.second[i]));
+                    break;
+                case LONG:
+                    printf("%lld\t", DecodeLong((char*)rec.second[i]));
+                    break;
+                case VARCHAR:
+                    printf("%s\t", (char*)rec.second[i]);
+                    break;
+                default:
+                    printf("%s\t", (char*)rec.second[i]);
+                    break;
+            }
+        }
+        cout << endl;
+    }
+
+
     char c[] = "Yemen";
     int i = 100000;
     Table* out = tbl.queryIndex(0,GREATER_THAN_EQUAL, vector<void*>(1,(void*)c));

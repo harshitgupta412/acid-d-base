@@ -100,10 +100,10 @@ Table* Database::load(std::string name){
 
     db_cross_table = connectDbTableList();
 
-    char *table_n = new char[name.length()];
+    char *table_n = new char[name.length()+1];
     strcpy(table_n, name.c_str());
 
-    char *db_n = new char[current.length()];
+    char *db_n = new char[current.length()+1];
     strcpy(db_n, current.c_str());
 
     void** pk = new void*[2];
@@ -117,7 +117,7 @@ Table* Database::load(std::string name){
         return NULL;
     }
 
-    Table ret = (decodeTable((char*) data[2], MAX_PAGE_SIZE));
+    Table ret = (decodeTable((char*) data[2]+2, MAX_PAGE_SIZE));
 
     Table* t = new Table(ret);
     db_cross_table->close();
