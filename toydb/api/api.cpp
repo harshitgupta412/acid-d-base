@@ -25,6 +25,7 @@ int main() {
 
     void **result;
     c.evalQuery(q,&result);
+    printf("eval done\n");
     c.endTxn();
     c.disconnect();
     

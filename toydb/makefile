@@ -5,7 +5,7 @@ OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./a
 all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o binaryops.o api.o
 	$(CC) -o main $(OBJ) schema.o table.o user.o db.o main.o
 	$(CC) -o txnmgr.bin $(OBJ) schema.o table.o user.o db.o txnmgr.o
-	$(CC) -o binaryops $(OBJ) schema.o table.o user.o db.o binaryops.o
+	$(CC) -o binaryops.bin $(OBJ) schema.o table.o user.o db.o binaryops.o
 	$(CC) -o api.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o api.o
 	$(CC) -o tests/query_union.bin  tests/query_union.cc $(OBJ) schema.o table.o user.o db.o
 	$(CC) -o tests/query_project.bin  tests/query_project.cc $(OBJ) schema.o table.o user.o db.o
@@ -42,6 +42,24 @@ load_data: schema.o user.o db.o table.o
 
 test_query: schema.o user.o db.o table.o 
 	$(CC) -o tests/query tests/query.cc $(OBJ) schema.o table.o user.o db.o  
+
+join_query: schema.o user.o db.o table.o 
+	$(CC) -o tests/join tests/join.cc $(OBJ) schema.o table.o user.o db.o  
+
+test_query_index: schema.o user.o db.o table.o 
+	$(CC) -o tests/query_index tests/queryindex.cc $(OBJ) schema.o table.o user.o db.o
+
+test_query_index_int: schema.o user.o db.o table.o 
+	$(CC) -o tests/query_index_int tests/query_index_int.cc $(OBJ) schema.o table.o user.o db.o  
+
+add_delete: schema.o user.o db.o table.o 
+	$(CC) -o tests/add_delete tests/normal.cc $(OBJ) schema.o table.o user.o db.o  
+
+add_delete_table: schema.o user.o db.o table.o 
+	$(CC) -o tests/add_delete_table tests/add_delete_table.cc $(OBJ) schema.o table.o user.o db.o  
+
+indexes: schema.o user.o db.o table.o 
+	$(CC) -o tests/indexes tests/indexes.cc $(OBJ) schema.o table.o user.o db.o          
 
 clean:
 	rm -f *.o

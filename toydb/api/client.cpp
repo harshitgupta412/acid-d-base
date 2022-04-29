@@ -39,6 +39,7 @@ int rcvMsg(int sock, char* msg) {
 }
 
 void Client::rollback() {
+    printf("rollback\n");
     for(auto it = openTables.begin(); it != openTables.end(); it++) {
         it->second->rollback();
     }
@@ -96,7 +97,7 @@ bool Client::initTxn(User _user) {
 Table* evalQueryTree(QueryObj* q, User user) {
     if( q->type == Identity_) {
         std::string dbname = q->tableName.substr(0, q->tableName.find('.'));
-        std::string tablename = q->tableName.substr(q->tableName.find('.'), q->tableName.size());
+        std::string tablename = q->tableName.substr(q->tableName.find('.')+1, q->tableName.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
@@ -199,7 +200,7 @@ bool Client::add(std::string name, void** data) {
     if(openTables.count(name) == 0) {
         printf("Table %s not open, opening\n", name.c_str());
         std::string dbname = name.substr(0, name.find('.'));
-        std::string tablename = name.substr(name.find('.'), name.size());
+        std::string tablename = name.substr(name.find('.')+1, name.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
@@ -229,7 +230,7 @@ bool Client::update(std::string name, void** data) {
     }
     if(openTables.count(name) == 0) {
         std::string dbname = name.substr(0, name.find('.'));
-        std::string tablename = name.substr(name.find('.'), name.size());
+        std::string tablename = name.substr(name.find('.')+1, name.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
@@ -258,7 +259,7 @@ bool Client::del(std::string name, void** pk) {
     }
     if(openTables.count(name) == 0) {
         std::string dbname = name.substr(0, name.find('.'));
-        std::string tablename = name.substr(name.find('.'), name.size());
+        std::string tablename = name.substr(name.find('.')+1, name.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);

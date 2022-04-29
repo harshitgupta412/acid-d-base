@@ -17,6 +17,7 @@ class Database {
     User* user;
 
     public:
+    void print();
     
     Database(User *current_user);
     bool connect(std::string name);
