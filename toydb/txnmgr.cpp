@@ -82,10 +82,20 @@ void initialize_globals()
 	User u("SUPERUSER", "SUPERUSER_PASSWORD");
 	Database db(&u);
 	bool ret = db.connect("DB");
+	if (ret)
+	{
+		printf("Connected to DB\n");
+	}
+	else
+	{
+		printf("Failed to connect to DB\n");
+		exit(1);
+	}
+
 	// databases
 	Table *tbl = db.load("DB_TABLE");
+	
 	std::vector<std::pair<int, void **>> dbs = tbl->get_records();
-	// std::cout << "DB TABLE LOADED" << std::endl;
 	for (int i = 0; i < dbs.size(); i++)
 	{
 		global_db.insert(std::string((char *)(dbs[i].second[0])));
@@ -198,18 +208,19 @@ std::pair<int, int> decode_lock_request(char *buffer, int sockfd)
 			printf("Transaction %d already active on socket %d\n", sockFD_txn[sockfd], sockfd);
 			return std::make_pair(0, -1);
 		}
-		DecodeCString2(buffer + 2, &username, 50);
+		DecodeCString2(buffer + 4, &username, 50);
 		printf("Username: %s\n", username);
 		txnID++;
 		txnMap[txnID] = new Transaction();
 		txnMap[txnID]->username = std::string(username);
+		sockFD_txn[sockfd] = txnID;
 		free(username);
 		return std::make_pair(0, txnID);
 
 	// read request
 	case 1:
 		printf("Read Lock Request\n");
-		DecodeCString2(buffer + 2, &db_table_name, 50);
+		DecodeCString2(buffer + 4, &db_table_name, 50);
 		txnMap[sockFD_txn[sockfd]]->readTables.push_back(std::string(db_table_name));
 		dbname = deconcat_db_table(std::string(db_table_name)).first;
 		tablename = deconcat_db_table(std::string(db_table_name)).second;
@@ -224,6 +235,7 @@ std::pair<int, int> decode_lock_request(char *buffer, int sockfd)
 			printf("Table %s.%s is currently being written to by another transaction\n", dbname.c_str(), tablename.c_str());
 			return std::make_pair(1, 0);
 		}
+		printf("Granted\n");
 		global_tbl_readers[dbname][tablename]++;
 		txnMap[sockFD_txn[sockfd]]->readTables.push_back(std::string(db_table_name));
 		free(db_table_name);
@@ -232,7 +244,7 @@ std::pair<int, int> decode_lock_request(char *buffer, int sockfd)
 	// write request
 	case 2:
 		printf("Write Lock Request\n");
-		DecodeCString2(buffer + 2, &db_table_name, 50);
+		DecodeCString2(buffer + 4, &db_table_name, 50);
 		dbname = deconcat_db_table(std::string(db_table_name)).first;
 		tablename = deconcat_db_table(std::string(db_table_name)).second;
 		printf("DB: %s, Table: %s\n", dbname.c_str(), tablename.c_str());
@@ -251,6 +263,7 @@ std::pair<int, int> decode_lock_request(char *buffer, int sockfd)
 			printf("Table %s.%s is currently being read from by another transaction\n", dbname.c_str(), tablename.c_str());
 			return std::make_pair(1, 0);
 		}
+		printf("Granted\n");
 		global_tbl_writers[dbname][tablename] = 1;
 		txnMap[sockFD_txn[sockfd]]->writeTables.push_back(std::string(db_table_name));
 		free(db_table_name);
@@ -372,6 +385,7 @@ int main(int argc, char *argv[])
 		if ((activity < 0) && (errno != EINTR))
 		{
 			printf("select error");
+			break;
 		}
 
 		// If something happened on the master socket ,
@@ -438,6 +452,8 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
+
+	close(master_sock);
 
 	return 0;
 }

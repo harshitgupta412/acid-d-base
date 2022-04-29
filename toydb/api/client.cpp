@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include<cstring>
 
-#define TABLEDIR "../"
+#define TABLEDIR ""
 
 bool sendMsg(int sock, MsgType type, char* msg, int len) {
     char message[MAXMSGLEN];
@@ -141,7 +141,7 @@ Table* evalQueryTree(QueryObj* q, User user) {
     else {
         Table* t1 = evalQueryTree(q->left, user);
         Table* t2 = evalQueryTree(q->right, user);
-        Table* t3 = table_union(t1, t2);
+        Table* t3 = table_intersect(t1, t2);
         delete t1;
         delete t2;
         return t3;
@@ -180,12 +180,14 @@ bool Client::evalQuery(QueryObj q, void*** result) {
 bool Client::add(std::string name, void** data) {
     char msg[MAXMSGLEN];
     int len = EncodeCString((char*)name.c_str(), msg, MAXMSGLEN);
-    if(!sendMsg(sock, Read, msg, len)) {
+    if(!sendMsg(sock, Write, msg, len)) {
+        fprintf(stderr, "send failed\n");
         rollback();
         return false;
     }
     int read_size = rcvMsg(sock, msg);
     if(read_size <= 0) {
+        fprintf(stderr, "recv failed\n");
         rollback();
         return false;
     }
@@ -195,12 +197,14 @@ bool Client::add(std::string name, void** data) {
         return false;
     }
     if(openTables.count(name) == 0) {
+        printf("Table %s not open, opening\n", name.c_str());
         std::string dbname = name.substr(0, name.find('.'));
         std::string tablename = name.substr(name.find('.'), name.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
         openTables[name] = t;
+        printf("Table %s opened\n", name.c_str());
     } 
     return openTables[name]->addRow(data, false, true);
 }
@@ -209,7 +213,7 @@ bool Client::add(std::string name, void** data) {
 bool Client::update(std::string name, void** data) {
     char msg[MAXMSGLEN];
     int len = EncodeCString((char*)name.c_str(), msg, MAXMSGLEN);
-    if(!sendMsg(sock, Read, msg, len)) {
+    if(!sendMsg(sock, Write, msg, len)) {
         rollback();
         return false;
     }
@@ -238,7 +242,7 @@ bool Client::update(std::string name, void** data) {
 bool Client::del(std::string name, void** pk) {
     char msg[MAXMSGLEN];
     int len = EncodeCString((char*)name.c_str(), msg, MAXMSGLEN);
-    if(!sendMsg(sock, Read, msg, len)) {
+    if(!sendMsg(sock, Write, msg, len)) {
         rollback();
         return false;
     }
