@@ -206,9 +206,6 @@ Table_* Table::getTable() {
 }
 
 bool Table::addRow(void* data[], bool update, bool log) {
-    for(int i=0;i<schema.getSchema()->numColumns;i++) {
-        std::cout<<(char*)(data[i]+2)<<std::endl;
-    }
     byte** pk_value = new byte*[pk_size];
 
     for(int i=0; i<pk_size; i++) {
@@ -284,20 +281,23 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
             }
             case INT:
             {
+                int in = DecodeInt(src);
                 pk_value[i] = (char*)malloc(sizeof(int));
-                memcpy(pk_value[i],src, 4);
+                memcpy(pk_value[i],(char*)std::to_string(in).c_str(), 4);
                 break;
             }
             case LONG:
             {
+                long in = DecodeLong(src);;
                 pk_value[i] = (char*)malloc(sizeof(long));
-                memcpy(pk_value[i],src, 8);
+                memcpy(pk_value[i],(char*)std::to_string(in).c_str(), 8);
                 break;
             }
             case FLOAT:
             {
+                float in = DecodeFloat(src);
                 pk_value[i] = (char*)malloc(sizeof(float));
-                memcpy(pk_value[i],src, 4);
+                memcpy(pk_value[i],(char*)std::to_string(in).c_str(), 4);
                 break;
             }
             default:
@@ -675,7 +675,8 @@ std::string Table::encodeTable() {
 void Table::rollback() 
 {
     int i = table_logs.size();
-    return;
+    if (i == 0)
+        return;
     i--;
     for(i; i>=0; i--) {
         std::pair<char, std::string> log = table_logs[i];
@@ -833,6 +834,7 @@ Table* Table::project(std::vector<int> cols) {
     return projectTable;
 }
 
+
 void copyRow(void* callbackObj, int rid, byte* row, int len) {
     Table* t = (Table*) callbackObj;
     t->addRowFromByte(row+2, len, true);
@@ -862,6 +864,7 @@ Table* table_union(Table* t1, Table* t2) {
         pk.push_back(i);
     Schema* s = new Schema(s1.getSchema(), pk);
     Table* t = new Table(s, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true, {}, false);
+
     Table_Scan(t1->getTable(), t, copyRow);
     Table_Scan(t2->getTable(), t, copyRow);
 
