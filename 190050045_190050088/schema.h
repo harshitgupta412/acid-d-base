@@ -34,6 +34,8 @@ class Schema {
     bool foreignKey(std::vector<int> ref_cols, char* ref_tbl);
 
     Schema_* getSchema();
+
+    Schema(Schema* other);
     
 
     std::vector<int> getpk();

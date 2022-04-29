@@ -138,7 +138,7 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
     if(overwrite) {
         for(auto index: indexes) {
             eraseIndex(index.indexNo);
-            std::cout<<index.indexNo<<std::endl;
+            // std::cout<<index.indexNo<<std::endl;
             createIndex(indexNo_to_cols(index.indexNo, schema.getSchema()->numColumns, index.numCols));
         } 
     }
@@ -205,7 +205,40 @@ bool Table::addRow(void* data[], bool update) {
 bool Table::addRowFromByte(byte *data, int len, bool update) {
     byte** pk_value = new byte*[pk_size];
     for(int i=0; i<pk_size; i++) {
-        pk_value[i] = (byte*)getNthfield(data, pk_index[i], (Schema_ *)schema.getSchema());
+        char* src = (byte*)getNthfield(data, pk_index[i], (Schema_ *)schema.getSchema());
+        switch ( schema.getSchema()->columns[pk_index[i]].type )
+        {
+            case VARCHAR:
+            {
+                short string_len = DecodeShort(src);
+                pk_value[i] = (char *)malloc(string_len+1);
+                int strlen = DecodeCString(src, pk_value[i], len);
+                break;
+            }
+            case INT:
+            {
+                pk_value[i] = (char*)malloc(sizeof(int));
+                memcpy(pk_value[i],src, 4);
+                break;
+            }
+            case LONG:
+            {
+                pk_value[i] = (char*)malloc(sizeof(long));
+                memcpy(pk_value[i],src, 8);
+                break;
+            }
+            case FLOAT:
+            {
+                pk_value[i] = (char*)malloc(sizeof(float));
+                memcpy(pk_value[i],src, 4);
+                break;
+            }
+            default:
+            {
+                printf("Unknown type %d\n", schema.getSchema()->columns[pk_index[i]].type);
+                exit(1);
+            }
+        }
     }
     // std::cout << "Table Search Starting" << std::endl;
     int rid = Table_Search(table, pk_index, pk_value, pk_size);
@@ -217,6 +250,7 @@ bool Table::addRowFromByte(byte *data, int len, bool update) {
     }
     Schema_ sch = *schema.getSchema();
 
+    
     Table_Insert(table, data, len, &rid);
     for(int i=0; i<indexes.size(); i++){
         if(indexes[i].isOpen){
@@ -302,6 +336,12 @@ void** Table::getRow(void** pk) {
     Schema_ sch = *schema.getSchema();
     decode(&sch, (char**)data, record, len);
     return data;
+}
+void Table::getRecordAsBytes(void** pk, char**record, int* len) {
+    int rid = Table_Search(table, pk_index, (byte**)pk, pk_size);
+    if(rid == -1) return;
+    *record = new char[MAX_PAGE_SIZE];
+    *len = Table_Get(table, rid, *record, MAX_PAGE_SIZE);
 }
 
 void Table::print() {
@@ -439,8 +479,8 @@ bool Table::close() {
 }
 
 Table::~Table() {
-    if(table != NULL)
-        close();
+    // if(table != NULL)
+    //     close();
     free (pk_index);
     free (table);
 }
@@ -585,25 +625,22 @@ std::string Table::encodeTable() {
     return str;
 }
 
-
 Table decodeTable(byte* s, int max_len ) {
     char* r;
     int len = DecodeCString2(s, &r, max_len);
     std::string db_name(r,len);
-    // std::cout<<len<<std::endl;
+    
     free(r);
     s += len+2;
     len = DecodeCString2(s, &r, max_len);
-    // std::cout<<len<<std::endl;
+   
     std::string name(r,len);
     free(r);
     s += len+2;
     Schema schema = decodeSchema(s, max_len, &len);
-    // std::cout<<name<<' '<<db_name<<std::endl;
-    schema.print();
+
     s+=len;
     int num_indexes = DecodeInt(s);
-    // std::cout<<num_indexes<<std::endl;
     s += sizeof(int);
     std::vector<IndexData> indexes(num_indexes);
     for(int i=0; i<num_indexes; i++) {
@@ -649,6 +686,7 @@ std::vector<std::pair<int, void**>> Table::get_records(){
     
     return final_res;
 }
+
 Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2){
     Schema s1 = t1->getSchema();
     Schema s2 = t1->getSchema();
@@ -721,7 +759,7 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int
                     j++;
                 }
             }
-            bool match =true;
+            bool match = true;
             int i1, i2;
             float f1, f2;
             long l1, l2;
@@ -757,4 +795,15 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int
         }
     }
     return t;
+}
+
+Table::Table(Table* t2) : schema(&(t2->schema)) {
+    name = t2->name;
+    db_name = t2->db_name;
+    pk_index = new int[t2->pk_size];
+    memcpy(pk_index, t2->pk_index, pk_size*sizeof(int));
+    pk_size = t2->pk_size;
+    indexes = t2->indexes;
+    table = new Table_;
+    memcpy(table, t2->table, sizeof(Table_));
 }

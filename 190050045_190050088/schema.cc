@@ -72,7 +72,11 @@ Schema decodeSchema(char * s, int max_len, int* length) {
         *length = s - old_s;
     return schema;
 }
-
+Schema::Schema(Schema* other){
+    pk = other->pk;
+    schema = new Schema_;
+    memcpy(schema, other->schema, sizeof(Schema_));
+}
 bool Schema::foreignKey(std::vector<int> ref_cols, char* refT) {
     if(fk.count(ref_cols)) return false;
     fk.insert(std::pair<std::vector<int>, std::string>(ref_cols, refT));

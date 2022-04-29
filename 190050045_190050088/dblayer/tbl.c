@@ -136,6 +136,7 @@ Table_Close(Table_ *tbl) {
     // if the page is already unfixed, don't unfix it again
     // if(err != PFE_OK && err != PFE_PAGEUNFIXED)
         // checkerr(err, "Table_ close : unfix page");
+    fflush(stdout);
     checkerr(PF_CloseFile(tbl->fileDesc), "Table_ close : close file");
 }
 
@@ -198,6 +199,7 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
     int pageNo, err;
     char *pageBuf;
     // printf("check");
+    printf("scan %d", tbl->fileDesc);
     fflush(stdout);
     if ( (err = PF_GetFirstPage(tbl->fileDesc, &pageNo, &pageBuf)) == PFE_EOF)
         return;
@@ -260,6 +262,8 @@ Table_Search(Table_ *tbl, int pk_index[], char* pk_value[], int numAttr) {
                 for(int j=0; j<numAttr; j++) {
                     bool flag = false;
                     if(tbl->schema->columns[pk_index[j]].type == VARCHAR) {
+                        // printf("Comparing %s and %s\n", fields[pk_index[j]], pk_value[j]+2);
+                        fflush(stdout);
                         if(strcmp(fields[pk_index[j]], pk_value[j]) != 0) {
                             // printf("Differ at               %d %s %s %d %ld %ld\n", j, fields[pk_index[j]], pk_value[j],tbl->schema->columns[pk_index[j]].type, strlen(fields[pk_index[j]]),strlen( pk_value[j]));
                             free(fields);

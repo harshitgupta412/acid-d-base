@@ -16,5 +16,11 @@ user.o: user.cc
 db.o: db.cc
 	$(CC) -c -g db.cc
 
+load_data: schema.o user.o db.o table.o 
+	$(CC) -o tests/load tests/load_data.cc $(OBJ) schema.o table.o user.o db.o  
+
+test_query: schema.o user.o db.o table.o 
+	$(CC) -o tests/query tests/query.cc $(OBJ) schema.o table.o user.o db.o  
+
 clean:
 	rm -f *.o

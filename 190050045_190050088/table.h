@@ -43,16 +43,20 @@ class Table {
     std::vector<IndexData> indexes;
 
     void deleteRow(int rowId);
-    bool addRowFromByte(byte* record, int len, bool update);
+    
 
     public:
 
-    std::vector<std::pair<int, void**>> get_records();
+    bool addRowFromByte(byte* record, int len, bool update);
+    void getRecordAsBytes(void** pk, char**record, int* len);
+    std::vector<std::pair<int, void**> > get_records();
     std::string get_name();
     std::string get_db_name();
     std::string get_table_name();
 
     Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk = true);
+
+    Table(Table* t2);
 
     const Schema& getSchema();
 

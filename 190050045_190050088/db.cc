@@ -10,25 +10,6 @@ Database::Database(User* current_user){
     current = "";
     db_table_name = "DB_TABLE";
     db_cross_name = "DB_CROSS_TABLE";
-    // char db_name[] = "DB";
-    
-    // std::vector<std::pair<std::string, int> > cols;
-    // cols.push_back({"DBNAME", VARCHAR});
-    // std::vector<int> pk = {0};
-
-    // schema_db = new Schema(cols, pk);
-
-    // std::vector<std::pair<std::string, int> > cols2;
-    // cols2.push_back({"DBNAME", VARCHAR});
-    // cols2.push_back({"TABLE", VARCHAR});  
-    // cols2.push_back({"METADATA", VARCHAR});     
-    // std::vector<int> pk2 = {0, 1};
-
-    // schema_cross = new Schema(cols2, pk2);
-    // vector<IndexData> vi;
-
-    // db_table = new Table(schema_db, (char*)db_table_name.c_str(), db_name, false, vi);
-    // db_cross_table = new Table(schema_cross, (char*)db_cross_name.c_str(), db_name, false, {});
 }
 
 bool Database::connect(std::string name) {
@@ -94,35 +75,57 @@ bool Database::drop(){
 }
 
 Table* Database::load(std::string name){
+
     if (fail){
         return NULL;
     }
 
     db_cross_table = connectDbTableList();
 
-    char *table_n = new char[name.length()];
+    char *table_n = new char[name.length()+1];
     strcpy(table_n, name.c_str());
 
-    char *db_n = new char[current.length()];
+    char *db_n = new char[current.length()+1];
     strcpy(db_n, current.c_str());
 
     void** pk = new void*[2];
-    pk[0] = (void*) table_n;
-    pk[1] = (void*) db_n;
+    pk[0] = (void*) db_n;
+    pk[1] = (void*) table_n;
 
-    void** data = db_cross_table->getRow(pk);
+    char* data;
+    int len;
 
+    db_cross_table->getRecordAsBytes(pk, &data, &len);
     if (data == NULL){
         db_cross_table->close();
         return NULL;
     }
 
-    Table ret = (decodeTable((char*) data[2], MAX_PAGE_SIZE));
+    int bytes_decoded = 0;
+    char* cursor = data;
 
-    Table* t = new Table(ret);
-    db_cross_table->close();
+    short string_len = DecodeShort(cursor);
+    char* db_record = (char *)malloc(string_len+1);
+    
+    int strlen = DecodeCString(cursor, db_record, len);
+    cursor += strlen+2;
+    bytes_decoded += strlen+2;
+    len -= strlen+2;
+
+    string_len = DecodeShort(cursor);
+    char* table_record = (char *)malloc(string_len+1);
+    strlen = DecodeCString(cursor, table_record, len);
+    cursor += strlen+2;
+    bytes_decoded += strlen+2;
+    len -= strlen+2;
+
+    char* metadata = new char[len];
+    memcpy(metadata, cursor, len);
+
+
+    Table r =  (decodeTable(metadata, MAX_PAGE_SIZE));
+    Table* t = new Table(&r);
     return t;
-
 
 }
 
@@ -133,6 +136,8 @@ bool Database::createTable(Table *t) {
 
     if(t->get_db_name() != current)
     {
+        std::cout << current << std::endl;
+        std::cout << t->get_db_name() << std::endl;
         std::cout << "Error: Connected to a different database" << std::endl;
         return false;
     }
@@ -140,23 +145,37 @@ bool Database::createTable(Table *t) {
     db_cross_table = connectDbTableList();
 
     std::string name = t->get_table_name();
+
     std::string encoded = t->encodeTable();
 
-    char *table_name = new char[name.length()+1];
-    strcpy(table_name,name.c_str());
+    char *table_name = new char[name.size() + 1];
+    strcpy(table_name, name.c_str());
 
-    char *db_name = new char[current.length()+1];
+    char *db_name = new char[current.size() + 1];
     strcpy(db_name, current.c_str());
 
-    char *encoded_c = new char[encoded.length()+1];
-    strcpy(encoded_c, encoded.c_str());
+    char *record = new char[MAX_PAGE_SIZE];
+    char *initial = record;
+    int spaceLeft = MAX_PAGE_SIZE;
 
-    void** data = new void*[3];
-    data[0] = (void*) db_name;
-    data[1] = (void*) table_name;
-    data[2] = (void*) encoded_c;
+    int bytes_encoded = 0;
 
-    bool status = db_cross_table->addRow(data, true);
+    int len = EncodeCString(db_name, record, spaceLeft);
+
+    spaceLeft -= len;
+    record += len;
+    bytes_encoded += len;
+
+    int len2 = EncodeCString(table_name, record, spaceLeft);
+
+    spaceLeft -= len2;
+    record += len2;
+    bytes_encoded += len2;
+
+    memcpy(record, encoded.c_str(), encoded.size());
+    int len3 = encoded.size();
+
+    bool status = db_cross_table->addRowFromByte(initial, len + len2 + len3, true);
     // db_cross_table->print();
     db_cross_table->close();
     return status;
