@@ -181,6 +181,14 @@ bool Database::createTable(Table *t) {
     return status;
 
 }
+void Database::print(){
+    Table* db_cross_table = connectDbTableList();
+
+    db_cross_table->print();
+
+    db_cross_table->close();
+
+}
 
 bool Database::deleteTable(Table *t) {
     if (fail){

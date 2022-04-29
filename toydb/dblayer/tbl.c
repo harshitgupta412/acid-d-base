@@ -272,9 +272,9 @@ Table_Search(Table_ *tbl, int pk_index[], char* pk_value[], int numAttr) {
                     }
                     else{
                         switch(tbl->schema->columns[pk_index[j]].type) {
-                            case INT: flag = DecodeInt(fields[pk_index[j]]) ==  DecodeInt(pk_value[j]); 
-                            case FLOAT: flag = DecodeFloat(fields[pk_index[j]]) ==  DecodeFloat(pk_value[j]); 
-                            case LONG: flag = DecodeLong(fields[pk_index[j]]) ==  DecodeLong(pk_value[j]); 
+                            case INT: flag = DecodeInt(fields[pk_index[j]]) ==  atoi(pk_value[j]); 
+                            case FLOAT: flag = DecodeFloat(fields[pk_index[j]]) ==  atof(pk_value[j]); 
+                            case LONG: flag = DecodeLong(fields[pk_index[j]]) ==  atol(pk_value[j]); 
                         }
                         if(!flag) {
                             // printf("2Differ at               %d %s %s %d\n", j, fields[pk_index[j]], pk_value[j],tbl->schema->columns[pk_index[j]].type);
@@ -341,6 +341,7 @@ encode(Schema_ *sch, char **fields, byte *record, int spaceLeft) {
             {
                 // assert(spaceLeft >= 4);
                 EncodeInt(atoi(fields[i]), record);
+
                 spaceLeft -= 4;
                 record += 4;
                 bytes_encoded += 4;

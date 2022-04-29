@@ -101,7 +101,7 @@ class Table {
 Table decodeTable(byte* s, int max_len ); //
 Table* table_union(Table* t1, Table* t2);
 Table* tabe_intersect(Table* t1, Table* t2);
-Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2);
+Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int> cols2);
 
 std::string get_temp_name();
 #endif

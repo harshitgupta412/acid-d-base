@@ -206,7 +206,11 @@ Table_* Table::getTable() {
 }
 
 bool Table::addRow(void* data[], bool update, bool log) {
+    for(int i=0;i<schema.getSchema()->numColumns;i++) {
+        std::cout<<(char*)(data[i]+2)<<std::endl;
+    }
     byte** pk_value = new byte*[pk_size];
+
     for(int i=0; i<pk_size; i++) {
         pk_value[i] = (byte*)data[pk_index[i]];
     }
@@ -618,14 +622,14 @@ Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
         int rid = AM_FindNextEntry(scanDesc);
         if(rid == AME_EOF) break;
         char record[MAX_PAGE_SIZE];
-        std::cout<<rid<<std::endl;
+        // std::cout<<rid<<std::endl;
         int num_bytes = Table_Get(table, rid, record, MAX_PAGE_SIZE);
         // std::cout << "Row fetched " << num_bytes << std::endl;
         t->addRowFromByte(record, num_bytes, 1);
         // std::cout << "Row added" << std::endl;
         x++;
     }
-    std::cout<<x<<std::endl;
+    // std::cout<<x<<std::endl;
     AM_CloseIndexScan(scanDesc);
     // delete keyPtr;
     return t;
@@ -732,7 +736,7 @@ Table decodeTable(byte* s, int max_len ) {
 
 void append(void* callbackObj, int rid, byte* row, int len){
     std::vector<std::pair<int, std::string> > * p = (std::vector<std::pair<int, std::string> > *) callbackObj;
-    std::string str(row, len);
+    std::string str(row, len+2);
     p->push_back({rid, str});
 }
 std::vector<std::pair<int, void**>> Table::get_records(){
@@ -742,12 +746,13 @@ std::vector<std::pair<int, void**>> Table::get_records(){
 
     Schema_ *sch = schema.getSchema();
     for (std::pair<int, std::string> p : returnal){
+        // std::cout << p.first << std::endl;
         char** data = new char*[sch->numColumns];
         decode(sch, data, (char*)p.second.c_str() + 2, p.second.length());
 
-        for(int i=0; i<sch->numColumns; i++) {
-            std::cout << data[i] << std::endl;
-        }
+        // for(int i=0; i<sch->numColumns; i++) {
+        //     std::cout << Ddata[i] << std::endl;
+        // }
         final_res.push_back({p.first, (void**)data});
 
     }
@@ -848,7 +853,7 @@ Table* table_intersect(Table* t1, Table *t2) {
     return t;
 }
 
-Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2){
+Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int> cols2){
     Schema s1 = t1->getSchema();
     Schema s2 = t1->getSchema();
 
@@ -874,10 +879,10 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int
     std::vector<std::pair<std::string, int> > cols_join;
 
     for (int i=0; i<sch1->numColumns; ++i){
-        cols_join.push_back({t1->get_name() + "." + sch1->columns[i].name, sch1->columns[i].type});
+        cols_join.push_back({t1->get_table_name() + "." + sch1->columns[i].name, sch1->columns[i].type});
     }
     for (int i=0; i<sch2->numColumns; ++i){
-        cols_join.push_back({t2->get_name() + "." + sch2->columns[i].name, sch2->columns[i].type});
+        cols_join.push_back({t2->get_table_name() + "." + sch2->columns[i].name, sch2->columns[i].type});
     }
 
     std::vector<int> pk;
@@ -893,6 +898,7 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int
     Schema *common = new Schema(cols_join, pk);
     Table* t = new Table(common, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
 
+    common->print();
     std::vector<std::pair<int, void**>> t1_rows = t1->get_records();
     std::vector<std::pair<int, void**>> t2_rows = t2->get_records();
 
@@ -906,7 +912,12 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int
 
             int j = 0;
             for (int i=0; i<sch1->numColumns; ++i){
-                union_row[i] = r1.second[i];
+                if(sch1->columns[i].type == VARCHAR) {
+                    union_row[i] = (void*)new char[strlen((char*)r1.second[i]) + 3];
+                    EncodeCString((char*)r1.second[i], (char*)union_row[i], strlen((char*)r1.second[i]) + 3);
+                }
+                else union_row[i] = r1.second[i];
+                // union_row[i] = r1.second[i];
                 if (i == cols1[j]){
                     d1[j] = r1.second[i];
                     j++;
@@ -914,12 +925,23 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int
             }
             j = 0;
             for (int i=0; i<sch2->numColumns; ++i){
-                union_row[sch1->numColumns + i] = r2.second[i];
+                if(sch2->columns[i].type == VARCHAR) {
+                    union_row[sch1->numColumns + i] = (void*)new char[strlen((char*)r2.second[i]) + 3];
+                    EncodeCString((char*)r2.second[i], (char*)union_row[sch1->numColumns + i], strlen((char*)r2.second[i]) + 3);
+                }
+                else union_row[sch1->numColumns + i] = r2.second[i];
+                // union_row[sch1->numColumns + i] = r2.second[i];
                 if (i == cols2[j]){
                     d2[j] = r2.second[i];
                     j++;
                 }
             }
+            std::cout<<"SAds"<<std::endl;
+
+            for(int i=0;i<sch1->numColumns+sch2->numColumns;i++){
+                std::cout<<" "<< (char*)(2+union_row[i])<<std::endl;
+            }
+            std::cout<<"SAds"<<std::endl;
             bool match = true;
             int i1, i2;
             float f1, f2;
@@ -930,6 +952,7 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int
                     case INT:
                         i1 =  DecodeInt((char*)d1[i]);
                         i2 =  DecodeInt((char*)d2[i]);
+                        std::cout << i1 << " and " << i2 << std::endl;
                         if (i1 != i2) match = false;
                         break;
                     case FLOAT:
@@ -945,12 +968,14 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int
                     case VARCHAR:
                         s1 = (char*)d1[i];
                         s2 = (char*)d2[i];
+                        std::cout<<s1<<' '<<s2<<std::endl;
                         if (strcmp(s1, s2) != 0) match = false;
                         break;
                 }
             }
-
+            
             if (match){
+            std::cout<<"SAds"<<std::endl;
                 t->addRow(union_row, true);
             }
         }
