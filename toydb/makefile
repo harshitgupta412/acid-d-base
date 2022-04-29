@@ -6,6 +6,7 @@ all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o api.o
 	$(CC) -o main $(OBJ) schema.o table.o user.o db.o main.o
 	$(CC) -o txnmgr.bin $(OBJ) schema.o table.o user.o db.o txnmgr.o
 	$(CC) -o api.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o api.o
+	$(CC) -o tests/query_union.bin  tests/query_union.cc $(OBJ) schema.o table.o user.o db.o
 
 
 api.o: client.o queryobj.o db.o

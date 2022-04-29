@@ -54,6 +54,7 @@ class Table {
     bool addRowFromByte(byte* record, int len, bool update);
     void getRecordAsBytes(void** pk, char**record, int* len);
     std::vector<std::pair<int, void**> > get_records();
+    std::vector<std::pair<int, void**>> get_records2();
     std::string get_name();
     std::string get_db_name();
     std::string get_table_name();

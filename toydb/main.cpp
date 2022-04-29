@@ -222,7 +222,7 @@ loadCSV() {
 
     char c[] = "Yemen";
     int i = 100000;
-    Table* out = tbl.queryIndex(0,GREATER_THAN_EQUAL, vector<void*>(1,(void*)c));
+    Table* out = tbl.queryIndex(0,GREATER_THAN_EQUAL, vector<void*>(1,(void*)&i));
     out->print();
     cout<<"Query done"<<endl;
 
