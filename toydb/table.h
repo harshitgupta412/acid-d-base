@@ -34,6 +34,7 @@ struct IndexData {
 };
 
 
+
 class Table {
     Table_ *table;
     std::string name;
@@ -63,6 +64,8 @@ class Table {
 
     const Schema& getSchema();
     Table_* getTable(); 
+
+    
 
     bool addRow(void* data[], bool update, bool log = false);
 
@@ -100,4 +103,5 @@ Table* table_union(Table* t1, Table* t2);
 Table* table_intersect(Table* t1, Table* t2);
 Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2);
 
+std::string get_temp_name();
 #endif

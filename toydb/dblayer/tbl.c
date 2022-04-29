@@ -199,7 +199,7 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
     int pageNo, err;
     char *pageBuf;
     // printf("check");
-    printf("scan %d", tbl->fileDesc);
+    // printf("scan %d", tbl->fileDesc);
     fflush(stdout);
     if ( (err = PF_GetFirstPage(tbl->fileDesc, &pageNo, &pageBuf)) == PFE_EOF)
         return;
