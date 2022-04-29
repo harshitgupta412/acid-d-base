@@ -169,7 +169,7 @@ Table* connectUserTable() {
 
     Schema* schema = new Schema(cols, pk);
     vector<IndexData> vi;
-    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi);
+    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi,false);
     return user_table;
 }
 
@@ -188,7 +188,7 @@ Table* connectUserPrivTable() {
 
     Schema* schema = new Schema(cols, pk);
     vector<IndexData> vi;
-    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi);
+    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi,false);
     return user_table;
 }
 
@@ -206,7 +206,7 @@ Table* connectUserPrivDb() {
 
     Schema* schema = new Schema(cols, pk);
     vector<IndexData> vi;
-    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi);
+    Table* user_table = new Table(schema, user_table_name, user_db_name, false, vi,false);
     return user_table;
 }
 

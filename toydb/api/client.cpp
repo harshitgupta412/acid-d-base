@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include<cstring>
 
-#define TABLEDIR "../"
+#define TABLEDIR ""
 
 bool sendMsg(int sock, MsgType type, char* msg, int len) {
     char message[MAXMSGLEN];
@@ -39,6 +39,7 @@ int rcvMsg(int sock, char* msg) {
 }
 
 void Client::rollback() {
+    printf("rollback\n");
     for(auto it = openTables.begin(); it != openTables.end(); it++) {
         it->second->rollback();
     }
@@ -96,7 +97,7 @@ bool Client::initTxn(User _user) {
 Table* evalQueryTree(QueryObj* q, User user) {
     if( q->type == Identity_) {
         std::string dbname = q->tableName.substr(0, q->tableName.find('.'));
-        std::string tablename = q->tableName.substr(q->tableName.find('.'), q->tableName.size());
+        std::string tablename = q->tableName.substr(q->tableName.find('.')+1, q->tableName.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
@@ -118,10 +119,9 @@ Table* evalQueryTree(QueryObj* q, User user) {
     }
     else if( q->type == Project_) {
         Table* t = evalQueryTree(q->left, user);
-        // Table* t2 = Table_Project(t, q->cols1);
-        // delete t;
-        // return t2;
-        return t;
+        Table* t2 = t->project(q->cols1);
+        delete t;
+        return t2;
     }
     else if( q->type == Join_) {
         Table* t1 = evalQueryTree(q->left, user);
@@ -134,20 +134,18 @@ Table* evalQueryTree(QueryObj* q, User user) {
     else if( q->type == Union_) {
         Table* t1 = evalQueryTree(q->left, user);
         Table* t2 = evalQueryTree(q->right, user);
-        // Table* t3 = Table_Union(t1, t2);
+        Table* t3 = table_union(t1, t2);
         delete t1;
         delete t2;
-        // return t3;
-        return t2;
+        return t3;
     }
     else {
         Table* t1 = evalQueryTree(q->left, user);
         Table* t2 = evalQueryTree(q->right, user);
-        // Table* t3 = Table_Intersection(t1, t2);
+        Table* t3 = table_intersect(t1, t2);
         delete t1;
         delete t2;
-        // return t3;
-        return t2;
+        return t3;
     }
 }
 
@@ -183,12 +181,14 @@ bool Client::evalQuery(QueryObj q, void*** result) {
 bool Client::add(std::string name, void** data) {
     char msg[MAXMSGLEN];
     int len = EncodeCString((char*)name.c_str(), msg, MAXMSGLEN);
-    if(!sendMsg(sock, Read, msg, len)) {
+    if(!sendMsg(sock, Write, msg, len)) {
+        fprintf(stderr, "send failed\n");
         rollback();
         return false;
     }
     int read_size = rcvMsg(sock, msg);
     if(read_size <= 0) {
+        fprintf(stderr, "recv failed\n");
         rollback();
         return false;
     }
@@ -198,12 +198,14 @@ bool Client::add(std::string name, void** data) {
         return false;
     }
     if(openTables.count(name) == 0) {
+        printf("Table %s not open, opening\n", name.c_str());
         std::string dbname = name.substr(0, name.find('.'));
-        std::string tablename = name.substr(name.find('.'), name.size());
+        std::string tablename = name.substr(name.find('.')+1, name.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
         openTables[name] = t;
+        printf("Table %s opened\n", name.c_str());
     } 
     return openTables[name]->addRow(data, false, true);
 }
@@ -212,7 +214,7 @@ bool Client::add(std::string name, void** data) {
 bool Client::update(std::string name, void** data) {
     char msg[MAXMSGLEN];
     int len = EncodeCString((char*)name.c_str(), msg, MAXMSGLEN);
-    if(!sendMsg(sock, Read, msg, len)) {
+    if(!sendMsg(sock, Write, msg, len)) {
         rollback();
         return false;
     }
@@ -228,7 +230,7 @@ bool Client::update(std::string name, void** data) {
     }
     if(openTables.count(name) == 0) {
         std::string dbname = name.substr(0, name.find('.'));
-        std::string tablename = name.substr(name.find('.'), name.size());
+        std::string tablename = name.substr(name.find('.')+1, name.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
@@ -241,7 +243,7 @@ bool Client::update(std::string name, void** data) {
 bool Client::del(std::string name, void** pk) {
     char msg[MAXMSGLEN];
     int len = EncodeCString((char*)name.c_str(), msg, MAXMSGLEN);
-    if(!sendMsg(sock, Read, msg, len)) {
+    if(!sendMsg(sock, Write, msg, len)) {
         rollback();
         return false;
     }
@@ -257,7 +259,7 @@ bool Client::del(std::string name, void** pk) {
     }
     if(openTables.count(name) == 0) {
         std::string dbname = name.substr(0, name.find('.'));
-        std::string tablename = name.substr(name.find('.'), name.size());
+        std::string tablename = name.substr(name.find('.')+1, name.size());
         Database db(&user);
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
@@ -279,4 +281,32 @@ bool Client::endTxn() {
 
 void Client::disconnect() {
     close(sock);
+}
+
+Client::Client(std::string user, std::string pass): user(user, pass) {
+    this->user = User(user, pass);
+}
+
+Client::Client(User *user) : user(*user){
+}
+
+
+bool Client::createTable(std::string dbname, std::string tablename, Schema s) {
+    Database db(&user);
+    db.connect(TABLEDIR + dbname);
+    Table* t = db.load(tablename);
+    if(t != NULL) {
+        return false;
+    }
+    t->close();
+    Table t2(&s, (char*)tablename.c_str(), (char*)dbname.c_str(), false, std::vector<IndexData>());
+    db.createTable(&t2);
+    return true;
+}
+
+bool Client::dropTable(std::string dbname, std::string tablename) {
+    Database db(&user);
+    db.connect(TABLEDIR + dbname);
+    Table* t = db.load(tablename);
+    db.deleteTable(t);
 }

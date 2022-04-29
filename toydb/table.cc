@@ -159,7 +159,7 @@ void Table::deleteRow(int rowId, bool log){
     Table_Delete(table, rowId);
 }
 
-Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes = std::vector<IndexData>(), bool index_pk): schema(*_schema) {
+Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk): schema(*_schema) {
     name += db_name;
     name += ".";
     name += table_name;
@@ -229,7 +229,6 @@ bool Table::addRow(void* data[], bool update, bool log) {
 
     if(log){
         table_logs.push_back({'a', std::to_string(rid)});
-        std::cout << "Adding Record " << rid << std::endl;
     }
 
     for(int i=0; i<indexes.size(); i++){
@@ -748,12 +747,58 @@ std::vector<std::pair<int, void**>> Table::get_records(){
     for (std::pair<int, std::string> p : returnal){
         // std::cout << p.first << std::endl;
         char** data = new char*[sch->numColumns];
-        decode(sch, data, (char*)p.second.c_str() + 2, p.second.length());
-
+        decode(sch, data, (char*)p.second.c_str()+2, p.second.length());
         // for(int i=0; i<sch->numColumns; i++) {
-        //     std::cout << Ddata[i] << std::endl;
+        //     std::cout << data[i] << " ";
         // }
+        // std::cout << std::endl;
         final_res.push_back({p.first, (void**)data});
+
+    }
+    
+    return final_res;
+}
+
+std::vector<std::pair<int, void**>> Table::get_records2(){
+    std::vector<std::pair<int, std::string> > returnal;
+    std::vector<std::pair<int, void**>> final_res;
+    Table_Scan(table, &returnal, append);
+
+    Schema_ *sch = schema.getSchema();
+    for (std::pair<int, std::string> p : returnal){
+        char** data = new char*[sch->numColumns];
+        void** res = new void*[sch->numColumns];
+        decode(sch, data, (char*)p.second.c_str()+2, p.second.length());
+        for(int i =0; i< sch->numColumns; i++) {
+            switch(sch->columns[i].type){
+                case INT: {
+                    int in = DecodeInt(data[i]);
+                    void* s = (void*) std::to_string(in).c_str();
+                    res[i] = new void*;
+                    memcpy(res[i], s, 4);
+                    break;
+                }
+                case FLOAT: {
+                    float f = DecodeFloat(data[i]);
+                    void* s = (void*) std::to_string(f).c_str();
+                    res[i] = new void*;
+                    memcpy(res[i], s, 4);
+                    break;
+                }
+                case LONG: {
+                    long l = DecodeLong(data[i]);
+                    void* s = (void*) std::to_string(l).c_str();
+                    res[i] = new void*;
+                    memcpy(res[i], s, 8);
+                    break;
+                }
+                case VARCHAR: {
+                    res[i] = (void*) data[i];
+                    break;
+                }
+            }
+        }
+        final_res.push_back({p.first, res});
 
     }
     
@@ -774,7 +819,7 @@ Table* Table::project(std::vector<int> cols) {
         schema_cols.push_back({sch.columns[col].name, sch.columns[col].type});
 
     Schema *projectSchema = new Schema(schema_cols, cols);
-    Table* projectTable = new Table(projectSchema, (char*)(get_temp_name().c_str()), (char*)("temp/" + db_name).c_str(), true);
+    Table* projectTable = new Table(projectSchema, (char*)(get_temp_name().c_str()), (char*)("temp/" + db_name).c_str(), true, {}, false);
 
     std::vector<std::pair<int, void**> > rows = get_records();
 
@@ -790,7 +835,7 @@ Table* Table::project(std::vector<int> cols) {
 
 void copyRow(void* callbackObj, int rid, byte* row, int len) {
     Table* t = (Table*) callbackObj;
-    t->addRowFromByte(row, len, true);
+    t->addRowFromByte(row+2, len, true);
 }
 
 Table* table_union(Table* t1, Table* t2) {
@@ -812,9 +857,22 @@ Table* table_union(Table* t1, Table* t2) {
         }
     }
 
-    Table* t = new Table(&s1, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
+    std::vector<int> pk;
+    for(int i = 0; i<s1.getSchema()->numColumns; i++)
+        pk.push_back(i);
+    Schema* s = new Schema(s1.getSchema(), pk);
+    Table* t = new Table(s, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true, {}, false);
     Table_Scan(t1->getTable(), t, copyRow);
     Table_Scan(t2->getTable(), t, copyRow);
+
+    // std::vector<std::pair<int, void**> > rows = t1->get_records2();
+    // for(auto row: rows){
+    //     t->addRow(row.second, true, false);
+    // }
+
+    // rows = t2->get_records2();
+    // for(auto row: rows)
+    //     t->addRow(row.second, true, false);
     return t;
 }
 
@@ -837,7 +895,7 @@ Table* table_intersect(Table* t1, Table *t2) {
         }
     }
 
-    Table* t = new Table(&s1, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
+    Table* t = new Table(&s1, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true, {}, false);
     std::vector<std::pair<int, void**> > rows = t1->get_records();
     std::vector<int> pk_keys = s1.getpk();
     for(auto row: rows) {

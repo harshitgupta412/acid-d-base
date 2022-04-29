@@ -3,4 +3,6 @@
 *.tbl
 dblayer/dumpdb
 dblayer/loaddb
-txnmgr.bin
+*.bin
+tests/load
+tests/query

@@ -2,15 +2,25 @@ CC=g++-11
 CFLAGS = -g
 OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./amlayer/amlayer.a
 
-all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o
+all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o binaryops.o api.o
 	$(CC) -o main $(OBJ) schema.o table.o user.o db.o main.o
 	$(CC) -o txnmgr.bin $(OBJ) schema.o table.o user.o db.o txnmgr.o
+	$(CC) -o binaryops $(OBJ) schema.o table.o user.o db.o binaryops.o
+	$(CC) -o api.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o api.o
+	$(CC) -o tests/query_union.bin  tests/query_union.cc $(OBJ) schema.o table.o user.o db.o
 
-client.o: api/client.cpp
+
+api.o: client.o queryobj.o db.o
+	$(CC) -g -c api/api.cpp
+
+client.o: api/client.cpp user.o
 	$(CC) -g -c api/client.cpp
 
 queryobj.o: api/queryobj.cpp
 	$(CC) -g -c api/queryobj.cpp
+
+binaryops.o: binaryops.cpp
+	$(CC) -g -c binaryops.cpp
 
 txnmgr.o: txnmgr.cpp
 	$(CC) -c -g txnmgr.cpp

@@ -9,6 +9,7 @@
 #include<set>
 #include "queryobj.h"
 #include "../user.h"
+#include "../db.h"
 #include <map>
 
 enum MsgType {
@@ -24,7 +25,10 @@ class Client {
     User user;
     int sock;
     void rollback();
+
     public:
+    Client(std::string user, std::string pass);
+    Client(User *user);
     bool connect2mngr();
     bool initTxn(std::string user, std::string pass);
     bool initTxn(User _user);
@@ -34,6 +38,9 @@ class Client {
     bool del(std::string name, void** pk);
     bool endTxn();
     void disconnect();
+
+    bool createTable(std::string dbname, std::string tablename, Schema s);
+    bool dropTable(std::string dbname, std::string tablename);
 };
 
 #endif

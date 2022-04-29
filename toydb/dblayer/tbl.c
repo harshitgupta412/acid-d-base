@@ -198,9 +198,6 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
     //          callbackfn(callbackObj, rid, record, recordLen)
     int pageNo, err;
     char *pageBuf;
-    // printf("check");
-    // printf("scan %d", tbl->fileDesc);
-    fflush(stdout);
     if ( (err = PF_GetFirstPage(tbl->fileDesc, &pageNo, &pageBuf)) == PFE_EOF)
         return;
     else if ( err >= 0 || err == PFE_PAGEFIXED )
@@ -208,8 +205,6 @@ Table_Scan(Table_ *tbl, void *callbackObj, ReadFunc callbackfn) {
         do
         {
             int nslots = getNumSlots(pageBuf);
-            // printf("%d\n",nslots);
-            fflush(stdout);
             for (int i = 0; i < nslots; i++)
             {
                 int len = getLen(i, pageBuf);
@@ -272,9 +267,9 @@ Table_Search(Table_ *tbl, int pk_index[], char* pk_value[], int numAttr) {
                     }
                     else{
                         switch(tbl->schema->columns[pk_index[j]].type) {
-                            case INT: flag = DecodeInt(fields[pk_index[j]]) ==  atoi(pk_value[j]); 
-                            case FLOAT: flag = DecodeFloat(fields[pk_index[j]]) ==  atof(pk_value[j]); 
-                            case LONG: flag = DecodeLong(fields[pk_index[j]]) ==  atol(pk_value[j]); 
+                            case INT: flag = DecodeInt(fields[pk_index[j]]) ==  atoi(pk_value[j]);  break;
+                            case FLOAT: flag = DecodeFloat(fields[pk_index[j]]) ==  atof(pk_value[j]);  break;
+                            case LONG: flag = DecodeLong(fields[pk_index[j]]) ==  atol(pk_value[j]); break;
                         }
                         if(!flag) {
                             // printf("2Differ at               %d %s %s %d\n", j, fields[pk_index[j]], pk_value[j],tbl->schema->columns[pk_index[j]].type);
