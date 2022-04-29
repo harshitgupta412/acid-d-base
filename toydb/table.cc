@@ -816,7 +816,7 @@ Table* Table::project(std::vector<int> cols) {
     Schema *projectSchema = new Schema(schema_cols, cols);
     Table* projectTable = new Table(projectSchema, (char*)(get_temp_name().c_str()), (char*)("temp/" + db_name).c_str(), true, {}, false);
 
-    std::vector<std::pair<int, void**> > rows = get_records();
+    std::vector<std::pair<int, void**> > rows = get_records2();
 
     for(auto row: rows) {
         void** projectRow = new void*[cols.size()];
@@ -890,17 +890,48 @@ Table* table_intersect(Table* t1, Table *t2) {
         }
     }
 
-    Table* t = new Table(&s1, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true, {}, false);
-    std::vector<std::pair<int, void**> > rows = t1->get_records();
-    std::vector<int> pk_keys = s1.getpk();
-    for(auto row: rows) {
-        void* pk[pk_keys.size()];
-        for(auto i: pk_keys)
-            pk[i] = row.second[pk_keys[i]];
-        void** res = t2->getRow(pk);
-        if(res == NULL)
-            continue;
-        t->addRow(row.second, true);
+    std::vector<int> pk;
+    for(int i = 0; i<s1.getSchema()->numColumns; i++)
+        pk.push_back(i);
+    Schema* s = new Schema(s1.getSchema(), pk);
+    Table* t = new Table(s, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true, {}, false);
+    std::vector<std::pair<int, void**> > rows1 = t1->get_records2();
+    std::vector<std::pair<int, void**> > rows2 = t2->get_records2();
+    for(auto row1: rows1) {
+        bool found = false;
+        for(auto row2: rows2) {
+            bool flag = true;
+            for(int i = 0; i < pk.size(); i++){
+                switch(s1.getSchema()->columns[i].type) {
+                    case INT: {
+                        if (atoi((char*)row1.second[i]) != atoi((char*)row2.second[i]))
+                            flag = false;
+                        break;
+                    }
+                    case FLOAT: {
+                        if (atof((char*)row1.second[i]) != atof((char*)row2.second[i]))
+                            flag = false;
+                        break;
+                    }
+                    case LONG: {
+                        if (atol((char*)row1.second[i]) != atol((char*)row2.second[i]))
+                            flag = false;
+                        break;
+                    }
+                    case VARCHAR: {
+                        if (strcmp((char*)row1.second[i], (char*)row2.second[i]) != 0)
+                            flag = false;
+                        break;
+                    }
+                }
+                if(!flag)
+                    break;
+            }
+            if(flag){
+                t->addRow(row1.second, true);
+                break;
+            }
+        }
     }
 
     return t;
