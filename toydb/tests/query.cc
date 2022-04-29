@@ -22,6 +22,23 @@
 
 using namespace std;
 
+bool all_func(RecId r, char* record, int len){
+    return true;
+}
+
+bool yemen_func(RecId r, char* record, int len){
+    short string_len = DecodeShort(record);
+    char* str = (char *)malloc(string_len+1);
+    int strlen = DecodeCString(record, str, len);
+
+
+    if (strcmp(str, "Yemen") == 0){
+        free(str);
+        return true;
+    }
+    return false;
+}
+
 int main(){
     User u("SUPERUSER", "SUPERUSER_PASSWORD");
 
@@ -30,6 +47,15 @@ int main(){
     Table* t = db.load("main");
     cout << t->get_name() << endl;
     t->print();
+    // t->print();
+
+    Table *yemen = t->query(yemen_func);
+
+    yemen->print();
+
+    Table *all = t->query(all_func);
+
+    all->print();
 
     return 0;
 }
