@@ -768,23 +768,26 @@ std::vector<std::pair<int, void**>> Table::get_records2(){
             switch(sch->columns[i].type){
                 case INT: {
                     int in = DecodeInt(data[i]);
-                    void* s = (void*) std::to_string(in).c_str();
-                    res[i] = new void*;
-                    memcpy(res[i], s, 4);
+                    std::string str = std::to_string(in);
+                    void* s = (void*) str.c_str();
+                    res[i] = (void*)new char[str.length()+1];
+                    memcpy(res[i], s, str.size()+1);
                     break;
                 }
                 case FLOAT: {
                     float f = DecodeFloat(data[i]);
-                    void* s = (void*) std::to_string(f).c_str();
-                    res[i] = new void*;
-                    memcpy(res[i], s, 4);
+                    std::string str = std::to_string(f);
+                    void* s = (void*) str.c_str();
+                    res[i] = (void*)new char[str.length()+1];
+                    memcpy(res[i], s, str.size()+1);
                     break;
                 }
                 case LONG: {
                     long l = DecodeLong(data[i]);
-                    void* s = (void*) std::to_string(l).c_str();
-                    res[i] = new void*;
-                    memcpy(res[i], s, 8);
+                    std::string str = std::to_string(l);
+                    void* s = (void*) str.c_str();
+                    res[i] = (void*)new char[str.length()+1];
+                    memcpy(res[i], s, str.size()+1);
                     break;
                 }
                 case VARCHAR: {

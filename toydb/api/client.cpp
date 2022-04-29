@@ -233,6 +233,7 @@ bool Client::add(std::string name, void** data) {
     } 
     bool ret = openTables[name]->addRow(data, false, true);
     if(!ret) {
+        std::cout<<"Failed to add row"<<std::endl;
         rollback();
         return false;
     }
