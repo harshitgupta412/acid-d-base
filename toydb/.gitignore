@@ -4,3 +4,5 @@
 dblayer/dumpdb
 dblayer/loaddb
 txnmgr.bin
+tests/load
+tests/query
