@@ -49,7 +49,7 @@ class Table {
 
     public:
 
-    std::vector<std::pair<int, void**>> get_records();
+    std::vector<std::pair<int, void**> > get_records();
     std::string get_name();
     std::string get_db_name();
     std::string get_table_name();

@@ -2,9 +2,12 @@ CC=g++-11
 CFLAGS = -g
 OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./amlayer/amlayer.a
 
-all: table.o schema.o main.o user.o db.o
+all: table.o schema.o txnmgr.o main.o user.o db.o
 	$(CC) -o main $(OBJ) schema.o table.o user.o db.o main.o
+	$(CC) -o txnmgr.bin $(OBJ) schema.o table.o user.o db.o txnmgr.o
 
+txnmgr.o: txnmgr.cpp
+	$(CC) -c -g txnmgr.cpp
 main.o: main.cpp
 	$(CC) -c -g main.cpp
 schema.o: schema.cc
