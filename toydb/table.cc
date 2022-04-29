@@ -203,7 +203,6 @@ bool Table::addRow(void* data[], bool update, bool log) {
 
     if(log){
         table_logs.push_back({'a', std::to_string(rid)});
-        std::cout << "Adding Record " << rid << std::endl;
     }
 
     for(int i=0; i<indexes.size(); i++){
@@ -705,7 +704,7 @@ Table decodeTable(byte* s, int max_len ) {
 
 void append(void* callbackObj, int rid, byte* row, int len){
     std::vector<std::pair<int, std::string> > * p = (std::vector<std::pair<int, std::string> > *) callbackObj;
-    std::string str(row, len);
+    std::string str(row, len+2);
     p->push_back({rid, str});
 }
 std::vector<std::pair<int, void**>> Table::get_records(){
@@ -716,11 +715,11 @@ std::vector<std::pair<int, void**>> Table::get_records(){
     Schema_ *sch = schema.getSchema();
     for (std::pair<int, std::string> p : returnal){
         char** data = new char*[sch->numColumns];
-        decode(sch, data, (char*)p.second.c_str() + 2, p.second.length());
-
-        for(int i=0; i<sch->numColumns; i++) {
-            std::cout << data[i] << std::endl;
-        }
+        decode(sch, data, (char*)p.second.c_str()+2, p.second.length());
+        // for(int i=0; i<sch->numColumns; i++) {
+        //     std::cout << data[i] << " ";
+        // }
+        // std::cout << std::endl;
         final_res.push_back({p.first, (void**)data});
 
     }
