@@ -1,7 +1,11 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sstream>
 #include "table.h"
+#include <dirent.h>
+#include <sys/types.h>
+#define checkerr(err, message) {if (err < 0) {std::cerr << (message) << std::endl; exit(1);}}
 
 #define SLOT_OFFSET 2
 #define HEADER_SIZE_OFFSET 2
@@ -9,6 +13,24 @@
 
 #define END_OF_PAGE PF_PAGE_SIZE
 
+int count = 0;
+
+
+static int count_files(const char *path) {
+    struct dirent *entry;
+    DIR *dir = opendir(path);
+    if (dir == NULL) {
+        return 0;
+    }
+
+    int count = 0;
+    while ((entry = readdir(dir)) != NULL) {
+       count++;
+    }
+
+    closedir(dir);
+    return count;
+}
 // get unique index number from cols of table
 int cols_to_indexNo(std::vector<int> cols, int maxcols)
 {
@@ -203,7 +225,6 @@ bool Table::addRow(void* data[], bool update, bool log) {
 
     if(log){
         table_logs.push_back({'a', std::to_string(rid)});
-        std::cout << "Adding Record " << rid << std::endl;
     }
 
     for(int i=0; i<indexes.size(); i++){
@@ -367,8 +388,15 @@ void Table::print() {
     Table_Scan(table, &sch, print_row);
 }
 
+std::string get_temp_name(){
+    std::stringstream ss;
+    ss << "result";
+    ss << count_files("temp/"); 
+    return ss.str();
+}
 Table* Table::query(bool (*callback)(RecId, byte*, int)){
-    Table *t = new Table(&schema, (char*)"result", (char*)this->db_name.c_str(), false, indexes);
+
+    Table *t = new Table(&schema, (char*)(get_temp_name().c_str()), (char*)("temp/" + this->db_name).c_str(), true, {}, false);
     int pageNo, err;
     char *pageBuf;
     Schema_ sch = *schema.getSchema();
@@ -386,18 +414,16 @@ Table* Table::query(bool (*callback)(RecId, byte*, int)){
                 if(len == -1) continue;
                 bool result = callback((pageNo << 16) | i, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
                 if (result){
-                    void** data = new void*[sch.numColumns];
-                    decode(&    sch, (char**)data, pageBuf + getNthSlotOffset(i, pageBuf)+2, len);
-                    t->addRow(data, false);
+                    t->addRowFromByte(pageBuf + getNthSlotOffset(i, pageBuf)+2, len, true);
                 }
             }
-            // if (err != PFE_PAGEFIXED) checkerr(PF_UnfixPage(table->fileDesc, pageNo, 0), "Table_ scan : unfix page");
+            if (err != PFE_PAGEFIXED) checkerr(PF_UnfixPage(table->fileDesc, pageNo, 0), "Table_ scan : unfix page");
             err = PF_GetNextPage(table->fileDesc, &pageNo, &pageBuf);
         } while( err >= 0 || err == PFE_PAGEFIXED );
         assert(err == PFE_EOF);
     }
-        // else
-        //     checkerr(err, "Table_ scan : get first page");
+        else
+            checkerr(err, "Table_ scan : get first page");
 
     return t;
 }
@@ -504,7 +530,7 @@ Table::~Table() {
 
 Table* Table::queryIndex(int indexNo, int op, std::vector<void*> values)
 {
-    Table *t = new Table(&schema, (char*)"result", (char*)this->db_name.c_str(), false, std::vector<IndexData>(), false);
+    Table *t = new Table(&schema, (char*)(get_temp_name().c_str()), (char*)("temp/" + this->db_name).c_str(), false, std::vector<IndexData>(), false);
     int pageNo, err;
     char *pageBuf;
     Schema_ sch = *schema.getSchema();
@@ -705,7 +731,7 @@ Table decodeTable(byte* s, int max_len ) {
 
 void append(void* callbackObj, int rid, byte* row, int len){
     std::vector<std::pair<int, std::string> > * p = (std::vector<std::pair<int, std::string> > *) callbackObj;
-    std::string str(row, len);
+    std::string str(row, len+2);
     p->push_back({rid, str});
 }
 std::vector<std::pair<int, void**>> Table::get_records(){
@@ -716,11 +742,11 @@ std::vector<std::pair<int, void**>> Table::get_records(){
     Schema_ *sch = schema.getSchema();
     for (std::pair<int, std::string> p : returnal){
         char** data = new char*[sch->numColumns];
-        decode(sch, data, (char*)p.second.c_str() + 2, p.second.length());
-
-        for(int i=0; i<sch->numColumns; i++) {
-            std::cout << data[i] << std::endl;
-        }
+        decode(sch, data, (char*)p.second.c_str()+2, p.second.length());
+        // for(int i=0; i<sch->numColumns; i++) {
+        //     std::cout << data[i] << " ";
+        // }
+        // std::cout << std::endl;
         final_res.push_back({p.first, (void**)data});
 
     }
@@ -742,7 +768,7 @@ Table* Table::project(std::vector<int> cols) {
         schema_cols.push_back({sch.columns[col].name, sch.columns[col].type});
 
     Schema *projectSchema = new Schema(schema_cols, cols);
-    Table* projectTable = new Table(projectSchema, (char*)"result", (char*)db_name.c_str(), true);
+    Table* projectTable = new Table(projectSchema, (char*)(get_temp_name().c_str()), (char*)("temp/" + db_name).c_str(), true);
 
     std::vector<std::pair<int, void**> > rows = get_records();
 
@@ -780,7 +806,7 @@ Table* table_union(Table* t1, Table* t2) {
         }
     }
 
-    Table* t = new Table(&s1, (char*)"result", (char*)t1->get_db_name().c_str(), true);
+    Table* t = new Table(&s1, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
     Table_Scan(t1->getTable(), t, copyRow);
     Table_Scan(t2->getTable(), t, copyRow);
     return t;
@@ -805,7 +831,7 @@ Table* table_intersect(Table* t1, Table *t2) {
         }
     }
 
-    Table* t = new Table(&s1, (char*)"result", (char*)t1->get_db_name().c_str(), true);
+    Table* t = new Table(&s1, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
     std::vector<std::pair<int, void**> > rows = t1->get_records();
     std::vector<int> pk_keys = s1.getpk();
     for(auto row: rows) {
@@ -864,7 +890,7 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int>
         pk.push_back(sch1->numColumns + i);
     }
     Schema *common = new Schema(cols_join, pk);
-    Table* t = new Table(common, (char*)"result", (char*)t1->get_db_name().c_str(), true);
+    Table* t = new Table(common, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
 
     std::vector<std::pair<int, void**>> t1_rows = t1->get_records();
     std::vector<std::pair<int, void**>> t2_rows = t2->get_records();

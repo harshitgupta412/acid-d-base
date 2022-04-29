@@ -277,3 +277,31 @@ bool Client::endTxn() {
 void Client::disconnect() {
     close(sock);
 }
+
+Client::Client(std::string user, std::string pass): user(user, pass) {
+    this->user = User(user, pass);
+}
+
+Client::Client(User *user) : user(*user){
+}
+
+
+bool Client::createTable(std::string dbname, std::string tablename, Schema s) {
+    Database db(&user);
+    db.connect(TABLEDIR + dbname);
+    Table* t = db.load(tablename);
+    if(t != NULL) {
+        return false;
+    }
+    t->close();
+    Table t2(&s, (char*)tablename.c_str(), (char*)dbname.c_str(), false, std::vector<IndexData>());
+    db.createTable(&t2);
+    return true;
+}
+
+bool Client::dropTable(std::string dbname, std::string tablename) {
+    Database db(&user);
+    db.connect(TABLEDIR + dbname);
+    Table* t = db.load(tablename);
+    db.deleteTable(t);
+}

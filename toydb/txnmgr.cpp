@@ -31,12 +31,58 @@ std::unordered_set<std::string> global_usr;
 std::unordered_map<std::string, std::unordered_map<std::string, int>> global_usr_db_perm;
 std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, int>>> global_usr_tbl_perm;
 
+void print_all_globals() 
+{
+	std::cout << "Global Db" << std::endl;
+	for(auto str: global_db)
+		std::cout << str << std::endl;
+	std::cout<<"\n----------------------------------------------------------------"<<std::endl;
+
+	std::cout << "Global Tbl" << std::endl;
+	for(auto m: global_tbl){
+		std::cout << "DB Name: " << m.first << std::endl;
+		for(auto str: m.second)
+			std::cout << str << std::endl;
+	}
+	std::cout<<"\n----------------------------------------------------------------"<<std::endl;
+
+	std::cout << "Global Usr" << std::endl;
+	for(auto str: global_usr)
+		std::cout << str << std::endl;
+	std::cout<<"\n----------------------------------------------------------------"<<std::endl;
+
+	std::cout << "Global Usr Db Perm" << std::endl;
+	for(auto m: global_usr_db_perm){
+		std::cout << "User Name: " << m.first << std::endl;
+		for(auto m1: m.second)
+			std::cout << m1.first << " " << m1.second << std::endl;
+	}
+	std::cout<<"\n----------------------------------------------------------------"<<std::endl;
+
+	std::cout << "Global Usr Tbl Perm" << std::endl;
+	for(auto m: global_usr_tbl_perm){
+		std::cout << "User Name: " << m.first << std::endl;
+		for(auto m1: m.second) {
+			std::cout << "Db Name: " << m1.first << std::endl;
+			for(auto m2: m1.second)
+				std::cout << m2.first << " " << m2.second << std::endl;
+		}
+	}
+	std::cout<<"\n----------------------------------------------------------------"<<std::endl;
+}
+
 void initialize_globals()
 {
+	createUserDb();
+    createPrivilegeTable();
+    createPrivilegeDb();
+    createDbList();
+    createDbTableList();
+
 	User u("SUPERUSER", "SUPERUSER_PASSWORD");
 	Database db(&u);
-	bool status = db.connect("DB");
-	if (status)
+	bool ret = db.connect("DB");
+	if (ret)
 	{
 		printf("Connected to DB\n");
 	}
@@ -50,8 +96,6 @@ void initialize_globals()
 	Table *tbl = db.load("DB_TABLE");
 	
 	std::vector<std::pair<int, void **>> dbs = tbl->get_records();
-	printf("aaaaa\n");
-	fflush(stdout);
 	for (int i = 0; i < dbs.size(); i++)
 	{
 		global_db.insert(std::string((char *)(dbs[i].second[0])));
@@ -61,6 +105,7 @@ void initialize_globals()
 	// tables
 	tbl = db.load("DB_CROSS_TABLE");
 	dbs = tbl->get_records();
+	// std::cout << "DB CROSS TABLE LOADED" << std::endl;
 	for (int i = 0; i < dbs.size(); i++)
 	{
 		std::string db_name = std::string((char *)(dbs[i].second[0]));
@@ -70,7 +115,7 @@ void initialize_globals()
 	tbl->close();
 
 	// users
-	db.connect("DB_USER_DB");
+	ret = db.connect("DB_USER_DB");
 	tbl = db.load("DB_USER_TABLE");
 	dbs = tbl->get_records();
 	for (int i = 0; i < dbs.size(); i++)
@@ -80,13 +125,17 @@ void initialize_globals()
 	}
 
 	// base perm
-	for (auto usr : global_usr)
+	for (auto usr : global_usr){
+		int perm = 0;
+		if (usr == "SUPERUSER")
+			perm = 2;
 		for (auto db : global_db)
 		{
-			global_usr_db_perm[usr][db] = 0;
+			global_usr_db_perm[usr][db] = perm;
 			for (auto tbl : global_tbl[db])
-				global_usr_tbl_perm[usr][db][tbl] = 0;
+				global_usr_tbl_perm[usr][db][tbl] = perm;
 		}
+	}
 
 	// user db perm
 	tbl = db.load("DB_USER_PRIV_DB");
@@ -260,6 +309,7 @@ void printTxn(Transaction txn)
 int main(int argc, char *argv[])
 {
 	initialize_globals();
+	print_all_globals();
 
 	int master_sock, c, read_size;
 	std::vector<int> client_sock;

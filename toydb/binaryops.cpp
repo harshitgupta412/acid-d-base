@@ -51,7 +51,6 @@ int main(){
     db.createTable(&tbl1);
     db.createTable(&tbl2);
 
-
     for (int i = 0; i < 3; i++){
         void **data = new void*[3];
         data[0] = (void*)name1[i].c_str(); data[1] = (void*)age1[i].c_str(); data[2] = (void*)sex1[i].c_str();

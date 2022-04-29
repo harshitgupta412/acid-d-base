@@ -14,8 +14,8 @@ Database::Database(User* current_user){
 
 bool Database::connect(std::string name) {
     db_table = connectDbList();
-    // todo check if user has permission
-    char *db_n = new char[name.length()];
+
+    char *db_n = new char[name.length()+1];
     strcpy(db_n,name.c_str());
 
     void** pk = new void*[1];
@@ -40,7 +40,7 @@ bool Database::create(std::string name) {
     if (fail){
         return false;
     }
-    char *db_n = new char[name.length()];
+    char *db_n = new char[name.length()+1];
     strcpy(db_n,name.c_str());
 
     void** data = new void*[1];
@@ -278,4 +278,57 @@ Table* connectDbTableList() {
     vector<IndexData> vi;
     Table* user_table = new Table(schema, db_cross_name, db_name, false, vi, 0);
     return user_table;
+}
+
+bool createDbList() {
+    Table* dbList = connectDbList();
+    char db[] = "DB";
+    void* data[1];
+    data[0] = (void*) db;
+    bool ret = dbList->addRow(data, true, true);
+    if(!ret) {
+        dbList->rollback();
+        return false;
+    }
+
+    char db1[] = "DB_USER_DB";
+    data[0] = (void*) db1;
+    ret = dbList->addRow(data, true, true);
+    if(!ret) {
+        dbList->rollback();
+        return false;
+    }
+    dbList->close();
+    return true;
+}
+
+bool addTableToList(std::string dbName, std::string tableName, Table* t) {
+    Table* dbTableList = connectDbTableList();
+
+    char *record = new char[MAX_PAGE_SIZE];
+    char *initial = record;
+    int spaceLeft = MAX_PAGE_SIZE;
+    int bytes_encoded = 0;
+    int len = EncodeCString((char*)dbName.c_str(), record, spaceLeft);
+    spaceLeft -= len;
+    record += len;
+    bytes_encoded += len;
+    int len2 = EncodeCString((char*)tableName.c_str(), record, spaceLeft);
+    spaceLeft -= len2;
+    record += len2;
+    bytes_encoded += len2;
+    std::string encoded = t->encodeTable();
+    memcpy(record, encoded.c_str(), encoded.size());
+    int len3 = encoded.size();
+    bool ret = dbTableList->addRowFromByte(initial, len + len2 + len3, true);
+    dbTableList->close();
+    return ret;
+}
+
+bool createDbTableList() {
+    addTableToList("DB", "DB_TABLE", connectDbList());
+    addTableToList("DB", "DB_CROSS_TABLE", connectDbTableList());
+    addTableToList("DB_USER_DB", "DB_USER_TABLE", connectUserTable());
+    addTableToList("DB_USER_DB", "DB_USER_PRIV_TABLE", connectUserPrivTable());
+    addTableToList("DB_USER_DB", "DB_USER_PRIV_DB", connectUserPrivDb());
 }

@@ -40,4 +40,8 @@ Table* connectDbTableList();
 bool isDb(std::string dbName);
 bool isTable(std::string dbName, std::string tableName);
 
+bool addTableToList(std::string dbName, std::string tableName, Table* t);
+bool createDbTableList();
+bool createDbList();
+
 #endif

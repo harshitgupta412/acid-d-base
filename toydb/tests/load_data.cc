@@ -109,6 +109,8 @@ int main(){
     bool success = createUserDb();
     createPrivilegeTable();
     createPrivilegeDb();
+    createDbList();
+    createDbTableList();
 
     User u("SUPERUSER", "SUPERUSER_PASSWORD");
 
