@@ -2,22 +2,14 @@
 #include <vector>
 using namespace std;
 
+bool Tautology(int, char*, int)
+{
+    return true;
+}
+
 int main() {
     User u("SUPERUSER", "SUPERUSER_PASSWORD");
-    Database db(&u);
-    if(!db.create("test")){
-        cout<<"hag diya gandu"<<endl;
-        exit(1);    
-    }
-    
-    vector<pair<string, int> > v(3);
-    v[0] = make_pair("name", VARCHAR);
-    v[1] = make_pair("age", INT);
-    v[2] = make_pair("salary", INT);
-
     Client c(&u);
-    Schema s(v, vector<int>(1, 1));
-    c.createTable("test", "test", s);
 
     c.connect2mngr();
     c.initTxn(u);
@@ -26,8 +18,14 @@ int main() {
     char name[] = "hello"; char age[] = "5"; char salary[] = "10";
     n[0] = name; n[1] = age; n[2] = salary;
     
-    c.add("test.test", (void**)n);
+    c.add("creme.pie1", (void**)n);
+    printf("add done\n");
+    QueryObj q("creme.pie1");
+    q.Select(&q,Tautology);
 
+    void **result;
+    c.evalQuery(q,&result);
     c.endTxn();
     c.disconnect();
+    
 }
