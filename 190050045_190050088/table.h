@@ -19,6 +19,7 @@ extern "C" {
 #include <string>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <assert.h>
 
 #define MAX_PAGE_SIZE 4000
@@ -45,7 +46,6 @@ class Table {
     std::vector<std::pair<char, std::string> > table_logs;
 
     void deleteRow(int rowId, bool log = false);
-    bool addRowFromByte(byte* record, int len, bool update);
 
     public:
 
@@ -57,6 +57,7 @@ class Table {
     Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, std::vector<IndexData> _indexes, bool index_pk = true);
 
     const Schema& getSchema();
+    Table_* getTable(); 
 
     bool addRow(void* data[], bool update, bool log = false);
 
@@ -67,6 +68,8 @@ class Table {
     void print();
 
     std::vector<char*> getPrimaryKey(); //
+
+    bool addRowFromByte(byte* record, int len, bool update);
 
     int createIndex(std::vector<int> col); //
 
@@ -84,9 +87,13 @@ class Table {
 
     void rollback();
     void clear_logs();
+
+    Table* project(std::vector<int> cols);      
 };
 
 Table decodeTable(byte* s, int max_len ); //
+Table* table_union(Table* t1, Table* t2);
+Table* tabe_intersect(Table* t1, Table* t2);
 Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2);
 
 #endif

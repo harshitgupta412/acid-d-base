@@ -179,6 +179,10 @@ const Schema& Table::getSchema() {
     return schema;
 }
 
+Table_* Table::getTable() {
+    return table;
+}
+
 bool Table::addRow(void* data[], bool update, bool log) {
     byte** pk_value = new byte*[pk_size];
     for(int i=0; i<pk_size; i++) {
@@ -684,6 +688,99 @@ std::vector<std::pair<int, void**>> Table::get_records(){
     }
     
     return final_res;
+}
+
+Table* Table::project(std::vector<int> cols) {
+    for(auto col: cols){
+        if (col < 0 || col >= schema.getSchema()->numColumns){
+            std::cout << "Invalid columns to project on" << std::endl;
+            return NULL;
+        }
+    }
+
+    std::vector<std::pair<std::string, int> > schema_cols;
+    Schema_ sch = *schema.getSchema();
+    for(auto col: cols)
+        schema_cols.push_back({sch.columns[col].name, sch.columns[col].type});
+
+    Schema *projectSchema = new Schema(schema_cols, cols);
+    Table* projectTable = new Table(projectSchema, (char*)"result", (char*)db_name.c_str(), true);
+
+    std::vector<std::pair<int, void**> > rows = get_records();
+
+    for(auto row: rows) {
+        void** projectRow = new void*[cols.size()];
+        for(int i = 0; i < cols.size(); i++) 
+            projectRow[i] = row.second[cols[i]];
+        projectTable->addRow(projectRow, true);
+        delete[] row.second;
+    }
+    return projectTable;
+}
+
+void copyRow(void* callbackObj, int rid, byte* row, int len) {
+    Table* t = (Table*) callbackObj;
+    t->addRowFromByte(row, len, true);
+}
+
+Table* table_union(Table* t1, Table* t2) {
+    Schema s1 = t1->getSchema();
+    Schema s2 = t2->getSchema();
+
+    if (t1->get_db_name() != t2->get_db_name()){
+        std::cerr << "Tables belong to different databases" << std::endl;
+        return NULL;
+    }
+    if (s1.getSchema()->numColumns != s2.getSchema()->numColumns){
+        std::cerr << "Schema of the 2 tables do not match" << std::endl;
+        return NULL;
+    }
+    for(int i = 0; i<s1.getSchema()->numColumns; i++) {
+        if(s1.getSchema()->columns[i].type != s2.getSchema()->columns[i].type) {
+            std::cerr << "Schema of the 2 tables do not match" << std::endl;
+            return NULL;
+        }
+    }
+
+    Table* t = new Table(&s1, (char*)"result", (char*)t1->get_db_name().c_str(), true);
+    Table_Scan(t1->getTable(), t, copyRow);
+    Table_Scan(t2->getTable(), t, copyRow);
+    return t;
+}
+
+Table* table_intersect(Table* t1, Table *t2) {
+    Schema s1 = t1->getSchema();
+    Schema s2 = t2->getSchema();
+
+    if (t1->get_db_name() != t2->get_db_name()){
+        std::cerr << "Tables belong to different databases" << std::endl;
+        return NULL;
+    }
+    if (s1.getSchema()->numColumns != s2.getSchema()->numColumns){
+        std::cerr << "Schema of the 2 tables do not match" << std::endl;
+        return NULL;
+    }
+    for(int i = 0; i<s1.getSchema()->numColumns; i++) {
+        if(s1.getSchema()->columns[i].type != s2.getSchema()->columns[i].type) {
+            std::cerr << "Schema of the 2 tables do not match" << std::endl;
+            return NULL;
+        }
+    }
+
+    Table* t = new Table(&s1, (char*)"result", (char*)t1->get_db_name().c_str(), true);
+    std::vector<std::pair<int, void**> > rows = t1->get_records();
+    std::vector<int> pk_keys = s1.getpk();
+    for(auto row: rows) {
+        void* pk[pk_keys.size()];
+        for(auto i: pk_keys)
+            pk[i] = row.second[pk_keys[i]];
+        void** res = t2->getRow(pk);
+        if(res == NULL)
+            continue;
+        t->addRow(row.second, true);
+    }
+
+    return t;
 }
 
 Table* table_join(Table* t1, Table* t2, std::vector<int> &cols1, std::vector<int> &cols2){
