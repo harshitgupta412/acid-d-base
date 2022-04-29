@@ -1,6 +1,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+
 #include "table.h"
 #include "db.h"
 #include "user.h"
@@ -8,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,82 +23,79 @@
 */
 
 std::unordered_set<std::string> global_db;
-std::unordered_map<std::string, std::unordered_set<std::string> > global_tbl;
-std::unordered_map<std::string, std::unordered_map<std::string, int> > global_tbl_readers;
-std::unordered_map<std::string, std::unordered_map<std::string, int> > global_tbl_writers;
+std::unordered_map<std::string, std::unordered_set<std::string>> global_tbl;
+std::unordered_map<std::string, std::unordered_map<std::string, int>> global_tbl_readers;
+std::unordered_map<std::string, std::unordered_map<std::string, int>> global_tbl_writers;
 
 std::unordered_set<std::string> global_usr;
-std::unordered_map<std::string, std::unordered_map<std::string, int> > global_usr_db_perm;
-std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, int> > > global_usr_tbl_perm;
+std::unordered_map<std::string, std::unordered_map<std::string, int>> global_usr_db_perm;
+std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, int>>> global_usr_tbl_perm;
 
 void initialize_globals()
 {
-    User u("SUPERUSER", "SUPERUSER_PASSWORD");
-    Database db(&u);
-	printf("kk1");
-    db.connect("DB");
-	printf("kk2");
+	User u("SUPERUSER", "SUPERUSER_PASSWORD");
+	Database db(&u);
+	db.connect("DB");
 
-    // databases
-    Table *tbl = db.load("DB_TABLE");
-    std::vector< std::pair <int, void**> > dbs = tbl->get_records();
-    for(int i = 0; i < dbs.size(); i++)
-    {
-        global_db.insert(std::string((char*)(dbs[i].second[0])));
-    }
-    tbl->close();
+	// databases
+	Table *tbl = db.load("DB_TABLE");
+	std::vector<std::pair<int, void **>> dbs = tbl->get_records();
+	for (int i = 0; i < dbs.size(); i++)
+	{
+		global_db.insert(std::string((char *)(dbs[i].second[0])));
+	}
+	tbl->close();
 
-    // tables
-    tbl = db.load("DB_CROSS_TABLE");
-    dbs = tbl->get_records();
-    for(int i = 0; i < dbs.size(); i++)
-    {
-        std::string db_name = std::string((char*)(dbs[i].second[0]));
-        std::string tbl_name = std::string((char*)(dbs[i].second[1]));
-        global_tbl[db_name].insert(tbl_name);
-    }
-    tbl->close();
+	// tables
+	tbl = db.load("DB_CROSS_TABLE");
+	dbs = tbl->get_records();
+	for (int i = 0; i < dbs.size(); i++)
+	{
+		std::string db_name = std::string((char *)(dbs[i].second[0]));
+		std::string tbl_name = std::string((char *)(dbs[i].second[1]));
+		global_tbl[db_name].insert(tbl_name);
+	}
+	tbl->close();
 
-    // users
-    db.connect("DB_USER_DB");
-    tbl = db.load("DB_USER_TABLE");
-    dbs = tbl->get_records();
-    for(int i = 0; i < dbs.size(); i++)
-    {
-        std::string user_name = std::string((char*)(dbs[i].second[0]));
-        global_usr.insert(user_name);
-    }
+	// users
+	db.connect("DB_USER_DB");
+	tbl = db.load("DB_USER_TABLE");
+	dbs = tbl->get_records();
+	for (int i = 0; i < dbs.size(); i++)
+	{
+		std::string user_name = std::string((char *)(dbs[i].second[0]));
+		global_usr.insert(user_name);
+	}
 
-    // base perm
-    for (auto usr : global_usr)
-        for (auto db : global_db)
-        {
-            global_usr_db_perm[usr][db] = 0;
-            for (auto tbl : global_tbl[db])
-                global_usr_tbl_perm[usr][db][tbl] = 0;
-        }
+	// base perm
+	for (auto usr : global_usr)
+		for (auto db : global_db)
+		{
+			global_usr_db_perm[usr][db] = 0;
+			for (auto tbl : global_tbl[db])
+				global_usr_tbl_perm[usr][db][tbl] = 0;
+		}
 
-    // user db perm
-    tbl = db.load("DB_USER_PRIV_DB");
-    dbs = tbl->get_records();
-    for(int i = 0; i < dbs.size(); i++)
-    {
-        std::string user_name = std::string((char*)(dbs[i].second[0]));
-        std::string db_name = std::string((char*)(dbs[i].second[1]));
-        global_usr_db_perm[user_name][db_name] = *(int*)(dbs[i].second[2]);
-    }
+	// user db perm
+	tbl = db.load("DB_USER_PRIV_DB");
+	dbs = tbl->get_records();
+	for (int i = 0; i < dbs.size(); i++)
+	{
+		std::string user_name = std::string((char *)(dbs[i].second[0]));
+		std::string db_name = std::string((char *)(dbs[i].second[1]));
+		global_usr_db_perm[user_name][db_name] = *(int *)(dbs[i].second[2]);
+	}
 
-    // user tbl perm
-    tbl = db.load("DB_USER_PRIV_TABLE");
-    dbs = tbl->get_records();
-    for(int i = 0; i < dbs.size(); i++)
-    {
-        std::string user_name = std::string((char*)(dbs[i].second[0]));
-        std::string db_name = std::string((char*)(dbs[i].second[1]));
-        std::string tbl_name = std::string((char*)(dbs[i].second[2]));
-        global_usr_tbl_perm[user_name][db_name][tbl_name] = *(int*)(dbs[i].second[3]);
-    }
-
+	// user tbl perm
+	tbl = db.load("DB_USER_PRIV_TABLE");
+	dbs = tbl->get_records();
+	for (int i = 0; i < dbs.size(); i++)
+	{
+		std::string user_name = std::string((char *)(dbs[i].second[0]));
+		std::string db_name = std::string((char *)(dbs[i].second[1]));
+		std::string tbl_name = std::string((char *)(dbs[i].second[2]));
+		global_usr_tbl_perm[user_name][db_name][tbl_name] = *(int *)(dbs[i].second[3]);
+	}
 }
 
 /* END globals */
@@ -105,292 +104,288 @@ void initialize_globals()
 	struct Transaction --  decoded from a client's request
 	this should be checked to be valid and accepted/rejected according to
 	R/W lock logic
-	On acceptance - 
-		send an OK response to client and wait on the connection for "timeout" ms
-		if the client responds with an in-out list before timeout -- spawn a thread to merge the list in the db
-			if the merge thread returns successfully -- send an ACCEPT response to client
-			else -- send a REJECT response to client
-		else -- send a REJECT response to client
-		close the connection
+*/
 
-struct Transaction
+class Transaction
 {
-	char* username;
-	int N;
-	char** db_name;
-	char** tbl_name;
-	int* access_type;
-	int timeout;
+public:
+	std::string username;
+	std::vector<std::string> readTables;
+	std::vector<std::string> writeTables;
 };
 
-struct Transaction decode_txn(char* buffer)
+int txnID = 0;
+std::unordered_map<int, Transaction *> txnMap;
+std::unordered_map<int, int> sockFD_txn;
+
+std::string concat_db_table(std::string db, std::string tbl)
 {
-	struct Transaction txn;
-	printf("starting decode\n");
-	int len = DecodeCString(buffer, &txn.username, MAX_STR_LEN);
-	printf("got username -- %s\n", txn.username);
-	buffer += len+4;
-	txn.N = DecodeInt(buffer);
-	printf("got N -- %d\n", txn.N);
-	buffer += 4;
-	txn.db_name = (char**)malloc(txn.N*sizeof(char*));
-	txn.tbl_name = (char**)malloc(txn.N*sizeof(char*));
-	txn.access_type = (int*)malloc(txn.N*sizeof(int));
-	for(int i=0; i<txn.N; i++)
-	{
-		len = DecodeCString(buffer, &txn.db_name[i], MAX_STR_LEN);
-		printf("got db_name[%d] -- %s\n", i, txn.db_name[i]);
-		buffer += len+4;
-		len = DecodeCString(buffer, &txn.tbl_name[i], MAX_STR_LEN);
-		printf("got tbl_name[%d] -- %s\n", i, txn.tbl_name[i]);
-		buffer += len+4;
-		txn.access_type[i] = DecodeInt(buffer);
-		printf("got access_type[%d] -- %d\n", i, txn.access_type[i]);
-		buffer += 4;
-	}
-	txn.timeout = DecodeInt(buffer);
-	printf("got timeout -- %d\n", txn.timeout);
-	return txn;
+	return db + "." + tbl;
 }
 
-void printTxn(struct Transaction txn)
+std::pair<std::string, std::string> deconcat_db_table(std::string db_tbl)
 {
-	printf("Username: %s\n", txn.username);
-	printf("N: %d\n", txn.N);
-	for(int i=0; i<txn.N; i++)
-	{
-		printf("db_name: %s\t", txn.db_name[i]);
-		printf("tbl_name: %s\t", txn.tbl_name[i]);
-		printf("access_type: %d\n", txn.access_type[i]);
-	}
-	printf("timeout: %d\n", txn.timeout);
+	int pos = db_tbl.find(".");
+	return std::make_pair(db_tbl.substr(0, pos), db_tbl.substr(pos + 1));
 }
 
-int validateTxn(struct Transaction txn)
+std::pair<int, int> decode_lock_request(char *buffer, int sockfd)
 {
-	int user_idx = -1;
-	for (int i = 0; i < global_user_count; ++i)
+	printf("Starting Decode\n");
+	int type = DecodeInt(buffer);
+	std::string dbname;
+	std::string tablename;
+	char *db_table_name;
+	char *username;
+	switch (type)
 	{
-		if(strcmp(global_user_list[i], txn.username) == 0)
+	// transaction request -- client sends username
+	case 0:
+		printf("Transaction Request\n");
+		if (sockFD_txn.find(sockfd) != sockFD_txn.end())
 		{
-			user_idx = i;
-			break;
+			printf("Transaction %d already active on socket %d\n", sockFD_txn[sockfd], sockfd);
+			return std::make_pair(0, -1);
 		}
+		DecodeCString2(buffer + 2, &username, 50);
+		printf("Username: %s\n", username);
+		txnID++;
+		txnMap[txnID] = new Transaction();
+		txnMap[txnID]->username = std::string(username);
+		free(username);
+		return std::make_pair(0, txnID);
+
+	// read request
+	case 1:
+		printf("Read Lock Request\n");
+		DecodeCString2(buffer + 2, &db_table_name, 50);
+		txnMap[sockFD_txn[sockfd]]->readTables.push_back(std::string(db_table_name));
+		dbname = deconcat_db_table(std::string(db_table_name)).first;
+		tablename = deconcat_db_table(std::string(db_table_name)).second;
+		printf("DB: %s, Table: %s\n", dbname.c_str(), tablename.c_str());
+		if (global_usr_tbl_perm[txnMap[sockFD_txn[sockfd]]->username][dbname][tablename] < 1)
+		{
+			printf("User %s does not have read permission on table %s.%s\n", txnMap[sockFD_txn[sockfd]]->username.c_str(), dbname.c_str(), tablename.c_str());
+			return std::make_pair(1, 0);
+		}
+		if (global_tbl_writers[dbname][tablename] != 0)
+		{
+			printf("Table %s.%s is currently being written to by another transaction\n", dbname.c_str(), tablename.c_str());
+			return std::make_pair(1, 0);
+		}
+		global_tbl_readers[dbname][tablename]++;
+		txnMap[sockFD_txn[sockfd]]->readTables.push_back(std::string(db_table_name));
+		free(db_table_name);
+		return std::make_pair(1, 1);
+
+	// write request
+	case 2:
+		printf("Write Lock Request\n");
+		DecodeCString2(buffer + 2, &db_table_name, 50);
+		dbname = deconcat_db_table(std::string(db_table_name)).first;
+		tablename = deconcat_db_table(std::string(db_table_name)).second;
+		printf("DB: %s, Table: %s\n", dbname.c_str(), tablename.c_str());
+		if (global_usr_tbl_perm[txnMap[sockFD_txn[sockfd]]->username][dbname][tablename] < 2)
+		{
+			printf("User %s does not have write permission on table %s.%s\n", txnMap[sockFD_txn[sockfd]]->username.c_str(), dbname.c_str(), tablename.c_str());
+			return std::make_pair(1, 0);
+		}
+		if (global_tbl_writers[dbname][tablename] != 0)
+		{
+			printf("Table %s.%s is currently being written to by another transaction\n", dbname.c_str(), tablename.c_str());
+			return std::make_pair(1, 0);
+		}
+		if (global_tbl_readers[dbname][tablename] != 0)
+		{
+			printf("Table %s.%s is currently being read from by another transaction\n", dbname.c_str(), tablename.c_str());
+			return std::make_pair(1, 0);
+		}
+		global_tbl_writers[dbname][tablename] = 1;
+		txnMap[sockFD_txn[sockfd]]->writeTables.push_back(std::string(db_table_name));
+		free(db_table_name);
+		return std::make_pair(1, 1);
+
+	// end txn request
+	case 3:
+		printf("End Transaction Request\n");
+		for (auto rtbl : txnMap[sockFD_txn[sockfd]]->readTables)
+		{
+			dbname = deconcat_db_table(std::string(rtbl)).first;
+			tablename = deconcat_db_table(std::string(rtbl)).second;
+			global_tbl_readers[dbname][tablename]--;
+		}
+		for (auto wtbl : txnMap[sockFD_txn[sockfd]]->writeTables)
+		{
+			dbname = deconcat_db_table(std::string(wtbl)).first;
+			tablename = deconcat_db_table(std::string(wtbl)).second;
+			global_tbl_writers[dbname][tablename] = 0;
+		}
+		delete txnMap[sockFD_txn[sockfd]];
+		txnMap.erase(sockFD_txn[sockfd]);
+		sockFD_txn.erase(sockfd);
+		return std::make_pair(3, 1);
+
+	default:
+		printf("Invalid Request\n");
+		return std::make_pair(-1, -1);
 	}
-	if(user_idx == -1)
-	{
-		printf("User not found\n");
-		return 0;
-	}
-
-	for (int i = 0; i < txn.N; ++i)
-	{
-		int db_idx = -1;
-		for (int j = 0; j < global_db_count; ++j)
-		{
-			if(strcmp(global_db_list[j], txn.db_name[i]) == 0)
-			{
-				db_idx = j;
-				break;
-			}
-		}
-		if(db_idx == -1)
-		{
-			printf("Database %d not found\n", i);
-			return 0;
-		}
-		// TODO -- check db level permissions after adding table creation, etc here
-
-		int tbl_idx = -1;
-		for (int j = 0; j < global_tbl_count[db_idx]; ++j)
-		{
-			if(strcmp(global_tbl_list[db_idx][j], txn.tbl_name[i]) == 0)
-			{
-				tbl_idx = j;
-				break;
-			}
-		}
-		if(tbl_idx == -1)
-		{
-			printf("Table %d not found\n", i);
-			return 0;
-		}
-		if(global_user_tbl_perm[user_idx][db_idx][tbl_idx] < txn.access_type[i])
-		{
-			printf("Access on Table %d with type %d not allowed\n", i, txn.access_type[i]);
-			return 0;
-		}
-
-		if (txn.access_type[i] == 1)
-		{
-			if(global_tbl_write_list[db_idx][tbl_idx] == 1)
-			{
-				printf("Table %d is currently open in write mode, declining read request\n", i);
-				return 0;
-			}
-		}
-		else if (txn.access_type[i] == 2)
-		{
-			if(global_tbl_read_list[db_idx][tbl_idx] > 0)
-			{
-				printf("Table %d is currently open in read mode, declining write request\n", i);
-				return 0;
-			}
-			else if (global_tbl_write_list[db_idx][tbl_idx] == 1)
-			{
-				printf("Table %d is currently open in write mode, declining write request\n", i);
-				return 0;
-			}
-		}
-	}
-
-	for (int i = 0; i < txn.N; ++i)
-	{
-		int db_idx = -1;
-		for (int j = 0; j < global_db_count; ++j)
-		{
-			if(strcmp(global_db_list[j], txn.db_name[i]) == 0)
-			{
-				db_idx = j;
-				break;
-			}
-		}
-		for (int j = 0; j < global_tbl_count[db_idx]; ++j)
-		{
-			if(strcmp(global_tbl_list[db_idx][j], txn.tbl_name[i]) == 0)
-			{
-				if(txn.access_type[i] == 2)
-				{
-					global_tbl_write_list[db_idx][j] = 1;
-				}
-				else if (txn.access_type[i] == 1)
-				{
-					global_tbl_read_list[db_idx][j]++;
-				}
-				break;
-			}
-		}
-	}
-
-	return 1;
-
 }
 
-void endTxn(struct Transaction txn)
+void printTxn(Transaction txn)
 {
-	for (int i = 0; i < txn.N; ++i)
-	{
-		int db_idx = -1;
-		for (int j = 0; j < global_db_count; ++j)
-		{
-			if(strcmp(global_db_list[j], txn.db_name[i]) == 0)
-			{
-				db_idx = j;
-				break;
-			}
-		}
-		for (int j = 0; j < global_tbl_count[db_idx]; ++j)
-		{
-			if(strcmp(global_tbl_list[db_idx][j], txn.tbl_name[i]) == 0)
-			{
-				if(txn.access_type[i] == 2)
-				{
-					global_tbl_write_list[db_idx][j] = 0;
-				}
-				else if (txn.access_type[i] == 1)
-				{
-					global_tbl_read_list[db_idx][j]--;
-				}
-				break;
-			}
-		}
-	}
+	printf("Username: %s\n", txn.username.c_str());
+	printf("Read Tables: ");
+	for (auto tbl : txn.readTables)
+		printf("%s ", tbl.c_str());
+	printf("\n");
+	printf("Write Tables: ");
+	for (auto tbl : txn.writeTables)
+		printf("%s ", tbl.c_str());
 }
 
 /* END Transaction */
 
-int main(int argc , char *argv[])
+int main(int argc, char *argv[])
 {
-    initialize_globals();
+	// initialize_globals();
 
-    // print everything
-    for (auto db : global_db)
-    {
-        printf("DB %s\n", db.c_str());
-        for (auto tbl : global_tbl[db])
-        {
-            printf("\tTBL %s\n", tbl.c_str());
-        }
-    }
+	int master_sock, c, read_size;
+	std::vector<int> client_sock;
+	struct sockaddr_in server, client;
+	char client_message[1024];
+	char server_message[1024];
 
-/*
-	// initialize_global_lists();
-
-	int socket_desc , client_sock , c , read_size;
-	struct sockaddr_in server , client;
-	char client_message[2000];
-	
-	//Create socket
-	socket_desc = socket(AF_INET, SOCK_STREAM, 0);
-	if (socket_desc == -1)
+	// Create socket
+	master_sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (master_sock == 0)
 	{
-		printf("Could not create socket");
+		fprintf(stderr, "Could not create master socket");
+		exit(1);
 	}
 	puts("Socket created");
-	
-	//Prepare the sockaddr_in structure
+
+	// Prepare the sockaddr_in structure
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons( 8900 );
-	
-	//Bind
-	if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
+	server.sin_port = htons(8900);
+
+	// Bind
+	if (bind(master_sock, (struct sockaddr *)&server, sizeof(server)) < 0)
 	{
-		//print the error message
+		// print the error message
 		perror("bind failed. Error");
 		return 1;
 	}
 	puts("bind done");
-	
-	//Listen
-	listen(socket_desc , 3);
-	
-	//Accept and incoming connection
+
+	// Listen
+	if (listen(master_sock, 3) < 0)
+	{
+		perror("listen failed. Error");
+		return 1;
+	}
+
+	// Accept and incoming connection
 	puts("Waiting for incoming connections...");
 	c = sizeof(struct sockaddr_in);
-	
+	fd_set readfds;
+	int max_sd;
+	// clear the socket set
+	FD_ZERO(&readfds);
+	// add master socket to set
+	FD_SET(master_sock, &readfds);
+	max_sd = master_sock;
+
 	while (1)
 	{
-		//accept connection from an incoming client
-		client_sock = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c);
-		if (client_sock < 0)
+		// add child sockets to set
+		for (int i = 0; i < client_sock.size(); i++)
 		{
-			perror("accept failed");
-			return 1;
+			// socket descriptor
+			int sd = client_sock[i];
+
+			// if valid socket descriptor then add to read list
+			if (sd > 0)
+				FD_SET(sd, &readfds);
+
+			// highest file descriptor number, need it for the select function
+			if (sd > max_sd)
+				max_sd = sd;
 		}
-		puts("Connection accepted");
-		
-		//Receive a message from client
-		while( (read_size = recv(client_sock , client_message , 2000 , 0)) > 0 )
+
+		// wait for an activity on one of the sockets , timeout is NULL ,
+		// so wait indefinitely
+		int activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
+
+		if ((activity < 0) && (errno != EINTR))
 		{
-			printf("size - %d\n", read_size);
-			struct Transaction txn = decode_txn(client_message);
-			printTxn(txn);
-			// send client OK
-			send(client_sock , "OK" , 2 , 0 );
+			printf("select error");
 		}
-		
-		if(read_size == 0)
+
+		// If something happened on the master socket ,
+		// then its an incoming connection
+		if (FD_ISSET(master_sock, &readfds))
 		{
-			puts("Client disconnected");
-			fflush(stdout);
+			int new_sock;
+			if ((new_sock = accept(master_sock, (struct sockaddr *)&client, (socklen_t *)&c)) < 0)
+			{
+				perror("accept");
+				exit(EXIT_FAILURE);
+			}
+
+			// inform user of socket number - used in send and receive commands
+			printf("New connection , socket fd is %d , ip is : %s , port : %d \n",
+				   new_sock, inet_ntoa(client.sin_addr), ntohs(client.sin_port));
+			client_sock.push_back(new_sock);
 		}
-		else if(read_size == -1)
+
+		// else its some IO operation on some other socket
+		for (int i = 0; i < client_sock.size(); i++)
 		{
-			perror("recv failed");
+			int sd = client_sock[i];
+
+			if (FD_ISSET(sd, &readfds))
+			{
+				// Check if it was for closing , and also read the
+				// incoming message
+				int valread;
+				if ((valread = read(sd, client_message, 1024)) == 0)
+				{
+					printf("Socket %d disconnected\n", sd);
+					if (sockFD_txn.find(sd) != sockFD_txn.end())
+					{
+						for (auto rtbl : txnMap[sockFD_txn[sd]]->readTables)
+						{
+							std::string dbname = deconcat_db_table(std::string(rtbl)).first;
+							std::string tablename = deconcat_db_table(std::string(rtbl)).second;
+							global_tbl_readers[dbname][tablename]--;
+						}
+						for (auto wtbl : txnMap[sockFD_txn[sd]]->writeTables)
+						{
+							std::string dbname = deconcat_db_table(std::string(wtbl)).first;
+							std::string tablename = deconcat_db_table(std::string(wtbl)).second;
+							global_tbl_writers[dbname][tablename] = 0;
+						}
+						printf("Transaction %d is forcefully aborted\n", sockFD_txn[sd]);
+						delete txnMap[sockFD_txn[sd]];
+						txnMap.erase(sockFD_txn[sd]);
+						sockFD_txn.erase(sd);
+					}
+					close(sd);
+					client_sock.erase(client_sock.begin() + i);
+				}
+
+				// Echo the correct code
+				else
+				{
+					client_message[valread] = '\0';
+					std::pair<int, int> temp = decode_lock_request(client_message, sd);
+					EncodeInt(temp.second, server_message);
+					send(sd, server_message, 4, 0);
+				}
+			}
 		}
 	}
-	
+
 	return 0;
-*/
 }
