@@ -39,12 +39,13 @@ class QueryObj {
     QueryObj();
 
     QueryObj(std::string _tbl);
-    QueryObj Select(QueryObj *q, bool (*callback)(int, char*, int));
-    QueryObj Select(QueryObj *q, int indexNo, int op, std::vector<void*> values);
-    QueryObj Project(QueryObj *q, std::vector<int> cols);
-    QueryObj Join(QueryObj *q1, QueryObj *q2, std::vector<int> cols1, std::vector<int> cols2);
-    QueryObj Union(QueryObj *q1, QueryObj *q2);
-    QueryObj Intersection(QueryObj *q1, QueryObj *q2);
+    QueryObj Select(bool (*callback)(int, char*, int));
+    QueryObj Select(int indexNo, int op, std::vector<void*> values);
+    QueryObj Project(std::vector<int> cols);
 };
+
+QueryObj Join(QueryObj *q1, QueryObj *q2, std::vector<int> cols1, std::vector<int> cols2);
+QueryObj Union(QueryObj *q1, QueryObj *q2);
+QueryObj Intersection(QueryObj *q1, QueryObj *q2);
 
 // #endif

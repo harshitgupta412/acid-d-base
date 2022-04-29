@@ -94,62 +94,83 @@ bool Client::initTxn(User _user) {
     }
 }
 
-Table* evalQueryTree(QueryObj* q, User user) {
+Table* Client::evalQueryTree(QueryObj* q, User user) {
     if( q->type == Identity_) {
         std::string dbname = q->tableName.substr(0, q->tableName.find('.'));
         std::string tablename = q->tableName.substr(q->tableName.find('.')+1, q->tableName.size());
-        Database db(&user);
-        db.connect(TABLEDIR + dbname);
-        Table* t = db.load(tablename);
+        Table* t;
+        if(openTables.count(q->tableName)) {
+            t = openTables[q->tableName];
+        }
+        else {
+            Database db(&user);
+            db.connect(TABLEDIR + dbname);
+            t = db.load(tablename);
+        }
         return t;
     }
     else if( q->type == SelectQ_) {
         Table* t = evalQueryTree(q->left, user);
         std::vector<int> cols;
         Table *t2 = t->query(q->callback);
-        delete t;
+        if(!openTables.count(t->get_name())) {
+            std::cout<<"ASsa"<<std::endl;
+            delete t;
+        }
         return t2;
     }
     else if( q->type == SelectO_) {
         Table* t = evalQueryTree(q->left, user);
         std::vector<int> cols;
         Table *t2 = t->queryIndex(q->indexNo, q->op, q->values);
-        delete t;
+        if(!openTables.count(t->get_name()))
+            delete t;
+        // delete t;
         return t2;
     }
     else if( q->type == Project_) {
         Table* t = evalQueryTree(q->left, user);
         Table* t2 = t->project(q->cols1);
-        delete t;
+        if(!openTables.count(t->get_name()))
+            delete t;
+        // delete t;
         return t2;
     }
     else if( q->type == Join_) {
         Table* t1 = evalQueryTree(q->left, user);
         Table* t2 = evalQueryTree(q->right, user);
         Table* t3 = table_join(t1, t2, q->cols1, q->cols2);
-        delete t1;
-        delete t2;
+        if(!openTables.count(t1->get_name()))
+            delete t1;
+        if(!openTables.count(t2->get_name()))
+            delete t2;
+        // delete t1;
+        // delete t2;
         return t3;
     }
     else if( q->type == Union_) {
         Table* t1 = evalQueryTree(q->left, user);
         Table* t2 = evalQueryTree(q->right, user);
         Table* t3 = table_union(t1, t2);
-        delete t1;
-        delete t2;
+        if(!openTables.count(t1->get_name()))
+            delete t1;
+        if(!openTables.count(t2->get_name()))
+            delete t2;
         return t3;
     }
     else {
         Table* t1 = evalQueryTree(q->left, user);
         Table* t2 = evalQueryTree(q->right, user);
         Table* t3 = table_intersect(t1, t2);
-        delete t1;
-        delete t2;
+        if(!openTables.count(t1->get_name()))
+            delete t1;
+        if(!openTables.count(t2->get_name()))
+            delete t2;
         return t3;
     }
 }
 
-bool Client::evalQuery(QueryObj q, void*** result) {
+bool Client::evalQuery(QueryObj q, void**** result, int &len) {
     for(auto t: q.usedTables) {
         char msg[MAXMSGLEN];
         int len = EncodeCString((char*)t.c_str(), msg, MAXMSGLEN);
@@ -169,12 +190,15 @@ bool Client::evalQuery(QueryObj q, void*** result) {
         }
     }
     Table * t = evalQueryTree(&q, user);
-    std::vector<std::pair<int,void**>> data = t->get_records();
-    result = (void***)malloc(sizeof(void**) * data.size());
+    std::vector<std::pair<int,void**>> data = t->get_records2();
+    *result = (void***)malloc(sizeof(void**) * data.size());
     for(int i = 0; i < data.size(); i++) {
-        result[i] = data[i].second;
+        (*result)[i] = data[i].second;
     }
-    delete t;
+    len = data.size();
+    if (!openTables.count(t->get_name())) {
+        delete t;
+    }
     return true;
 }
 
@@ -207,7 +231,12 @@ bool Client::add(std::string name, void** data) {
         openTables[name] = t;
         printf("Table %s opened\n", name.c_str());
     } 
-    return openTables[name]->addRow(data, false, true);
+    bool ret = openTables[name]->addRow(data, false, true);
+    if(!ret) {
+        rollback();
+        return false;
+    }
+    return true;
 }
 
 

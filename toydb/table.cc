@@ -121,7 +121,7 @@ void Table::deleteRow(int rowId, bool log){
     }
     
     if(log){
-        std::string val(record, num_bytes);
+        std::string val(record, num_bytes+1);
         table_logs.push_back({'d',val});
     }
 
@@ -671,7 +671,7 @@ std::string Table::encodeTable() {
 void Table::rollback() 
 {
     int i = table_logs.size();
-    return;
+    if(i==0) return;
     i--;
     for(i; i>=0; i--) {
         std::pair<char, std::string> log = table_logs[i];
