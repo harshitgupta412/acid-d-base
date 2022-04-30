@@ -2,7 +2,7 @@ CC=g++-11
 CFLAGS = -g
 OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./amlayer/amlayer.a SHA256.o
 
-all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o binaryops.o api.o api2.o api3.o parallel1.o parallel2.o domain.o
+all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o binaryops.o api.o api2.o api3.o parallel1.o parallel2.o load_add.o load_rm.o
 	$(CC) -o main.bin $(OBJ) schema.o table.o user.o db.o main.o
 	$(CC) -o txnmgr.bin $(OBJ) schema.o table.o user.o db.o txnmgr.o
 	$(CC) -o binaryops.bin $(OBJ) schema.o table.o user.o db.o binaryops.o
@@ -14,10 +14,14 @@ all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o b
 	$(CC) -o tests/query_intersect.bin  tests/query_intersect.cc $(OBJ) schema.o table.o user.o db.o
 	$(CC) -o parallel1.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o parallel1.o
 	$(CC) -o parallel2.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o parallel2.o
-	$(CC) -o domain.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o domain.o
+	$(CC) -o load_add.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o load_add.o
+	$(CC) -o load_rm.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o load_rm.o
 
-domain.o: api/domain.cpp client.o queryobj.o db.o
-	$(CC) -c -o domain.o api/domain.cpp
+load_add.o: api/load_add.cpp schema.o user.o db.o table.o client.o queryobj.o
+	$(CC) -c api/load_add.cpp
+
+load_rm.o: api/load_rm.cpp schema.o user.o db.o table.o client.o queryobj.o
+	$(CC) -c api/load_rm.cpp
 
 parallel1.o: api/parallel1.cpp client.o queryobj.o db.o
 	$(CC) -c api/parallel1.cpp

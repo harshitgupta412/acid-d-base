@@ -9,6 +9,7 @@
 #include "../table.h"
 #include "../db.h"
 #include "../user.h"
+#include "client.h"
 
 #define checkerr(err, message) {if (err < 0) {PF_PrintError(message); exit(1);}}
 
@@ -106,16 +107,6 @@ parseSchema(char *buf) {
 }
 
 int main(){
-    bool success = createUserDb();
-    createPrivilegeTable();
-    createPrivilegeDb();
-    createDbList();
-    createDbTableList();
-
-    User u("SUPERUSER", "SUPERUSER_PASSWORD");
-
-    Database db(&u);
-    db.create(DB_NAME);
 
     FILE *fp = fopen(CSV_NAME, "r");
     if (!fp) {
@@ -130,17 +121,11 @@ int main(){
         exit(EXIT_FAILURE);
     }
 
-    // Open main db file
-    Schema_ *sch = parseSchema(line);
-    Schema s(sch, vector<int>(1,0));
-    cout<<"Schema loaded"<<endl;
-    Table tbl(&s,"main",DB_NAME,true,vector<IndexData>());
-    Table tbl2(&s,"main2",DB_NAME,true,vector<IndexData>());
-    cout<<"Tables created"<<endl;
-    cout<<"----------------------------------------------------------------"<<endl;
-    tbl.createIndex(std::vector(1,2));
-    cout<<"Index created"<<endl;
-    cout<<"----------------------------------------------------------------"<<endl;
+    User u("SUPERUSER", "SUPERUSER_PASSWORD");
+    Client c(&u);
+
+    c.connect2mngr();
+    c.initTxn(u);
 
     char *tokens[MAX_TOKENS];
     char record[MAX_PAGE_SIZE];
@@ -148,24 +133,46 @@ int main(){
     cout<<"Adding rows"<<endl;
     while ((line = fgets(buf, MAX_LINE_LEN, fp)) != NULL) {
         int n = split(line, ",", tokens);
-        assert (n == sch->numColumns);
-        tbl.addRow((void**)tokens,true);
+        if (!c.add("SCUSTOM_SECOND_DB.main2",(void**)tokens)) {
+            c.rollback();
+            c.endTxn();
+            c.disconnect();
+            printf("Unable to add row : \n");
+            for (int i = 0; i < n; i++) {
+                printf("%s\t", tokens[i]);
+            }
+            printf("\n");
+            exit(1);
+        }
+        printf("successfully added : \n");
+        for (int i = 0; i < n; i++) {
+            printf("%s\t", tokens[i]);
+        }
+        printf("\n");
     }
     cout<<"----------------------------------------------------------------"<<endl;
     cout<<"Printing"<<endl;
-    tbl.print();
-    cout<<"----------------------------------------------------------------"<<endl;
-    db.createTable(&tbl);
-    db.createTable(&tbl2);
-
-    std::string a = tbl.encodeTable();
-
-    char* ptr = (char*)a.c_str();
-    tbl.close();
-
-    Table *b = db.load("main");
-    // b->print();
     
+    QueryObj q("SCUSTOM_SECOND_DB.main2");
+    void ***result;
+    int len;
+    if (!c.evalQuery(q,&result, len))
+    {
+        c.rollback();
+        c.endTxn();
+        c.disconnect();
+        exit(1);
+    }
+
+    for(int j=0;j<len;j++) {
+        for(int i = 0; i<3;i++) 
+            printf("%s\t",(char*)result[j][i]);
+        printf("\n");
+    }
+    cout<<"----------------------------------------------------------------"<<endl;
+    
+    c.endTxn();
+    c.disconnect();
 
     return 0;
 }
