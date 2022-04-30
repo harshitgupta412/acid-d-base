@@ -1,6 +1,6 @@
 CC=g++-11
 CFLAGS = -g
-OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./amlayer/amlayer.a
+OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./amlayer/amlayer.a SHA256.o
 
 all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o binaryops.o api.o api2.o api3.o
 	$(CC) -o main.bin $(OBJ) schema.o table.o user.o db.o main.o
@@ -39,10 +39,13 @@ schema.o: schema.cc
 	$(CC) -c -g schema.cc
 table.o: table.cc
 	$(CC) -c -g table.cc
-user.o: user.cc
+user.o: user.cc SHA256.o
 	$(CC) -c -g user.cc
 db.o: db.cc
 	$(CC) -c -g db.cc
+
+SHA256.o:
+	$(CC) -c -g SHA256.cpp
 
 load_data: schema.o user.o db.o table.o 
 	$(CC) -o tests/load tests/load_data.cc $(OBJ) schema.o table.o user.o db.o  
@@ -66,7 +69,10 @@ add_delete_table: schema.o user.o db.o table.o
 	$(CC) -o tests/add_delete_table tests/add_delete_table.cc $(OBJ) schema.o table.o user.o db.o  
 
 indexes: schema.o user.o db.o table.o 
-	$(CC) -o tests/indexes tests/indexes.cc $(OBJ) schema.o table.o user.o db.o          
+	$(CC) -o tests/indexes tests/indexes.cc $(OBJ) schema.o table.o user.o db.o     
+
+user_test: schema.o user.o db.o table.o 
+	$(CC) -o tests/user_permission tests/user.cc $(OBJ) schema.o table.o user.o db.o          
 
 clean:
 	rm -f *.o

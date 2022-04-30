@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "user.h"
+#include "sha256.h"
 #include <iostream>
 
 using namespace std;
@@ -27,11 +28,17 @@ User::User(string username, string password){
         user_table->close();
         return;
     }
-    long pass = DecodeLong((char*)data[1]);
-    hash<string> hasher;
-    long hashedPasswordGuess = hasher(password);
 
-    if (hashedPasswordGuess != pass){
+    char* buffer = (char*) data[1];
+    SHA256 sha;
+    sha.update(password);
+    uint8_t * digest = sha.digest();
+
+    string dig =  SHA256::toString(digest);
+
+    string stored = buffer;
+
+    if (dig != stored){
         std::cout << "Incorrect username or password" << std::endl;
         status = false;
         user_table->close();
@@ -54,10 +61,15 @@ bool User::addUser(std::string username, std::string password){
     char user[username.length()];
     strcpy(user,username.c_str());
 
-    hash<string> hasher;
-    std::string pass = std::to_string(hasher(password));
-    char* passCh = new char[pass.length() + 1];
-    strcpy(passCh, pass.c_str());
+    SHA256 sha;
+    sha.update(password);
+    uint8_t * digest = sha.digest();
+
+    string dig =  SHA256::toString(digest);
+
+    
+    char* passCh = new char[dig.length() + 1];
+    strcpy(passCh, dig.c_str());
     
     void* data[3];
     char is_admin[] = "0";
@@ -163,7 +175,7 @@ Table* connectUserTable() {
 
     std::vector<std::pair<std::string, int> > cols;
     cols.push_back({"username", VARCHAR});
-    cols.push_back({"password", LONG});
+    cols.push_back({"password", VARCHAR});
     cols.push_back({"admin", INT});
     vector<int> pk = {0};
 
@@ -214,11 +226,15 @@ bool createUserDb() {
     Table* user_table = connectUserTable();
 
     char username[] = "SUPERUSER";
-    hash<string> hasher;
-    long passLong = hasher("SUPERUSER_PASSWORD");
-    string pass = std::to_string(passLong);
-    char* password = new char[pass.length() + 1];
-    strcpy(password, pass.c_str());
+
+    SHA256 sha;
+    sha.update("SUPERUSER_PASSWORD");
+    uint8_t * digest = sha.digest();
+
+    string dig =  SHA256::toString(digest);
+
+    char* password = new char[dig.length() + 1];
+    strcpy(password, dig.c_str());
     char admin[] = "1";
 
     void* data[3];
