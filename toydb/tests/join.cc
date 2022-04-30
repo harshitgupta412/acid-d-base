@@ -16,7 +16,7 @@
 #define MAX_TOKENS 100
 #define MAX_LINE_LEN   1000
 
-#define DB_NAME "SCUSTOM_SECOND_DB"
+#define DB_NAME "TEST_DB"
 #define INDEX_NAME "FIRST_DB.0.idx"
 #define CSV_NAME "./dblayer/data.csv"
 
@@ -26,7 +26,7 @@ int main(){
     User u("SUPERUSER", "SUPERUSER_PASSWORD");
 
     Database db(&u);
-    db.connect(DB_NAME);
+    db.create(DB_NAME);
 
     Schema s = Schema({{"ID", VARCHAR}, {"VALUE", VARCHAR}}, {0});
 
@@ -45,8 +45,9 @@ int main(){
 
     t.addRow(row1, true);
     t.addRow(row2, true);
-    
+    std::cout << "Table 1" << std::endl;
     t.print();
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
     
 
 
@@ -63,11 +64,15 @@ int main(){
 
     t2.addRow(row3, true);
     t2.addRow(row4, true);
+    std::cout << "Table 2" << std::endl;
     t2.print();
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
 
 
     Table* joined = table_join(&t, &t2, {0}, {0});
+    std::cout << "Joined Table" << std::endl;
     joined->print();
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
     t.close();
     t2.close();
     

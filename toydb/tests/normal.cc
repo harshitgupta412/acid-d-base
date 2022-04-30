@@ -44,13 +44,15 @@ int main(){
     t.addRow(row1, true);
     t.addRow(row2, true);
 
-    
+    std::cout << "Initial Table" << std::endl;    
     t.print();
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
 
     void** pk = new void*[1]; pk[0] = (void*)(array[0]);
     t.deleteRow(pk);
+    std::cout << "After deleting row with primary key 4" << std::endl;
     t.print();
-
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
 
     Table t2(&s, "b", DB_NAME, true, {}, false);
 
@@ -65,14 +67,17 @@ int main(){
 
     t2.addRow(row3, true);
     t2.addRow(row4, true);
+    std::cout << "After adding a row and updating row with pk 1" << std::endl;
     t2.print();
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
     
 
     void** row5 = new void*[2];
     row5[0] = (void*)(array2[2]); row5[1] = (void*)(array2[1]);
 
-    t2.addRow(row5, true);
-    
+    t2.addRow(row5, false);
+    std::cout << "Adding row with pk 1 and no update" << std::endl;
     t2.print(); 
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
     return 0;
 }
