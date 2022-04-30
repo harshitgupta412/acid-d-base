@@ -135,7 +135,8 @@ int main(){
     Schema s(sch, vector<int>(1,0));
     cout<<"Schema loaded"<<endl;
     Table tbl(&s,"main",DB_NAME,true,vector<IndexData>());
-    cout<<"Table created"<<endl;
+    Table tbl2(&s,"main2",DB_NAME,true,vector<IndexData>());
+    cout<<"Tables created"<<endl;
     cout<<"----------------------------------------------------------------"<<endl;
     tbl.createIndex(std::vector(1,2));
     cout<<"Index created"<<endl;
@@ -155,6 +156,7 @@ int main(){
     // tbl.print();
     cout<<"----------------------------------------------------------------"<<endl;
     db.createTable(&tbl);
+    db.createTable(&tbl2);
 
     std::string a = tbl.encodeTable();
 

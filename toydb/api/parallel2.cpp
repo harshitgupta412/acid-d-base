@@ -18,7 +18,6 @@ int main() {
 
     char* n[3];
     char name[] = "hapipola"; char age[] = "221001"; char salary[] = "21220";
-    printf("%s\n", name);
 
     n[0] = name; n[1] = age; n[2] = salary;
 

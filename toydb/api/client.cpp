@@ -114,7 +114,6 @@ Table* Client::evalQueryTree(QueryObj* q, User user) {
         std::vector<int> cols;
         Table *t2 = t->query(q->callback);
         if(!openTables.count(t->get_name())) {
-            std::cout<<"ASsa"<<std::endl;
             delete t;
         }
         return t2;
