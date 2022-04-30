@@ -16,7 +16,7 @@
 #define MAX_TOKENS 100
 #define MAX_LINE_LEN   1000
 
-#define DB_NAME "TEST_DB"
+#define DB_NAME "DB_COUNTRY"
 #define INDEX_NAME "FIRST_DB.0.idx"
 #define CSV_NAME "./dblayer/data.csv"
 
