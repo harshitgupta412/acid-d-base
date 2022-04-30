@@ -294,8 +294,7 @@ bool Client::del(std::string name, void** pk) {
         db.connect(TABLEDIR + dbname);
         Table* t = db.load(tablename);
         openTables[name] = t;
-    } 
-    openTables[name]->print();
+    }
     return openTables[name]->deleteRow(pk, true);
 }
 

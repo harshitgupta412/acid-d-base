@@ -2,7 +2,7 @@ CC=g++-11
 CFLAGS = -g
 OBJ = ./dblayer/tbl.o ./dblayer/codec.o ./dblayer/util.o ./pflayer/pflayer.a ./amlayer/amlayer.a
 
-all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o binaryops.o api.o api2.o api3.o
+all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o binaryops.o api.o api2.o api3.o parallel1.o parallel2.o
 	$(CC) -o main.bin $(OBJ) schema.o table.o user.o db.o main.o
 	$(CC) -o txnmgr.bin $(OBJ) schema.o table.o user.o db.o txnmgr.o
 	$(CC) -o binaryops.bin $(OBJ) schema.o table.o user.o db.o binaryops.o
@@ -12,6 +12,14 @@ all: table.o schema.o txnmgr.o main.o user.o db.o client.o queryobj.o txnmgr.o b
 	$(CC) -o tests/query_union.bin  tests/query_union.cc $(OBJ) schema.o table.o user.o db.o
 	$(CC) -o tests/query_project.bin  tests/query_project.cc $(OBJ) schema.o table.o user.o db.o
 	$(CC) -o tests/query_intersect.bin  tests/query_intersect.cc $(OBJ) schema.o table.o user.o db.o
+	$(CC) -o parallel1.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o parallel1.o
+	$(CC) -o parallel2.bin $(OBJ) schema.o table.o user.o db.o client.o queryobj.o parallel2.o
+
+parallel1.o: api/parallel1.cpp client.o queryobj.o db.o
+	$(CC) -c api/parallel1.cpp
+
+parallel2.o: api/parallel2.cpp client.o queryobj.o db.o
+	$(CC) -c api/parallel2.cpp
 
 api3.o: api/api3.cpp client.o queryobj.o db.o
 	$(CC) -g -c api/api3.cpp

@@ -1,4 +1,5 @@
 #include "client.h"
+#include <unistd.h>
 #include <vector>
 using namespace std;
 
@@ -8,6 +9,7 @@ bool Tautology(int, char*, int)
 }
 
 int main() {
+
     User u("SUPERUSER", "SUPERUSER_PASSWORD");
     Client c(&u);
 
@@ -27,6 +29,8 @@ int main() {
         c.disconnect();
         exit(1);
     }
+    sleep(10);
+
     printf("add done\n");
 
     c.rollback();

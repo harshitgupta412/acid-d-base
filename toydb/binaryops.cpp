@@ -64,8 +64,11 @@ int main(){
     tbl2.print();
 
     table_intersect(&tbl1, &tbl2)->print();
-    // table_union(&tbl1, &tbl2)->print();
-    // table_join(&tbl1, &tbl2, {1}, {1})->print();
-    
+    table_union(&tbl1, &tbl2)->print();
+    table_join(&tbl1, &tbl2, {1}, {1})->print();
+
+    tbl1.close();
+    tbl2.close();
+
     return 0;
 }
