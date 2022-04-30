@@ -1,5 +1,7 @@
 #include "client.h"
 #include <vector>
+#include <unistd.h>
+
 using namespace std;
 
 bool Tautology(int, char*, int)
@@ -19,15 +21,7 @@ int main() {
     printf("%s\n", name);
 
     n[0] = name; n[1] = age; n[2] = salary;
-    
-    if (!c.add("creme.pie1", (void**)n))
-    {
-        c.rollback();
-        c.endTxn();
-        c.disconnect();
-        exit(1);
-    }
-    printf("add done\n");
+
     QueryObj q("creme.pie1");
     
     QueryObj q2 = q.Select(Tautology);
@@ -41,6 +35,8 @@ int main() {
         c.disconnect();
         exit(1);
     }
+
+    sleep(10);
 
     for(int j=0;j<len;j++) {
         for(int i = 0; i<3;i++) 

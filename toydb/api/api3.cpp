@@ -11,23 +11,21 @@ int main() {
     User u("SUPERUSER", "SUPERUSER_PASSWORD");
     Client c(&u);
 
+    char* n[1];
+    char age[] = "221001";
+
+    n[0] = age; // n[1] = age; n[2] = salary;
+
     c.connect2mngr();
     c.initTxn(u);
-
-    char* n[3];
-    char name[] = "hapipola"; char age[] = "221001"; char salary[] = "21220";
-    printf("%s\n", name);
-
-    n[0] = name; n[1] = age; n[2] = salary;
     
-    if (!c.add("creme.pie1", (void**)n))
-    {
-        c.rollback();
+    if(!c.del("creme.pie1", (void**)n)) {
         c.endTxn();
         c.disconnect();
-        exit(1);
+        return 1;
     }
-    printf("add done\n");
+    printf("delete done\n");
+
     QueryObj q("creme.pie1");
     
     QueryObj q2 = q.Select(Tautology);
@@ -48,6 +46,9 @@ int main() {
         printf("\n");
     }
     printf("eval done\n");
+
     c.endTxn();
+
     c.disconnect();
+    
 }

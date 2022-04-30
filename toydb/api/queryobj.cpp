@@ -6,34 +6,34 @@ QueryObj::QueryObj(std::string _tbl) {
     type = Identity_;
 }
 
-QueryObj QueryObj::Select(QueryObj *q, bool (*callback)(int, char*, int)) {
+QueryObj QueryObj::Select(bool (*callback)(int, char*, int)) {
     QueryObj newQuery;
     newQuery.type = SelectQ_;
     newQuery.callback = callback;
-    newQuery.left = q;
-    newQuery.usedTables = q->usedTables;
+    newQuery.left = this;
+    newQuery.usedTables = this->usedTables;
     return newQuery;
 }
 
-QueryObj QueryObj::Select(QueryObj *q, int indexNo, int op, std::vector<void*> values) {
+QueryObj QueryObj::Select(int indexNo, int op, std::vector<void*> values) {
     QueryObj newQuery;
     newQuery.type = SelectO_;
     newQuery.op = op;
     newQuery.values = values;
-    newQuery.left = q;
-    newQuery.usedTables = q->usedTables;
+    newQuery.left = this;
+    newQuery.usedTables = this->usedTables;
     newQuery.indexNo = indexNo;
     return newQuery;
 }
-QueryObj QueryObj::Project(QueryObj *q, std::vector<int> cols) {
+QueryObj QueryObj::Project(std::vector<int> cols) {
     QueryObj newQuery;
     newQuery.type = Project_;
     newQuery.cols1 = cols;
-    newQuery.left = q;
-    newQuery.usedTables = q->usedTables;
+    newQuery.left = this;
+    newQuery.usedTables = this->usedTables;
     return newQuery;
 }
-QueryObj QueryObj::Join(QueryObj *q1, QueryObj *q2, std::vector<int> cols1, std::vector<int> cols2) {
+QueryObj Join(QueryObj *q1, QueryObj *q2, std::vector<int> cols1, std::vector<int> cols2) {
     QueryObj newQuery;
     newQuery.type = Join_;
     newQuery.cols1 = cols1;
@@ -44,7 +44,7 @@ QueryObj QueryObj::Join(QueryObj *q1, QueryObj *q2, std::vector<int> cols1, std:
     newQuery.usedTables.insert(q2->usedTables.begin(), q2->usedTables.end());
     return newQuery;
 }
-QueryObj QueryObj::Union(QueryObj *q1, QueryObj *q2) {
+QueryObj Union(QueryObj *q1, QueryObj *q2) {
     QueryObj newQuery;
     newQuery.type = Union_;
     newQuery.left = q1;
@@ -53,7 +53,7 @@ QueryObj QueryObj::Union(QueryObj *q1, QueryObj *q2) {
     newQuery.usedTables.insert(q2->usedTables.begin(), q2->usedTables.end());
     return newQuery;
 }
-QueryObj QueryObj::Intersection(QueryObj *q1, QueryObj *q2) {
+QueryObj Intersection(QueryObj *q1, QueryObj *q2) {
     QueryObj newQuery;
     newQuery.type = Intersection_;
     newQuery.left = q1;
