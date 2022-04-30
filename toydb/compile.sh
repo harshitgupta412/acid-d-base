@@ -1,3 +1,6 @@
+rm -rf temp/;
+mkdir temp/;
+
 cd pflayer/;
 make clean;make;
 cd ../amlayer/;
