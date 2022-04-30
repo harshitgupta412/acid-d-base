@@ -16,7 +16,7 @@
 #define MAX_TOKENS 100
 #define MAX_LINE_LEN   1000
 
-#define DB_NAME "SCUSTOM_SECOND_DB"
+#define DB_NAME "TEST_DB"
 #define INDEX_NAME "FIRST_DB.0.idx"
 #define CSV_NAME "./dblayer/data.csv"
 
@@ -26,11 +26,11 @@ int main(){
     User u("SUPERUSER", "SUPERUSER_PASSWORD");
 
     Database db(&u);
-    db.connect(DB_NAME);
+    db.create(DB_NAME);
 
     Schema s = Schema({{"ID", VARCHAR}, {"VALUE", VARCHAR}}, {0});
 
-    Table t(&s, "a", DB_NAME, true, {}, false);
+    Table t(&s, "TEST_TABLE", DB_NAME, true, {}, false);
 
     char **array = new char*[4];
     array[0] = "4"; array[2] = "1";
@@ -43,12 +43,17 @@ int main(){
 
     t.addRow(row1, true);
     t.addRow(row2, true);
-    db.createTable(&t);
-
+    
+    std::cout << "Original (Db,Table)" << std::endl;
     db.print();
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
+    db.createTable(&t);
+    // std::cout << "After adding table";
+    // db.print();
+    // std::cout<<"----------------------------------------------------------------"<<std::endl;
 
 
-    Table t2(&s, "b", DB_NAME, true, {}, false);
+    Table t2(&s, "TEST_TABLE_2", DB_NAME, true, {}, false);
 
     char **array2 = new char*[4];
     array2[0] = "6";  array2[2] = "1";
@@ -63,11 +68,13 @@ int main(){
     t2.addRow(row4, true);
 
     db.createTable(&t2);
-
+    std::cout << "After adding 2 tables";
     db.print();
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
 
     db.deleteTable(&t);
-
+    std::cout << "After deleting TEST_TABLE" << std::endl;
     db.print();
+    std::cout<<"----------------------------------------------------------------"<<std::endl;
     return 0;
 }

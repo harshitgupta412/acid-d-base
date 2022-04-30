@@ -990,7 +990,7 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int>
     Schema *common = new Schema(cols_join, pk);
     Table* t = new Table(common, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
 
-    common->print();
+    // common->print();
     std::vector<std::pair<int, void**>> t1_rows = t1->get_records2();
     std::vector<std::pair<int, void**>> t2_rows = t2->get_records2();
 
