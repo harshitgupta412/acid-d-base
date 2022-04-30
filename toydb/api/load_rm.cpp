@@ -17,7 +17,7 @@
 #define MAX_TOKENS 100
 #define MAX_LINE_LEN   1000
 
-#define DB_NAME "SCUSTOM_SECOND_DB"
+#define DB_NAME "DB_COUNTRY"
 #define INDEX_NAME "FIRST_DB.0.idx"
 #define CSV_NAME "./dblayer/data.csv"
 
@@ -133,7 +133,7 @@ int main(){
     cout<<"Deleting rows"<<endl;
     while ((line = fgets(buf, MAX_LINE_LEN, fp)) != NULL) {
         int n = split(line, ",", tokens);
-        if (!c.del("SCUSTOM_SECOND_DB.main2",(void**)tokens)) {
+        if (!c.del("DB_COUNTRY.main2",(void**)tokens)) {
             c.rollback();
             c.endTxn();
             c.disconnect();
@@ -153,7 +153,7 @@ int main(){
     cout<<"----------------------------------------------------------------"<<endl;
     cout<<"Printing"<<endl;
     
-    QueryObj q("SCUSTOM_SECOND_DB.main2");
+    QueryObj q("DB_COUNTRY.main2");
     void ***result;
     int len;
     if (!c.evalQuery(q,&result, len))
