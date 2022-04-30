@@ -12,7 +12,7 @@ int main() {
     Client c(&u);
 
     char* n[1];
-    char name[] = "hello8"; char age[] = "115244"; char salary[] = "122210";
+    char name[] = "hello3"; char age[] = "151"; char salary[] = "1220";
     printf("%s\n", name);
 
     n[0] = age;// n[1] = age; n[2] = salary;

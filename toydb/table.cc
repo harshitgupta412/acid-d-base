@@ -171,7 +171,7 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
     }
     name = table_name;
     std::vector<int> _pk = _schema->getpk();
-    pk_index = new int[_pk.size()];
+    pk_index = new int[_pk.size()+1];
     for(int i=0; i<_pk.size(); i++) {
         pk_index[i] = _pk[i];
     }
@@ -195,6 +195,7 @@ Table::Table(Schema* _schema, char* table_name, char* db_name, bool overwrite, s
             createIndex(indexNo_to_cols(index.indexNo, schema.getSchema()->numColumns, index.numCols));
         } 
     }
+
 }
 
 const Schema& Table::getSchema() {
@@ -711,7 +712,6 @@ Table decodeTable(byte* s, int max_len ) {
     free(r);
     s += len+2;
     Schema schema = decodeSchema(s, max_len, &len);
-
     s+=len;
     int num_indexes = DecodeInt(s);
     s += sizeof(int);
@@ -992,7 +992,6 @@ Table* table_join(Table* t1, Table* t2, std::vector<int> cols1, std::vector<int>
     Schema *common = new Schema(cols_join, pk);
     Table* t = new Table(common, (char*)(get_temp_name().c_str()), (char*)("temp/" + t1->get_db_name()).c_str(), true);
 
-    common->print();
     std::vector<std::pair<int, void**>> t1_rows = t1->get_records2();
     std::vector<std::pair<int, void**>> t2_rows = t2->get_records2();
 
@@ -1065,8 +1064,8 @@ Table::Table(Table* t2) : schema(&(t2->schema)) {
     name = t2->name;
     db_name = t2->db_name;
     pk_index = new int[t2->pk_size];
-    memcpy(pk_index, t2->pk_index, pk_size*sizeof(int));
     pk_size = t2->pk_size;
+    for(int i=0;i<pk_size;i++) pk_index[i] = t2->pk_index[i];
     indexes = t2->indexes;
     table = new Table_;
     memcpy(table, t2->table, sizeof(Table_));

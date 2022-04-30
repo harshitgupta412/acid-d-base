@@ -20,7 +20,7 @@ int main() {
 
     n[0] = name; n[1] = age; n[2] = salary;
     
-    c.add("creme.pie1", (void**)n);
+    // c.add("creme.pie1", (void**)n);
     printf("add done\n");
     QueryObj q("creme.pie1");
     
@@ -37,5 +37,4 @@ int main() {
     printf("eval done\n");
     c.endTxn();
     c.disconnect();
-    
 }
