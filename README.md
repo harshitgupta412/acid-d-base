@@ -24,7 +24,7 @@ Finally, we created a transaction manager class which will manage all the locks 
     - We use sockets to create a server and client side for inter process communications
     - A client can initiate a transaction, perform queries and finally end the transaction, which commits it.
     - The daemon process allows for concurrency of requests with locking at the table level to allow multiple reads and single write
-- We also create a simplistic evaluation engine working like 
+- We also created a simplistic evaluation engine
     - It uses relational algebra as a base to form an evaluation tree structure which is eagerly computed
     - Using this evaluation we can find out which locks are required and use it to implement a Two Phase Locking protocol.
 
